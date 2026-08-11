@@ -3,61 +3,49 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Native\Mobile\Facades\SecureStorage;
-use Native\Mobile\Facades\Device;
-use native\Mobile\Facades\Dialog;
+use App\Models\User;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $users = User::paginate(10);
+
+        return view('users.index', ['users' => $users]);
+    }
+
     public function edit($id)
     {
-        // $response = Http::baseUrl(config('api.base_url'))->acceptJson()->withToken(SecureStorage::get('api_token'))->get("/users/{$id}");
-        $response = Http::baseUrl(config('api.base_url'))->acceptJson()->withToken(session('api_token'))->get("/users/{$id}");
+        $user = User::findOrFail($id);
 
-        if ($response->failed()) {
-            abort(404);
-        }
-
-        return view('users.edit', ['user' => $response->json()]);
+        return view('users.edit', ['user' => $user]);
     }
 
     public function update(Request $request, $id)
     {
+        $user = User::findOrFail($id);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'min:4'],
-            'email' => ['required', 'string', 'email', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
         ]);
 
-        // $response = Http::baseUrl(config('api.base_url'))->acceptJson()->withToken(SecureStorage::get('api_token'))->put("/users/{$id}", $validated);
-        $response = Http::baseUrl(config('api.base_url'))->acceptJson()->withToken(session('api_token'))->put("/users/{$id}", $validated);
+        $user->update($validated);
 
-        if ($response->failed()) {
-            return back()
-                ->withErrors($response->json('errors') ?? ['email' => 'Update failed.'])
-                ->withInput();
-        }
-        Device::vibrate();
-        Dialog::toast("User updated successfully.");
-        return redirect()->route('home');
+        return redirect()->route('users.index')->with('status', 'User updated.');
     }
 
     public function destroy($id)
     {
-        $response = Http::baseUrl(config('api.base_url'))
-            ->acceptJson()
-            // ->withToken(SecureStorage::get('api_token'))
-            ->withToken(session('api_token'))
-            ->delete("/users/{$id}");
+        $user = User::findOrFail($id);
 
-        if ($response->failed()) {
-            return redirect()->route('home')
-                ->withErrors(['delete' => $response->json('message') ?? 'Delete failed.']);
+        if ($user->id === auth()->id()) {
+            return redirect()->route('users.index')
+                ->withErrors(['delete' => 'You cannot delete your own account.']);
         }
 
-        Device::vibrate();
-        Dialog::toast('User deleted.');
+        $user->delete();
 
-        return redirect()->route('home');
+        return redirect()->route('users.index')->with('status', 'User deleted.');
     }
 }

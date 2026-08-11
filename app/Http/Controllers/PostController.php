@@ -3,25 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Models\Post;
+use Illuminate\Support\Str;
+use Native\Mobile\Facades\Camera;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
     public function index(Request $request)
     {
-        $response = Http::baseUrl(config('api.base_url'))
-            ->acceptJson()
-            ->withToken(session('api_token'))
-            ->get('/posts', ['page' => $request->query('page', 1)]);
-
-        $data = $response->json();
+        $posts = auth()->user()->posts()->latest()->paginate(10);
 
         return view('posts.index', [
-            'posts' => $data['data'],
-            'meta' => [
-                'current_page' => $data['current_page'],
-                'last_page' => $data['last_page'],
-            ],
+            'posts' => $posts,
         ]);
     }
 
@@ -37,67 +31,65 @@ class PostController extends Controller
             'body' => ['required', 'string'],
         ]);
 
-        $payload = $validated;
+        $photoUrl = null;
 
-        if ($request->input('photo_base64')) {
-            $payload['photo_base64'] = $request->input('photo_base64');
+        if (session('temp_photo_base64')) {
+            $photoData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', session('temp_photo_base64')));
+            $filename = 'posts/' . uniqid() . '.jpg';
+            \Storage::disk('local')->put($filename, $photoData);
+            $photoUrl = $filename;
+            session()->forget('temp_photo_base64');
         }
 
-        $response = Http::baseUrl(config('api.base_url'))
-            ->acceptJson()
-            ->withToken(session('api_token'))
-            ->post('/posts', $payload);
-
-        if ($response->failed()) {
-            return back()
-                ->withErrors($response->json('errors') ?? ['title' => 'Could not create post.'])
-                ->withInput();
-        }
+        auth()->user()->posts()->create([
+            'title' => $validated['title'],
+            'slug' => Str::slug($validated['title']) . '-' . uniqid(),
+            'body' => $validated['body'],
+            'photo_url' => $photoUrl,
+            'published_at' => now(),
+        ]);
 
         return redirect()->route('posts.index')->with('status', 'Post created.');
     }
 
     public function edit($id)
     {
-        $response = Http::baseUrl(config('api.base_url'))
-            ->acceptJson()
-            ->withToken(session('api_token'))
-            ->get("/posts/{$id}");
-
-        if ($response->failed()) {
-            abort(404);
+        $post = Post::findOrFail($id);
+        
+        if (Gate::denies('update', $post)) {
+            abort(403);
         }
 
-        return view('posts.edit', ['post' => $response->json()]);
+        return view('posts.edit', ['post' => $post]);
     }
 
     public function update(Request $request, $id)
     {
+        $post = Post::findOrFail($id);
+        
+        if (Gate::denies('update', $post)) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string'],
         ]);
 
-        $response = Http::baseUrl(config('api.base_url'))
-            ->acceptJson()
-            ->withToken(session('api_token'))
-            ->put("/posts/{$id}", $validated);
-
-        if ($response->failed()) {
-            return back()
-                ->withErrors($response->json('errors') ?? ['title' => 'Could not update post.'])
-                ->withInput();
-        }
+        $post->update($validated);
 
         return redirect()->route('posts.index')->with('status', 'Post updated.');
     }
 
     public function destroy($id)
     {
-        Http::baseUrl(config('api.base_url'))
-            ->acceptJson()
-            ->withToken(session('api_token'))
-            ->delete("/posts/{$id}");
+        $post = Post::findOrFail($id);
+        
+        if (Gate::denies('delete', $post)) {
+            abort(403);
+        }
+
+        $post->delete();
 
         return redirect()->route('posts.index')->with('status', 'Post deleted.');
     }

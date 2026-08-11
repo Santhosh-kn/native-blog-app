@@ -4,30 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Native\Mobile\Facades\Camera;
-use Illuminate\Support\Facades\Storage;
+
 
 class CameraController extends Controller
 {
-    public function capture()
-    {
-        try {
+    public function capture(){
+        try{
             $photo = Camera::getPhoto([
-                'quality' => 80,
-                'resultType' => 'base64',
+                'quality' => 100,
+                'resultType' => 'base64'
             ]);
 
-            // Store in session temporarily
             session(['temp_photo_base64' => $photo]);
-
             return response()->json([
                 'success' => true,
-                'photo' => $photo,
+                'photo' => $photo
             ]);
-        } catch (\Exception $e) {
+        } catch(\Exception $e){
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to capture photo: ' . $e->getMessage(),
+                'message' => $e->getMessage()
             ], 500);
         }
     }
 }
+

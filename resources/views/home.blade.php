@@ -7,61 +7,59 @@
     <style>
         body { font-family: -apple-system, sans-serif; padding: 24px; background: #f5f5f5; }
         button, .btn { padding: 8px 14px; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn-logout { background: #d33; color: white; padding: 12px 20px; font-size: 16px; border-radius: 8px; }
+        .btn-primary { background: #04ABA6; color: white; padding: 10px 16px; }
         .btn-edit { background: #04ABA6; color: white; }
         .btn-delete { background: #999; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { text-align: left; padding: 10px; font-size: 14px; border-bottom: 1px solid #eee; }
-        th { background: #eee; }
+        .post-card { background: white; border-radius: 8px; padding: 16px; margin-top: 12px; }
+        .post-card h3 { margin: 0 0 6px; }
+        .post-card p { margin: 0 0 10px; font-size: 14px; color: #555; }
+        .post-card img { width: 100%; height: auto; border-radius: 6px; margin-bottom: 12px; }
         .actions { display: flex; gap: 6px; }
         .pagination { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
         .status { background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; margin-top: 16px; }
-        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin-top: 16px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; }
+        .back { display: inline-block; margin-top: 16px; }
     </style>
 </head>
 <body>
-    <h1>Welcome, {{ session('api_user')['name'] }}</h1>
+    <div class="top-bar">
+        <h1>My Posts</h1>
+        <a href="{{ route('posts.create') }}" class="btn btn-primary">New Post</a>
+    </div>
 
-    <p><a href="{{ route('posts.index') }}">Manage Posts</a></p>
-    
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="btn-logout">Logout</button>
-    </form>
+    @if (session('status'))
+        <p class="status">{{ session('status') }}</p>
+    @endif
 
-    @error('delete')
-        <p class="error">{{ $message }}</p>
-    @enderror
-
-    <h2>Registered users</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Actions</th>
-        </tr>
-        @foreach ($users as $user)
-            <tr>
-                <td>{{ $user['id'] }}</td>
-                <td>{{ $user['name'] }}</td>
-                <td>{{ $user['email'] }}</td>
-                <td class="actions">
-                    <a href="{{ route('users.edit', $user['id']) }}" class="btn btn-edit">Edit</a>
-                    <form method="POST" action="{{ route('users.destroy', $user['id']) }}" onsubmit="return confirm('Delete this user?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-delete">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </table>
+    @forelse ($posts as $post)
+        <div class="post-card">
+            @if ($post->photo_url)
+                <img src="{{ asset('storage/' . $post->photo_url) }}">
+            @endif
+            <h3>{{ $post->title }}</h3>
+            <p>{{ Str::limit($post->body, 100) }}</p>
+            <div class="actions">
+                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-edit">Edit</a>
+                <form method="POST" action="{{ route('posts.destroy', $post->id) }}" onsubmit="return confirm('Delete this post?');" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-delete">Delete</button>
+                </form>
+            </div>
+        </div>
+    @empty
+        <p>No posts yet. <a href="{{ route('posts.create') }}">Create one</a></p>
+    @endforelse
 
     <div class="pagination">
-        <span>@if ($meta['current_page'] > 1)<a href="{{ route('home', ['page' => $meta['current_page'] - 1]) }}">&laquo; Prev</a>@endif</span>
-        <span>Page {{ $meta['current_page'] }} of {{ $meta['last_page'] }}</span>
-        <span>@if ($meta['current_page'] < $meta['last_page'])<a href="{{ route('home', ['page' => $meta['current_page'] + 1]) }}">Next &raquo;</a>@endif</span>
+        <span>@if ($posts->onFirstPage()) &laquo; Prev @else <a href="{{ $posts->previousPageUrl() }}">&laquo; Prev</a> @endif</span>
+        <span>Page {{ $posts->currentPage() }} of {{ $posts->lastPage() }}</span>
+        <span>@if ($posts->hasMorePages()) <a href="{{ $posts->nextPageUrl() }}">Next &raquo;</a> @else Next &raquo; @endif</span>
     </div>
+
+    <form method="POST" action="{{ route('logout') }}" style="margin-top: 24px;">
+        @csrf
+        <button type="submit" class="btn" style="background: #d33;">Logout</button>
+    </form>
 </body>
 </html>

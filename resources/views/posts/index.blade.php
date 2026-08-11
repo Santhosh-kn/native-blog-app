@@ -34,14 +34,14 @@
 
     @forelse ($posts as $post)
         <div class="post-card">
-            @if ($post['photo_url'])
-                <img src="{{ $post['photo_url'] }}">
+            @if ($post->photo_url)
+                <img src="{{ asset('storage/' . $post->photo_url) }}" style="width: 100%; height: auto; border-radius: 6px; margin-bottom: 12px;">
             @endif
-            <h3>{{ $post['title'] }}</h3>
-            <p>{{ Str::limit($post['body'], 100) }}</p>
+            <h3>{{ $post->title }}</h3>
+            <p>{{ Str::limit($post->body, 100) }}</p>
             <div class="actions">
-                <a href="{{ route('posts.edit', $post['id']) }}" class="btn btn-edit">Edit</a>
-                <form method="POST" action="{{ route('posts.destroy', $post['id']) }}" onsubmit="return confirm('Delete this post?');" style="display: inline;">
+                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-edit">Edit</a>
+                <form method="POST" action="{{ route('posts.destroy', $post->id) }}" onsubmit="return confirm('Delete this post?');" style="display: inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-delete">Delete</button>
@@ -53,9 +53,9 @@
     @endforelse
 
     <div class="pagination">
-        <span>@if ($meta['current_page'] > 1)<a href="{{ route('posts.index', ['page' => $meta['current_page'] - 1]) }}">&laquo; Prev</a>@endif</span>
-        <span>Page {{ $meta['current_page'] }} of {{ $meta['last_page'] }}</span>
-        <span>@if ($meta['current_page'] < $meta['last_page'])<a href="{{ route('posts.index', ['page' => $meta['current_page'] + 1]) }}">Next &raquo;</a>@endif</span>
+        <span>@if ($posts->onFirstPage()) &laquo; Prev @else <a href="{{ $posts->previousPageUrl() }}">&laquo; Prev</a> @endif</span>
+        <span>Page {{ $posts->currentPage() }} of {{ $posts->lastPage() }}</span>
+        <span>@if ($posts->hasMorePages()) <a href="{{ $posts->nextPageUrl() }}">Next &raquo;</a> @else Next &raquo; @endif</span>
     </div>
 
     <a href="{{ route('home') }}" class="back">&larr; Back to home</a>

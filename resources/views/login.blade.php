@@ -10,8 +10,6 @@
         label { font-size: 14px; font-weight: 600; }
         input { padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; width: 100%; box-sizing: border-box; }
         button { padding: 12px; font-size: 16px; background: #04ABA6; color: white; border: none; border-radius: 8px; margin-top: 8px; }
-        .google-btn { background: #4285F4; margin-top: 16px; }
-        .divider { text-align: center; margin: 16px 0; font-size: 12px; color: #999; }
         .error { color: #d33; font-size: 13px; margin: 0; }
         a { color: #04ABA6; text-decoration: none; }
     </style>
@@ -32,45 +30,8 @@
         <button type="submit">Login</button>
     </form>
 
-    <div class="divider">OR</div>
-
-    <button type="button" class="google-btn" id="google-signin-btn">Sign in with Google</button>
-
     <p style="text-align: center; margin-top: 16px; font-size: 14px;">
         Don't have an account? <a href="{{ route('register') }}">Register</a>
     </p>
-
-    <script type="module">
-        import { GoogleAuth } from '#nativephp';
-
-        document.getElementById('google-signin-btn').addEventListener('click', async () => {
-            try {
-                const result = await GoogleAuth.signIn();
-                
-                if (result.idToken) {
-                    const response = await fetch('{{ route("google.callback") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        },
-                        body: JSON.stringify({
-                            id_token: result.idToken,
-                        }),
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        window.location.href = data.redirect;
-                    } else {
-                        alert('Authentication failed: ' + data.message);
-                    }
-                }
-            } catch (error) {
-                alert('Google Sign-In error: ' + error.message);
-            }
-        });
-    </script>
 </body>
 </html>

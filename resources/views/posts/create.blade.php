@@ -12,9 +12,9 @@
         textarea { min-height: 160px; resize: vertical; }
         button { padding: 12px; font-size: 16px; background: #04ABA6; color: white; border: none; border-radius: 8px; margin-top: 8px; }
         .camera-btn { background: #666; }
-        #photo-preview { max-width: 100%; height: auto; margin-top: 12px; border-radius: 8px; }
+        #photo-preview { max-width: 100%; height: auto; margin-top: 12px; border-radius: 8px; display: none; }
+        .error { color: #d33; font-size: 13px; margin: 0; }
         .back { display: inline-block; margin-top: 16px; }
-        .error { color: #d33; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -32,7 +32,7 @@
         @error('body') <p class="error">{{ $message }}</p> @enderror
 
         <button type="button" class="camera-btn" id="camera-btn">Take Photo</button>
-        <img id="photo-preview" style="display: none;">
+        <img id="photo-preview">
         <input type="hidden" id="photo_base64" name="photo_base64">
 
         <button type="submit">Publish</button>
@@ -40,24 +40,24 @@
 
     <a href="{{ route('posts.index') }}" class="back">&larr; Back to posts</a>
 
-    <script>
+    <script type="module">
+        import { Camera } from '#nativephp';
+
         document.getElementById('camera-btn').addEventListener('click', async () => {
             try {
-                const response = await fetch('{{ route("camera.capture") }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                    },
+                const result = await Camera.getPhoto({
+                    quality: 80,
+                    resultType: 'base64',
                 });
 
-                const data = await response.json();
-
-                if (data.success) {
+                if (result && result.base64String) {
+                    const base64 = 'data:image/jpeg;base64,' + result.base64String;
                     const preview = document.getElementById('photo-preview');
-                    const base64Input = document.getElementById('photo_base64');
-                    preview.src = 'data:image/jpeg;base64,' + data.photo;
+                    const input = document.getElementById('photo_base64');
+                    
+                    preview.src = base64;
                     preview.style.display = 'block';
-                    base64Input.value = 'data:image/jpeg;base64,' + data.photo;
+                    input.value = base64;
                 } else {
                     alert('Failed to capture photo');
                 }

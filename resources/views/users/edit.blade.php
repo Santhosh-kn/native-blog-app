@@ -17,21 +17,21 @@
 <body>
     <h1>Edit User</h1>
 
-    <form method="POST" action="{{ route('users.update', $user['id']) }}">
+    <form method="POST" action="{{ route('users.update', $user->id) }}">
         @csrf
         @method('PUT')
 
         <label for="name">Name</label>
-        <input type="text" id="name" name="name" value="{{ old('name', $user['name']) }}">
+        <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}">
         @error('name') <p class="error">{{ $message }}</p> @enderror
 
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="{{ old('email', $user['email']) }}">
+        <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}">
         @error('email') <p class="error">{{ $message }}</p> @enderror
 
         <button type="submit">Save Changes</button>
     </form>
 
-    <a href="{{ route('home') }}" class="back">&larr; Back to list</a>
+    <a href="{{ route('users.index') }}" class="back">&larr; Back to users</a>
 </body>
 </html>
