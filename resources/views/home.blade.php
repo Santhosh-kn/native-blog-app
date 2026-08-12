@@ -27,6 +27,15 @@
         <a href="{{ route('posts.create') }}" class="btn btn-primary">New Post</a>
     </div>
 
+    @if (! $networkConnected)
+        <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin-top: 16px; font-size: 14px;">
+            ⚠ No internet connection
+        </div>
+    @else
+        <div style="background: #d4edda; color: #155724; padding: 6px 10px; border-radius: 6px; margin-top: 16px; font-size: 12px; display: inline-block;">
+            Connected via {{ $networkType }}
+        </div>
+    @endif
     @if (session('status'))
         <p class="status">{{ session('status') }}</p>
     @endif

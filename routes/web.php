@@ -5,6 +5,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UnlockController;
+use App\Http\Controllers\CameraController;
+
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
@@ -31,7 +34,23 @@ Route::middleware('auth')->group(function () {
     Route::put('/posts/{id}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    Route::post('/camera/capture', [CameraController::class, 'capture'])->name('camera.capture');
+    Route::get('/camera/capture', [CameraController::class, 'capture'])->name('camera.capture');
+    Route::get('/camera/preview', [CameraController::class, 'preview'])->name('camera.preview');
+    Route::get('/camera/waiting', [CameraController::class, 'waiting'])->name('camera.waiting');
+    Route::get('/camera/status', [CameraController::class, 'status'])->name('camera.status');
+
+    Route::get('/camera/pick', [CameraController::class, 'pick'])->name('camera.pick');
+
+    Route::get('/debug/cache', function () {
+        $path = \Illuminate\Support\Facades\Cache::get('pending_photo_path');
+        $mediaDebug = \Illuminate\Support\Facades\Cache::get('debug_media_files');
+
+        return response()->json([
+            'cached_path' => $path,
+            'file_exists' => $path ? file_exists($path) : null,
+            'media_debug' => $mediaDebug,
+        ]);
+    });
 });
 
 

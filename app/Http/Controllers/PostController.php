@@ -7,6 +7,9 @@ use App\Models\Post;
 use Illuminate\Support\Str;
 use Native\Mobile\Facades\Camera;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
@@ -21,7 +24,9 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
+        return view('posts.create', [
+            'capturedPhoto' => Cache::get('pending_photo_path'),
+        ]);
     }
 
     public function store(Request $request)
@@ -32,13 +37,13 @@ class PostController extends Controller
         ]);
 
         $photoUrl = null;
+        $capturedPath = $request->input('captured_photo_path');
 
-        if (session('temp_photo_base64')) {
-            $photoData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', session('temp_photo_base64')));
+        if ($capturedPath && file_exists($capturedPath)) {
             $filename = 'posts/' . uniqid() . '.jpg';
-            \Storage::disk('local')->put($filename, $photoData);
+            Storage::disk('local')->put($filename, file_get_contents($capturedPath));
             $photoUrl = $filename;
-            session()->forget('temp_photo_base64');
+            Cache::forget('pending_photo_path');
         }
 
         auth()->user()->posts()->create([

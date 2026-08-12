@@ -35,6 +35,10 @@ class NativeServiceProvider extends ServiceProvider
     {
         return [
             \Santhosh\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider::class,
+            \Native\Mobile\Providers\CameraServiceProvider::class,
+            \Native\Mobile\Providers\NetworkServiceProvider::class,
+        
+        
         
         ];
     }

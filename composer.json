@@ -15,7 +15,9 @@
         "php": "^8.3",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
-        "nativephp/mobile": "3.3.6"
+        "nativephp/mobile": "3.3.6",
+        "nativephp/mobile-camera": "^1.0",
+        "nativephp/mobile-network": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
