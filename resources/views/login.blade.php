@@ -1,37 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; padding: 24px; background: #f5f5f5; }
-        form { display: flex; flex-direction: column; gap: 12px; }
-        label { font-size: 14px; font-weight: 600; }
-        input { padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; width: 100%; box-sizing: border-box; }
-        button { padding: 12px; font-size: 16px; background: #04ABA6; color: white; border: none; border-radius: 8px; margin-top: 8px; }
-        .error { color: #d33; font-size: 13px; margin: 0; }
-        a { color: #04ABA6; text-decoration: none; }
-    </style>
-</head>
-<body>
-    <h1>Login</h1>
+@extends('layouts.app')
 
-    <form method="POST" action="{{ route('login.store') }}">
-        @csrf
+@section('title', 'Login')
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="{{ old('email') }}">
-        @error('email') <p class="error">{{ $message }}</p> @enderror
+@section('content')
+    <div style="max-width: 400px; margin: 40px auto 0;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <p style="font-size: 40px; margin: 0 0 8px;">📖</p>
+            <p style="font-size: 22px; font-weight: 700; margin: 0;">Welcome back</p>
+            <p style="font-size: 14px; color: var(--text-muted); margin: 4px 0 0;">Log in to continue</p>
+        </div>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password">
+        <form method="POST" action="{{ route('login.store') }}">
+            @csrf
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" autocomplete="email">
+                @error('email') <p class="error">{{ $message }}</p> @enderror
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
 
-        <button type="submit">Login</button>
-    </form>
-
-    <p style="text-align: center; margin-top: 16px; font-size: 14px;">
-        Don't have an account? <a href="{{ route('register') }}">Register</a>
-    </p>
-</body>
-</html>
+        <p style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-muted);">
+            Don't have an account? <a href="{{ route('register') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Register</a>
+        </p>
+    </div>
+@endsection

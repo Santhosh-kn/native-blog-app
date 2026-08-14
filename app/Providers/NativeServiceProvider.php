@@ -37,6 +37,22 @@ class NativeServiceProvider extends ServiceProvider
             \Santhosh\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider::class,
             \Native\Mobile\Providers\CameraServiceProvider::class,
             \Native\Mobile\Providers\NetworkServiceProvider::class,
+            \Native\Mobile\Providers\FileServiceProvider::class,
+            \Native\Mobile\Providers\DialogServiceProvider::class,
+            \Native\Mobile\Providers\BrowserServiceProvider::class,
+            \Native\Mobile\Providers\SystemServiceProvider::class,
+            \Native\Mobile\Providers\DeviceServiceProvider::class,
+            \Native\Mobile\Providers\MicrophoneServiceProvider::class,
+            \Lumi\NativePush\PushServiceProvider::class,
+            \Native\Mobile\Providers\ShareServiceProvider::class,
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         

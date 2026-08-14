@@ -7,7 +7,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UnlockController;
 use App\Http\Controllers\CameraController;
-
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\MicrophoneController;
+use App\Http\Controllers\PushController;
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
@@ -51,6 +53,46 @@ Route::middleware('auth')->group(function () {
             'media_debug' => $mediaDebug,
         ]);
     });
+
+    Route::get('/debug/push-token', function () {
+        return response()->json(['push_token' => auth()->user()->push_token]);
+    });
+
+    Route::post('/posts/{id}/export', [PostController::class, 'export'])->name('posts.export');
+
+    Route::post('/browser/open', function () {
+        \Native\Mobile\Facades\Browser::open('https://nativephp.com/mobile');
+        return back();
+    })->name('browser.open');
+
+    Route::post('/system/open-settings', function () {
+        \Native\Mobile\Facades\System::openAppSettings();
+        return back();
+    })->name('system.open-settings');
+
+
+    Route::post('/system/open-settings', [SystemController::class, 'openSettings'])->name('system.open-settings');
+
+
+    Route::get('/microphone', [MicrophoneController::class, 'index'])->name('microphone.index');
+    Route::post('/microphone/start', [MicrophoneController::class, 'start'])->name('microphone.start');
+    Route::post('/microphone/stop', [MicrophoneController::class, 'stop'])->name('microphone.stop');
+    Route::get('/microphone/status', [MicrophoneController::class, 'status'])->name('microphone.status');
+
+
+    Route::get('/push', [PushController::class, 'index'])->name('push.index');
+    Route::post('/push/enroll', [PushController::class, 'enroll'])->name('push.enroll');
+    Route::get('/push/enroll', function () {
+        return redirect()->route('push.index');
+    });
+    Route::get('/push/status', [PushController::class, 'status'])->name('push.status');
+
+    Route::post('/push/send-test', [PushController::class, 'sendTest'])->name('push.send-test');
+    Route::get('/push/send-test', function () {
+        return redirect()->route('push.index');
+    });
+
+    Route::post('/posts/{id}/share', [PostController::class, 'share'])->name('posts.share');
 });
 
 

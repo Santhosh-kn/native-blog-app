@@ -1,25 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlock</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; padding: 24px; background: #f5f5f5; text-align: center; }
-        button { padding: 14px 24px; font-size: 16px; background: #04ABA6; color: white; border: none; border-radius: 8px; margin-top: 24px; }
-        p.error { color: #d33; font-size: 14px; }
-    </style>
-</head>
-<body>
-    <h1>Welcome back</h1>
-    <p>Unlock with biometrics to continue</p>
+@extends('layouts.app')
 
-    <button id="unlock-btn">Unlock</button>
-    <p id="error-msg" class="error"></p>
+@section('title', 'Unlock')
 
-    <form id="confirm-form" method="POST" action="{{ route('unlock.confirm') }}" style="display: none;">
-        @csrf
-    </form>
+@section('content')
+    <div style="max-width: 360px; margin: 60px auto 0; text-align: center;">
+        <p style="font-size: 48px; margin: 0 0 16px;">🔒</p>
+        <p style="font-size: 20px; font-weight: 700; margin: 0 0 4px;">Welcome back</p>
+        <p style="font-size: 14px; color: var(--text-muted); margin: 0 0 32px;">Unlock with biometrics to continue</p>
+
+        <button id="unlock-btn" class="btn btn-primary btn-block">Unlock</button>
+        <p id="error-msg" class="error" style="text-align: center; margin-top: 12px;"></p>
+
+        <form id="confirm-form" method="POST" action="{{ route('unlock.confirm') }}" style="display: none;">
+            @csrf
+        </form>
+    </div>
 
     <script type="module">
         import { Biometric, On, Events } from '#nativephp';
@@ -34,8 +29,11 @@
 
         document.getElementById('unlock-btn').addEventListener('click', async () => {
             document.getElementById('error-msg').textContent = '';
-            await Biometric.prompt();
+            try {
+                await Biometric.prompt();
+            } catch (e) {
+                document.getElementById('error-msg').textContent = 'Biometrics not available.';
+            }
         });
     </script>
-</body>
-</html>
+@endsection

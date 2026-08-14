@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Native\Mobile\Facades\File;
+use Native\Mobile\Facades\Dialog;
+use Native\Mobile\Facades\Share;
 
 class PostController extends Controller
 {
@@ -97,5 +100,51 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()->route('posts.index')->with('status', 'Post deleted.');
+    }
+
+    public function export($id)
+    {
+        $post = Post::findOrFail($id);
+        if (\Illuminate\Support\Facades\Gate::denies('update', $post)) {
+            abort(403);
+        }
+
+        $filename = Str::slug($post->title) . '.txt';
+        $content = "{$post->title}\n\n{$post->body}\n\nPublished: {$post->published_at}";
+
+        Storage::disk('local')->put("exports/{$filename}", $content);
+        $sourcePath = Storage::disk('local')->path("exports/{$filename}");
+        $destinationPath = '/storage/emulated/0/Download/' . $filename;
+
+        $result = File::copy($sourcePath, $destinationPath);
+        $result = File::copy($sourcePath, $destinationPath);
+
+        if ($result) {
+            Dialog::toast('Exported to Downloads: ' . $filename);
+            return redirect()->route('posts.index');
+        } else {
+            Dialog::toast('Export failed: ' . ($result['error'] ?? 'unknown error'));
+        }
+
+        return redirect()->route('posts.index');
+    }
+
+    public function share($id)
+    {
+        $post = Post::findOrFail($id);
+
+        if (\Illuminate\Support\Facades\Gate::denies('update', $post)) {
+            abort(403);
+        }
+
+        $filename = Str::slug($post->title) . '.txt';
+        $content = "{$post->title}\n\n{$post->body}\n\nPublished: {$post->published_at}";
+
+        Storage::disk('local')->put("exports/{$filename}", $content);
+        $path = Storage::disk('local')->path("exports/{$filename}");
+
+        Share::file($post->title, 'Check out this post', $path);
+
+        return back();
     }
 }

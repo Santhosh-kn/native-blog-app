@@ -13,13 +13,22 @@
     ],
     "require": {
         "php": "^8.3",
+        "fatlum/nativephp-push": "^0.1.3",
+        "google/auth": "^1.53",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
         "nativephp/mobile": "3.3.6",
+        "nativephp/mobile-browser": "^1.0",
         "nativephp/mobile-camera": "^1.0",
-        "nativephp/mobile-network": "^1.0"
+        "nativephp/mobile-dialog": "^1.0",
+        "nativephp/mobile-file": "^1.0",
+        "nativephp/mobile-microphone": "^1.0",
+        "nativephp/mobile-network": "^1.0",
+        "nativephp/mobile-share": "^1.0",
+        "nativephp/mobile-system": "^1.0"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.7",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
