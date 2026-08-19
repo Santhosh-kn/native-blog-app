@@ -35,8 +35,12 @@ class UnlockController extends Controller
 
     public function biometricStatus()
     {
+        $result = Cache::get('biometric_result');
+
+        \Log::info('Polled biometric status', ['result' => $result]);
+
         return response()->json([
-            'result' => Cache::get('biometric_result'),
+            'result' => $result,
         ]);
     }
 }

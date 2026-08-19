@@ -1,0 +1,35 @@
+<?php
+
+namespace Bbs\Biometric\Commands;
+
+use Native\Mobile\Plugins\Commands\NativePluginHookCommand;
+
+class CopyAssetsCommand extends NativePluginHookCommand
+{
+    protected $signature = 'nativephp:biometric:copy-assets';
+
+    protected $description = 'Copy assets for Biometric plugin';
+
+    public function handle(): int
+    {
+        if ($this->isAndroid()) {
+            $this->copyAndroidAssets();
+        }
+
+        if ($this->isIos()) {
+            $this->copyIosAssets();
+        }
+
+        return self::SUCCESS;
+    }
+
+    protected function copyAndroidAssets(): void
+    {
+        $this->info('Android assets copied for Biometric');
+    }
+
+    protected function copyIosAssets(): void
+    {
+        $this->info('iOS assets copied for Biometric');
+    }
+}

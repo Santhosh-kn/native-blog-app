@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f16a812061793adf9426e17a31270b4d",
+    "content-hash": "78d8e17ea7693ff84888c970876aa2e9",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -60,6 +60,56 @@
                 "source": "https://github.com/Bacon/BaconQrCode/tree/v3.1.1"
             },
             "time": "2026-04-05T21:06:35+00:00"
+        },
+        {
+            "name": "bbs/plugin-biometric",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-biometric",
+                "reference": "8f92dc8a1ec453d5223b327194f8f480035efe9d"
+            },
+            "require": {
+                "nativephp/mobile": "^3.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "pestphp/pest": "^3.0"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\Biometric\\BiometricServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\Biometric\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Santhosh",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "Biometric authentication plugin for NativePHP Mobile",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "brick/math",

@@ -9,6 +9,7 @@ use Native\Mobile\Events\Camera\PhotoTaken;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Cache;
 use Native\Mobile\Events\Gallery\MediaSelected;
+use Bbs\Biometric\Events\BiometricCompleted;   
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,6 +47,22 @@ class AppServiceProvider extends ServiceProvider
                     Cache::forever('pending_photo_path', $path);
                 }
             }
+        });
+
+        Event::listen(BiometricCompleted::class, function (BiometricCompleted $event) {
+            \Log::info('BiometricCompleted event received', [
+                'success' => $event->success,
+                'id' => $event->id,
+            ]);
+
+            Cache::forever('biometric_result', [
+                'success' => $event->success,
+                'id' => $event->id,
+            ]);
+
+            \Log::info('Cached biometric_result', [
+                'stored' => Cache::get('biometric_result'),
+            ]);
         });
     }
 }

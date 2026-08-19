@@ -34,6 +34,7 @@ class LoginController extends Controller
     {
         Auth::logout();
 
+        $request->session()->forget('device_unlocked');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

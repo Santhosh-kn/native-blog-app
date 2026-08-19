@@ -21,7 +21,8 @@ Route::get('/logout', function () {
     return redirect('/login');
 });
 
-Route::middleware('auth')->group(function () {
+// Route::middleware('auth')->group(function () {
+Route::middleware('device.unlocked')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -93,8 +94,13 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::post('/posts/{id}/share', [PostController::class, 'share'])->name('posts.share');
-});
 
+});
+    
+Route::get('/unlock', [UnlockController::class, 'show'])->name('unlock');
+Route::post('/unlock', [UnlockController::class, 'confirm'])->name('unlock.confirm');
+Route::post('/unlock/trigger-biometric', [UnlockController::class, 'triggerBiometric'])->name('unlock.trigger-biometric');
+Route::get('/unlock/biometric-status', [UnlockController::class, 'biometricStatus'])->name('unlock.biometric-status');
 
 // use Illuminate\Support\Facades\Route;
 // use App\Http\Controllers\RegistrationController;
