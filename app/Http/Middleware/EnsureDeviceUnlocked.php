@@ -6,18 +6,18 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureApiAuthenticated
+class EnsureDeviceUnlocked
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! session('api_token')) {
+        if (! auth()->check()) {
             return redirect()->route('login');
         }
 
-        // if (! session('device_unlocked')) {
-        //     return redirect()->route('unlock');
-        // }
-        session(['device_unlocked' => true]);
+        if (! session('device_unlocked')) {
+            return redirect()->route('unlock');
+        }
+
         return $next($request);
     }
 }

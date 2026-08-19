@@ -1,0 +1,77 @@
+{
+    "name": "bbs/plugin-biometric",
+    "version": "1.0.0",
+    "description": "Biometric authentication plugin for NativePHP Mobile",
+    "namespace": "Biometric",
+    "keywords": ["biometric", "fingerprint", "face-id"],
+    "category": "security",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "Santhosh",
+        "email": "you@example.com",
+        "url": ""
+    },
+    "homepage": "",
+    "repository": "",
+    "funding": [],
+    "platforms": [
+        "android",
+        "ios"
+    ],
+    "icon": "resources/icon.png",
+    "screenshots": [],
+    "bridge_functions": [
+        {
+            "name": "Biometric.IsAvailable",
+            "android": "com.bbs.plugins.biometric.BiometricFunctions.IsAvailable",
+            "ios": "",
+            "description": "Check whether biometric hardware is available and enrolled"
+        },
+        {
+            "name": "Biometric.Authenticate",
+            "android": "com.bbs.plugins.biometric.BiometricFunctions.Authenticate",
+            "ios": "",
+            "description": "Show the native biometric prompt and authenticate the user"
+        }
+    ],
+    "android": {
+        "min_version": 23,
+        "permissions": [
+            "android.permission.USE_BIOMETRIC"
+        ],
+        "repositories": [],
+        "dependencies": {
+            "implementation": [
+                "androidx.biometric:biometric:1.1.0"
+            ]
+        },
+        "activities": [],
+        "services": [],
+        "receivers": [],
+        "providers": []
+    },
+    "ios": {
+        "min_version": "15.0",
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "assets": {
+        "android": [],
+        "ios": []
+    },
+    "secrets": [],
+    "events": [
+        "Bbs\\Biometric\\Events\\BiometricCompleted"
+    ],
+    "service_provider": "Bbs\\Biometric\\BiometricServiceProvider",
+    "hooks": {
+        "copy_assets": "nativephp:biometric:copy-assets"
+    }
+}

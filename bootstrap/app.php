@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'api.auth' => \App\Http\Middleware\EnsureApiAuthenticated::class,
+            // 'api.auth' => \App\Http\Middleware\EnsureApiAuthenticated::class,
+            'device.unlocked' => \App\Http\Middleware\EnsureDeviceUnlocked::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
