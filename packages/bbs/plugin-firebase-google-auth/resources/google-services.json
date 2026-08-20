@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "213497002699",
+    "project_id": "php-native-app",
+    "storage_bucket": "php-native-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213497002699:android:1b164952ca9cd61098794e",
+        "android_client_info": {
+          "package_name": "com.santhosh.nativeblog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "213497002699-4d9qklhtbd29t1usl0vo2rrqbt1onk2h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.santhosh.nativeblog",
+            "certificate_hash": "a487c2ef6dfae9e984f7179ae4ec35c462e17d06"
+          }
+        },
+        {
+          "client_id": "213497002699-l62hdi0o85rs6u8cuqhktkt9tmoo3p78.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQOD21Ws2lfQH2LiLKuD7E8ZSYXLwAO1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "213497002699-l62hdi0o85rs6u8cuqhktkt9tmoo3p78.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

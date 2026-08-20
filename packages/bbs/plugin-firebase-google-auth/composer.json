@@ -1,12 +1,12 @@
 {
-    "name": "santhosh/plugin-firebase-google-auth",
+    "name": "bbs/plugin-firebase-google-auth",
     "version": "1.0.0",
     "description": "NativePHP Mobile plugin for Google Sign-In with Firebase Authentication",
     "type": "nativephp-plugin",
     "license": "MIT",
     "authors": [
         {
-            "name": "Your Name",
+            "name": "BBS",
             "email": "you@example.com"
         }
     ],
@@ -16,13 +16,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Santhosh\\FirebaseGoogleAuth\\": "src/"
+            "Bbs\\FirebaseGoogleAuth\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Santhosh\\FirebaseGoogleAuth\\FirebaseGoogleAuthServiceProvider"
+                "Bbs\\FirebaseGoogleAuth\\FirebaseGoogleAuthServiceProvider"
             ]
         },
         "nativephp": {

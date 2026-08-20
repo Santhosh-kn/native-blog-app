@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78d8e17ea7693ff84888c970876aa2e9",
+    "content-hash": "65423d854a1af0a7eaa9e7cf0b5ce34a",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -107,6 +107,56 @@
                 }
             ],
             "description": "Biometric authentication plugin for NativePHP Mobile",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-firebase-google-auth",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-firebase-google-auth",
+                "reference": "6005511518d4fa6731714af367dc55acd0c89a6d"
+            },
+            "require": {
+                "nativephp/mobile": "^3.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "pestphp/pest": "^3.0"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\FirebaseGoogleAuth\\FirebaseGoogleAuthServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\FirebaseGoogleAuth\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BBS",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "NativePHP Mobile plugin for Google Sign-In with Firebase Authentication",
             "transport-options": {
                 "relative": true
             }

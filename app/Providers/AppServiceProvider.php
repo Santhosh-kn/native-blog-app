@@ -9,8 +9,9 @@ use Native\Mobile\Events\Camera\PhotoTaken;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Cache;
 use Native\Mobile\Events\Gallery\MediaSelected;
-use Bbs\Biometric\Events\BiometricCompleted;   
-
+use Bbs\Biometric\Events\BiometricCompleted;
+use Bbs\FirebaseGoogleAuth\Events\FirebaseGoogleAuthCompleted;
+use Illuminate\Support\Facades\Log;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -64,5 +65,37 @@ class AppServiceProvider extends ServiceProvider
                 'stored' => Cache::get('biometric_result'),
             ]);
         });
+
+        Event::listen(
+            FirebaseGoogleAuthCompleted::class,
+            function (FirebaseGoogleAuthCompleted $event) {
+                if (! $event->id) {
+                    Log::warning('Google authentication result received without a request ID');
+
+                    return;
+                }
+
+                Cache::put(
+                    "firebase_google_auth_result:{$event->id}",
+                    [
+                        'success' => $event->success,
+                        'id_token' => $event->idToken,
+                        'firebase_uid' => $event->uid,
+                        'email' => $event->email,
+                        'name' => $event->name,
+                        'avatar_url' => $event->photoUrl,
+                        'error' => $event->error,
+                        'cancelled' => $event->cancelled,
+                    ],
+                    now()->addMinutes(2),
+                );
+
+                Log::info('Firebase Google authentication result received', [
+                    'success' => $event->success,
+                    'request_id' => $event->id,
+                    'cancelled' => $event->cancelled,
+                ]);
+            },
+        );
     }
 }

@@ -34,7 +34,6 @@ class NativeServiceProvider extends ServiceProvider
     public function plugins(): array
     {
         return [
-            \Santhosh\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider::class,
             \Native\Mobile\Providers\CameraServiceProvider::class,
             \Native\Mobile\Providers\NetworkServiceProvider::class,
             \Native\Mobile\Providers\FileServiceProvider::class,
@@ -46,18 +45,7 @@ class NativeServiceProvider extends ServiceProvider
             \Lumi\NativePush\PushServiceProvider::class,
             \Native\Mobile\Providers\ShareServiceProvider::class,
             \Bbs\Biometric\BiometricServiceProvider::class,
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+            \Bbs\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider::class,
         ];
     }
 }
