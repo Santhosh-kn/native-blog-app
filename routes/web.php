@@ -10,6 +10,7 @@ use App\Http\Controllers\CameraController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\MicrophoneController;
 use App\Http\Controllers\PushController;
+use App\Http\Controllers\GoogleAuthController;
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
@@ -101,6 +102,9 @@ Route::get('/unlock', [UnlockController::class, 'show'])->name('unlock');
 Route::post('/unlock', [UnlockController::class, 'confirm'])->name('unlock.confirm');
 Route::post('/unlock/trigger-biometric', [UnlockController::class, 'triggerBiometric'])->name('unlock.trigger-biometric');
 Route::get('/unlock/biometric-status', [UnlockController::class, 'biometricStatus'])->name('unlock.biometric-status');
+
+Route::post('/auth/google/start', [GoogleAuthController::class, 'start'])->name('google.start');
+Route::get('/auth/google/status/{requestId}', [GoogleAuthController::class, 'status'])->whereUuid('requestId')->name('google.status');
 
 // use Illuminate\Support\Facades\Route;
 // use App\Http\Controllers\RegistrationController;

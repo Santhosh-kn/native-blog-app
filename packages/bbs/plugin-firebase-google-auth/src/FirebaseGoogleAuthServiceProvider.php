@@ -1,9 +1,9 @@
 <?php
 
-namespace Santhosh\FirebaseGoogleAuth;
+namespace Bbs\FirebaseGoogleAuth;
 
 use Illuminate\Support\ServiceProvider;
-use Santhosh\FirebaseGoogleAuth\Commands\CopyAssetsCommand;
+use Bbs\FirebaseGoogleAuth\Commands\CopyAssetsCommand;
 
 class FirebaseGoogleAuthServiceProvider extends ServiceProvider
 {

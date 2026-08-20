@@ -25,7 +25,7 @@ describe('Plugin Manifest', function () {
         $manifest = json_decode(file_get_contents($this->manifestPath), true);
 
         expect($manifest)->toHaveKeys(['name', 'namespace', 'bridge_functions']);
-        expect($manifest['name'])->toBe('santhosh/plugin-firebase-google-auth');
+        expect($manifest['name'])->toBe('bbs/plugin-firebase-google-auth');
         expect($manifest['namespace'])->toBe('FirebaseGoogleAuth');
     });
 
@@ -36,7 +36,11 @@ describe('Plugin Manifest', function () {
 
         foreach ($manifest['bridge_functions'] as $function) {
             expect($function)->toHaveKeys(['name']);
-            expect($function)->toHaveAnyKeys(['android', 'ios']);
+            $hasNativeImplementation =
+                array_key_exists('android', $function)
+                || array_key_exists('ios', $function);
+
+            expect($hasNativeImplementation)->toBeTrue();
         }
     });
 
@@ -68,7 +72,7 @@ describe('Native Code', function () {
         expect(file_exists($kotlinFile))->toBeTrue();
 
         $content = file_get_contents($kotlinFile);
-        expect($content)->toContain('package com.santhosh.plugins.firebase_google_auth');
+        expect($content)->toContain('package com.bbs.plugins.firebase_google_auth');
         expect($content)->toContain('object FirebaseGoogleAuthFunctions');
         expect($content)->toContain('BridgeFunction');
     });
@@ -115,7 +119,7 @@ describe('PHP Classes', function () {
         expect(file_exists($file))->toBeTrue();
 
         $content = file_get_contents($file);
-        expect($content)->toContain('namespace Santhosh\FirebaseGoogleAuth');
+        expect($content)->toContain('namespace Bbs\FirebaseGoogleAuth');
         expect($content)->toContain('class FirebaseGoogleAuthServiceProvider');
     });
 
@@ -124,7 +128,7 @@ describe('PHP Classes', function () {
         expect(file_exists($file))->toBeTrue();
 
         $content = file_get_contents($file);
-        expect($content)->toContain('namespace Santhosh\FirebaseGoogleAuth\Facades');
+        expect($content)->toContain('namespace Bbs\FirebaseGoogleAuth\Facades');
         expect($content)->toContain('class FirebaseGoogleAuth extends Facade');
     });
 
@@ -133,7 +137,7 @@ describe('PHP Classes', function () {
         expect(file_exists($file))->toBeTrue();
 
         $content = file_get_contents($file);
-        expect($content)->toContain('namespace Santhosh\FirebaseGoogleAuth');
+        expect($content)->toContain('namespace Bbs\FirebaseGoogleAuth');
         expect($content)->toContain('class FirebaseGoogleAuth');
     });
 });

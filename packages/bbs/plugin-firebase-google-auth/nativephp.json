@@ -1,5 +1,5 @@
 {
-    "name": "santhosh/plugin-firebase-google-auth",
+    "name": "bbs/plugin-firebase-google-auth",
     "version": "1.0.0",
     "description": "NativePHP Mobile plugin for Google Sign-In with Firebase Authentication",
     "namespace": "FirebaseGoogleAuth",
@@ -10,7 +10,7 @@
         "type": "free"
     },
     "author": {
-        "name": "Your Name",
+        "name": "BBS",
         "email": "you@example.com",
         "url": ""
     },
@@ -25,24 +25,31 @@
     "screenshots": [],
     "bridge_functions": [
         {
-            "name": "FirebaseGoogleAuth.Execute",
-            "android": "com.santhosh.plugins.firebase_google_auth.FirebaseGoogleAuthFunctions.Execute",
-            "ios": "FirebaseGoogleAuthFunctions.Execute",
-            "description": "Execute the plugin functionality"
+            "name": "FirebaseGoogleAuth.SignIn",
+            "android": "com.bbs.plugins.firebase_google_auth.FirebaseGoogleAuthFunctions.SignIn",
+            "ios": "FirebaseGoogleAuthFunctions.SignIn",
+            "description": "Start Google Sign-In and authenticate the credential with Firebase"
         },
         {
-            "name": "FirebaseGoogleAuth.GetStatus",
-            "android": "com.santhosh.plugins.firebase_google_auth.FirebaseGoogleAuthFunctions.GetStatus",
-            "ios": "FirebaseGoogleAuthFunctions.GetStatus",
-            "description": "Get the current status"
+            "name": "FirebaseGoogleAuth.SignOut",
+            "android": "com.bbs.plugins.firebase_google_auth.FirebaseGoogleAuthFunctions.SignOut",
+            "ios": "FirebaseGoogleAuthFunctions.SignOut",
+            "description": "Sign out from Firebase Authentication"
         }
     ],
     "android": {
         "min_version": 21,
-        "permissions": [],
+        "permissions": [
+            "android.permission.INTERNET"
+        ],
         "repositories": [],
         "dependencies": {
-            "implementation": []
+            "implementation": [
+                "com.google.firebase:firebase-auth",
+                "androidx.credentials:credentials:1.3.0",
+                "androidx.credentials:credentials-play-services-auth:1.3.0",
+                "com.google.android.libraries.identity.googleid:googleid:1.1.1"
+            ]
         },
         "activities": [],
         "services": [],
@@ -64,9 +71,9 @@
     },
     "secrets": [],
     "events": [
-        "Santhosh\\FirebaseGoogleAuth\\Events\\FirebaseGoogleAuthCompleted"
+        "Bbs\\FirebaseGoogleAuth\\Events\\FirebaseGoogleAuthCompleted"
     ],
-    "service_provider": "Santhosh\\FirebaseGoogleAuth\\FirebaseGoogleAuthServiceProvider",
+    "service_provider": "Bbs\\FirebaseGoogleAuth\\FirebaseGoogleAuthServiceProvider",
     "hooks": {
         "copy_assets": "nativephp:firebase-google-auth:copy-assets"
     }

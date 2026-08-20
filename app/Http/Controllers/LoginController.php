@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Bbs\FirebaseGoogleAuth\Facades\FirebaseGoogleAuth;
+use Throwable;
 
 class LoginController extends Controller
 {
@@ -32,6 +34,16 @@ class LoginController extends Controller
 
     public function destroy(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user?->firebase_uid) {
+            try {
+                FirebaseGoogleAuth::signOut();
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        }
+
         Auth::logout();
 
         $request->session()->forget('device_unlocked');
