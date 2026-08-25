@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Blog')</title>
     <style>
@@ -32,7 +32,7 @@
             top: 0;
             z-index: 10;
             background: var(--surface);
-            padding: 16px 20px;
+            padding: calc(16px + env(safe-area-inset-top)) 20px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;

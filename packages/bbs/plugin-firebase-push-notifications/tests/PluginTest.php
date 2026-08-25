@@ -119,11 +119,36 @@ final class PluginTest extends TestCase
         );
     }
 
-    public function test_manifest_does_not_duplicate_firebase_dependencies(): void
+    public function test_manifest_declares_firebase_build_configuration(): void
     {
-        $dependencies = $this->manifest()['android']['dependencies']['implementation'];
+        $android = $this->manifest()['android'];
 
-        $this->assertSame([], $dependencies);
+        $this->assertSame(
+            [
+                'platform(com.google.firebase:firebase-bom:33.12.0)',
+                'com.google.firebase:firebase-messaging',
+            ],
+            $android['dependencies']['implementation']
+        );
+
+        $this->assertSame(
+            [
+                [
+                    'id' => 'com.google.gms.google-services',
+                    'version' => '4.4.3',
+                    'apply' => false,
+                ],
+            ],
+            $android['gradle_plugins']
+        );
+
+        $this->assertSame(
+            [
+                '-keep class com.google.firebase.** { *; }',
+                '-dontwarn com.google.firebase.**',
+            ],
+            $android['proguard_rules']
+        );
     }
 
     public function test_manifest_declares_event_without_hooks(): void

@@ -14,7 +14,6 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Native\Mobile\Facades\Browser;
-use Native\Mobile\Facades\System;
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
@@ -67,12 +66,6 @@ Route::middleware('device.unlocked')->group(function () {
 
         return back();
     })->name('browser.open');
-
-    Route::post('/system/open-settings', function () {
-        System::openAppSettings();
-
-        return back();
-    })->name('system.open-settings');
 
     Route::post('/system/open-settings', [SystemController::class, 'openSettings'])->name('system.open-settings');
 
