@@ -1,16 +1,20 @@
 <?php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RegistrationController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\UnlockController;
+
 use App\Http\Controllers\CameraController;
-use App\Http\Controllers\SystemController;
-use App\Http\Controllers\MicrophoneController;
-use App\Http\Controllers\PushController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MicrophoneController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PushController;
+use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\UnlockController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
+use Native\Mobile\Facades\Browser;
+use Native\Mobile\Facades\System;
 
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
@@ -46,8 +50,8 @@ Route::middleware('device.unlocked')->group(function () {
     Route::get('/camera/pick', [CameraController::class, 'pick'])->name('camera.pick');
 
     Route::get('/debug/cache', function () {
-        $path = \Illuminate\Support\Facades\Cache::get('pending_photo_path');
-        $mediaDebug = \Illuminate\Support\Facades\Cache::get('debug_media_files');
+        $path = Cache::get('pending_photo_path');
+        $mediaDebug = Cache::get('debug_media_files');
 
         return response()->json([
             'cached_path' => $path,
@@ -56,48 +60,37 @@ Route::middleware('device.unlocked')->group(function () {
         ]);
     });
 
-    Route::get('/debug/push-token', function () {
-        return response()->json(['push_token' => auth()->user()->push_token]);
-    });
-
     Route::post('/posts/{id}/export', [PostController::class, 'export'])->name('posts.export');
 
     Route::post('/browser/open', function () {
-        \Native\Mobile\Facades\Browser::open('https://nativephp.com/mobile');
+        Browser::open('https://nativephp.com/mobile');
+
         return back();
     })->name('browser.open');
 
     Route::post('/system/open-settings', function () {
-        \Native\Mobile\Facades\System::openAppSettings();
+        System::openAppSettings();
+
         return back();
     })->name('system.open-settings');
 
-
     Route::post('/system/open-settings', [SystemController::class, 'openSettings'])->name('system.open-settings');
-
 
     Route::get('/microphone', [MicrophoneController::class, 'index'])->name('microphone.index');
     Route::post('/microphone/start', [MicrophoneController::class, 'start'])->name('microphone.start');
     Route::post('/microphone/stop', [MicrophoneController::class, 'stop'])->name('microphone.stop');
     Route::get('/microphone/status', [MicrophoneController::class, 'status'])->name('microphone.status');
 
-
-    Route::get('/push', [PushController::class, 'index'])->name('push.index');
-    Route::post('/push/enroll', [PushController::class, 'enroll'])->name('push.enroll');
-    Route::get('/push/enroll', function () {
-        return redirect()->route('push.index');
-    });
-    Route::get('/push/status', [PushController::class, 'status'])->name('push.status');
-
-    Route::post('/push/send-test', [PushController::class, 'sendTest'])->name('push.send-test');
-    Route::get('/push/send-test', function () {
-        return redirect()->route('push.index');
+    Route::prefix('push')->name('push.')->group(function () {
+        Route::get('/', [PushController::class, 'index'])->name('index');
+        Route::post('/enroll', [PushController::class, 'enroll'])->name('enroll');
+        Route::post('/sync', [PushController::class, 'sync'])->name('sync');
+        Route::get('/status', [PushController::class, 'status'])->name('status');
     });
 
     Route::post('/posts/{id}/share', [PostController::class, 'share'])->name('posts.share');
-
 });
-    
+
 Route::get('/unlock', [UnlockController::class, 'show'])->name('unlock');
 Route::post('/unlock', [UnlockController::class, 'confirm'])->name('unlock.confirm');
 Route::post('/unlock/trigger-biometric', [UnlockController::class, 'triggerBiometric'])->name('unlock.trigger-biometric');

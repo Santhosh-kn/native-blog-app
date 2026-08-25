@@ -1,0 +1,38 @@
+{
+    "name": "bbs/plugin-firebase-push-notifications",
+    "version": "1.0.0",
+    "description": "NativePHP Mobile Android plugin for Firebase Cloud Messaging push notifications",
+    "type": "nativephp-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "BBS",
+            "email": "you@example.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "nativephp/mobile": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bbs\\FirebasePushNotifications\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bbs\\FirebasePushNotifications\\FirebasePushNotificationsServiceProvider"
+            ]
+        },
+        "nativephp": {
+            "manifest": "nativephp.json"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0 || ^12.0"
+    },
+    "scripts": {
+        "test": "phpunit tests/PluginTest.php"
+    }
+}

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "65423d854a1af0a7eaa9e7cf0b5ce34a",
+    "content-hash": "7fb8b766d813769e53a29a20b2b7af65",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -157,6 +157,56 @@
                 }
             ],
             "description": "NativePHP Mobile plugin for Google Sign-In with Firebase Authentication",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-firebase-push-notifications",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-firebase-push-notifications",
+                "reference": "2392465c506ae068472810ded499fe0691ee17a7"
+            },
+            "require": {
+                "nativephp/mobile": "^3.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.0 || ^12.0"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\FirebasePushNotifications\\FirebasePushNotificationsServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\FirebasePushNotifications\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit tests/PluginTest.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BBS",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "NativePHP Mobile Android plugin for Firebase Cloud Messaging push notifications",
             "transport-options": {
                 "relative": true
             }
@@ -830,69 +880,6 @@
                 "source": "https://github.com/igorw/evenement/tree/v3.0.2"
             },
             "time": "2023-08-08T05:53:35+00:00"
-        },
-        {
-            "name": "fatlum/nativephp-push",
-            "version": "0.1.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/FatlumGjinofci/nativephp-push.git",
-                "reference": "8b33a64e1b1753f560b153c80afbb1e1845d7ad8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FatlumGjinofci/nativephp-push/zipball/8b33a64e1b1753f560b153c80afbb1e1845d7ad8",
-                "reference": "8b33a64e1b1753f560b153c80afbb1e1845d7ad8",
-                "shasum": ""
-            },
-            "require": {
-                "nativephp/mobile": "^3.2",
-                "php": "^8.2"
-            },
-            "suggest": {
-                "google/auth": "Server-side only: required by Lumi\\NativePush\\Server\\FcmSender to mint FCM v1 tokens. Run `composer require google/auth` on the machine that SENDS pushes."
-            },
-            "type": "nativephp-plugin",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Lumi\\NativePush\\PushServiceProvider"
-                    ]
-                },
-                "nativephp": {
-                    "manifest": "nativephp.json"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Lumi\\NativePush\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fatlum Gjinofci",
-                    "email": "fgjinofci@gmail.com"
-                }
-            ],
-            "description": "Free FCM/APNs push notifications for NativePHP Mobile — the native layer that the paid nativephp/mobile-firebase plugin charges for, wired into the existing (MIT) core PHP API.",
-            "homepage": "https://github.com/FatlumGjinofci/nativephp-push",
-            "keywords": [
-                "FCM",
-                "apns",
-                "firebase",
-                "nativephp",
-                "notifications",
-                "push"
-            ],
-            "support": {
-                "issues": "https://github.com/FatlumGjinofci/nativephp-push/issues",
-                "source": "https://github.com/FatlumGjinofci/nativephp-push"
-            },
-            "time": "2026-07-27T14:00:21+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -1991,16 +1978,16 @@
         },
         {
             "name": "league/commonmark",
-            "version": "2.8.3",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "1902f60f984235023acbe03db6ad614a37b3c3e7"
+                "reference": "d2d1aa8b35e072966c89bc0c66cf926e56767dc4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/1902f60f984235023acbe03db6ad614a37b3c3e7",
-                "reference": "1902f60f984235023acbe03db6ad614a37b3c3e7",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/d2d1aa8b35e072966c89bc0c66cf926e56767dc4",
+                "reference": "d2d1aa8b35e072966c89bc0c66cf926e56767dc4",
                 "shasum": ""
             },
             "require": {
@@ -2037,7 +2024,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "2.9-dev"
+                    "dev-main": "2.11-dev"
                 }
             },
             "autoload": {
@@ -2094,7 +2081,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-12T15:29:16+00:00"
+            "time": "2026-08-11T16:06:25+00:00"
         },
         {
             "name": "league/config",
@@ -3325,16 +3312,16 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.3.5",
+            "version": "v1.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "f0ab1a3cda782dbc5da270d28545236aa80c4002"
+                "reference": "c54350438cd6914616f790a49cb424605f421562"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/schema/zipball/f0ab1a3cda782dbc5da270d28545236aa80c4002",
-                "reference": "f0ab1a3cda782dbc5da270d28545236aa80c4002",
+                "url": "https://api.github.com/repos/nette/schema/zipball/c54350438cd6914616f790a49cb424605f421562",
+                "reference": "c54350438cd6914616f790a49cb424605f421562",
                 "shasum": ""
             },
             "require": {
@@ -3386,9 +3373,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/schema/issues",
-                "source": "https://github.com/nette/schema/tree/v1.3.5"
+                "source": "https://github.com/nette/schema/tree/v1.3.6"
             },
-            "time": "2026-02-23T03:47:12+00:00"
+            "time": "2026-08-16T21:58:41+00:00"
         },
         {
             "name": "nette/utils",

@@ -42,10 +42,10 @@ class NativeServiceProvider extends ServiceProvider
             \Native\Mobile\Providers\SystemServiceProvider::class,
             \Native\Mobile\Providers\DeviceServiceProvider::class,
             \Native\Mobile\Providers\MicrophoneServiceProvider::class,
-            \Lumi\NativePush\PushServiceProvider::class,
             \Native\Mobile\Providers\ShareServiceProvider::class,
             \Bbs\Biometric\BiometricServiceProvider::class,
             \Bbs\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider::class,
+            \Bbs\FirebasePushNotifications\FirebasePushNotificationsServiceProvider::class,
         ];
     }
 }

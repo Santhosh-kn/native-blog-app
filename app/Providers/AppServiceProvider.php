@@ -1,17 +1,20 @@
 <?php
 
 namespace App\Providers;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
+
 use App\Models\Post;
 use App\Policies\PostPolicy;
-use Native\Mobile\Events\Camera\PhotoTaken;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Cache;
-use Native\Mobile\Events\Gallery\MediaSelected;
 use Bbs\Biometric\Events\BiometricCompleted;
 use Bbs\FirebaseGoogleAuth\Events\FirebaseGoogleAuthCompleted;
+use Bbs\FirebasePushNotifications\Events\FirebasePushNotificationsCompleted;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\ServiceProvider;
+use Native\Mobile\Events\Camera\PhotoTaken;
+use Native\Mobile\Events\Gallery\MediaSelected;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -94,6 +97,33 @@ class AppServiceProvider extends ServiceProvider
                     'success' => $event->success,
                     'request_id' => $event->id,
                     'cancelled' => $event->cancelled,
+                ]);
+            },
+        );
+        Event::listen(
+            FirebasePushNotificationsCompleted::class,
+            function (FirebasePushNotificationsCompleted $event) {
+                if (! $event->id) {
+                    Log::warning(
+                        'Firebase push-token result received without a request ID'
+                    );
+
+                    return;
+                }
+
+                Cache::put(
+                    "firebase_push_token_result:{$event->id}",
+                    [
+                        'success' => $event->success,
+                        'error' => $event->error,
+                        'id' => $event->id,
+                    ],
+                    now()->addMinutes(2),
+                );
+
+                Log::info('Firebase push-token result received', [
+                    'success' => $event->success,
+                    'request_id' => $event->id,
                 ]);
             },
         );

@@ -1,0 +1,100 @@
+{
+    "name": "bbs/plugin-firebase-push-notifications",
+    "version": "1.0.0",
+    "description": "Android Firebase Cloud Messaging plugin for NativePHP Mobile",
+    "namespace": "FirebasePushNotifications",
+    "keywords": [
+        "firebase",
+        "fcm",
+        "push-notifications"
+    ],
+    "category": "utilities",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "BBS",
+        "email": "you@example.com",
+        "url": ""
+    },
+    "homepage": "",
+    "repository": "",
+    "funding": [],
+    "platforms": [
+        "android"
+    ],
+    "icon": "resources/icon.png",
+    "screenshots": [],
+    "bridge_functions": [
+        {
+            "name": "FirebasePushNotifications.CheckPermission",
+            "android": "com.bbs.plugins.firebase_push_notifications.FirebasePushNotificationsFunctions.CheckPermission",
+            "description": "Check the current Android notification permission"
+        },
+        {
+            "name": "FirebasePushNotifications.RequestPermission",
+            "android": "com.bbs.plugins.firebase_push_notifications.FirebasePushNotificationsFunctions.RequestPermission",
+            "description": "Request Android notification permission"
+        },
+        {
+            "name": "FirebasePushNotifications.GetToken",
+            "android": "com.bbs.plugins.firebase_push_notifications.FirebasePushNotificationsFunctions.GetToken",
+            "description": "Request the Firebase Cloud Messaging registration token"
+        },
+        {
+            "name": "FirebasePushNotifications.GetStoredToken",
+            "android": "com.bbs.plugins.firebase_push_notifications.FirebasePushNotificationsFunctions.GetStoredToken",
+            "description": "Return a private token-file reference for trusted PHP synchronization"
+        }
+    ],
+    "android": {
+        "min_version": 21,
+        "init_function": "com.bbs.plugins.firebase_push_notifications.initializeFirebasePushNotifications",
+        "permissions": [
+            "android.permission.INTERNET",
+            "android.permission.POST_NOTIFICATIONS"
+        ],
+        "repositories": [],
+        "dependencies": {
+            "implementation": []
+        },
+        "activities": [],
+        "services": [
+            {
+                "name": "com.bbs.plugins.firebase_push_notifications.FirebasePushMessagingService",
+                "exported": false,
+                "intent_filters": [
+                    {
+                        "action": "com.google.firebase.MESSAGING_EVENT"
+                    }
+                ]
+            }
+        ],
+        "meta_data": [
+            {
+                "name": "firebase_messaging_notification_delegation_enabled",
+                "value": "false"
+            }
+        ],
+        "receivers": [],
+        "providers": []
+    },
+    "ios": {
+        "min_version": "15.0",
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "assets": {
+        "android": []
+    },
+    "secrets": [],
+    "events": [
+        "Bbs\\FirebasePushNotifications\\Events\\FirebasePushNotificationsCompleted"
+    ],
+    "service_provider": "Bbs\\FirebasePushNotifications\\FirebasePushNotificationsServiceProvider"
+}

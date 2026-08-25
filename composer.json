@@ -16,13 +16,17 @@
         "plugin-firebase-google-auth": {
             "type": "path",
             "url": "packages/bbs/plugin-firebase-google-auth"
+        },
+        "plugin-firebase-push-notifications": {
+            "type": "path",
+            "url": "packages/bbs/plugin-firebase-push-notifications"
         }
     },
     "require": {
         "php": "^8.3",
         "bbs/plugin-biometric": "^1.0",
         "bbs/plugin-firebase-google-auth": "1.0.0",
-        "fatlum/nativephp-push": "^0.1.3",
+        "bbs/plugin-firebase-push-notifications": "^1.0",
         "google/auth": "^1.53",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
