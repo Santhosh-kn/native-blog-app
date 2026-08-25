@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Blog')</title>
     <style>
         :root {
@@ -189,6 +190,10 @@
                 <span class="icon">👥</span> Users
             </a>
         </nav>
+        @if (filled(auth()->user()->push_token))
+            @include('partials.firebase-push-token-sync')
+        @endif
     @endauth
+    @stack('scripts')
 </body>
 </html>
