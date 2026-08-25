@@ -2,7 +2,15 @@
 
 namespace App\Providers;
 
+use Bbs\Biometric\BiometricServiceProvider;
+use Bbs\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider;
+use Bbs\FirebasePushNotifications\FirebasePushNotificationsServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Native\Mobile\Providers\BrowserServiceProvider;
+use Native\Mobile\Providers\CameraServiceProvider;
+use Native\Mobile\Providers\MicrophoneServiceProvider;
+use Native\Mobile\Providers\NetworkServiceProvider;
+use Native\Mobile\Providers\ShareServiceProvider;
 
 class NativeServiceProvider extends ServiceProvider
 {
@@ -29,23 +37,19 @@ class NativeServiceProvider extends ServiceProvider
      * This is a security measure to prevent transitive dependencies from
      * automatically registering plugins without your explicit consent.
      *
-     * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
+     * @return array<int, class-string<ServiceProvider>>
      */
     public function plugins(): array
     {
         return [
-            \Native\Mobile\Providers\CameraServiceProvider::class,
-            \Native\Mobile\Providers\NetworkServiceProvider::class,
-            \Native\Mobile\Providers\FileServiceProvider::class,
-            \Native\Mobile\Providers\DialogServiceProvider::class,
-            \Native\Mobile\Providers\BrowserServiceProvider::class,
-            \Native\Mobile\Providers\SystemServiceProvider::class,
-            \Native\Mobile\Providers\DeviceServiceProvider::class,
-            \Native\Mobile\Providers\MicrophoneServiceProvider::class,
-            \Native\Mobile\Providers\ShareServiceProvider::class,
-            \Bbs\Biometric\BiometricServiceProvider::class,
-            \Bbs\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider::class,
-            \Bbs\FirebasePushNotifications\FirebasePushNotificationsServiceProvider::class,
+            CameraServiceProvider::class,
+            NetworkServiceProvider::class,
+            BrowserServiceProvider::class,
+            MicrophoneServiceProvider::class,
+            ShareServiceProvider::class,
+            BiometricServiceProvider::class,
+            FirebaseGoogleAuthServiceProvider::class,
+            FirebasePushNotificationsServiceProvider::class,
         ];
     }
 }

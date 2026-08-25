@@ -57,7 +57,10 @@
         ],
         "repositories": [],
         "dependencies": {
-            "implementation": []
+            "implementation": [
+                "platform(com.google.firebase:firebase-bom:33.12.0)",
+                "com.google.firebase:firebase-messaging"
+            ]
         },
         "activities": [],
         "services": [
@@ -78,7 +81,18 @@
             }
         ],
         "receivers": [],
-        "providers": []
+        "providers": [],
+        "gradle_plugins": [
+            {
+                "id": "com.google.gms.google-services",
+                "version": "4.4.3",
+                "apply": false
+            }
+        ],
+        "proguard_rules": [
+            "-keep class com.google.firebase.** { *; }",
+            "-dontwarn com.google.firebase.**"
+        ]
     },
     "ios": {
         "min_version": "15.0",

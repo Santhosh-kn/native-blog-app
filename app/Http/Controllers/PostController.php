@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Post;
-use Illuminate\Support\Str;
-use Native\Mobile\Facades\Camera;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Native\Mobile\Facades\File;
+use Illuminate\Support\Str;
 use Native\Mobile\Facades\Dialog;
+use Native\Mobile\Facades\File;
 use Native\Mobile\Facades\Share;
 
 class PostController extends Controller
@@ -43,7 +41,7 @@ class PostController extends Controller
         $capturedPath = $request->input('captured_photo_path');
 
         if ($capturedPath && file_exists($capturedPath)) {
-            $filename = 'posts/' . uniqid() . '.jpg';
+            $filename = 'posts/'.uniqid().'.jpg';
             Storage::disk('local')->put($filename, file_get_contents($capturedPath));
             $photoUrl = $filename;
             Cache::forget('pending_photo_path');
@@ -51,7 +49,7 @@ class PostController extends Controller
 
         auth()->user()->posts()->create([
             'title' => $validated['title'],
-            'slug' => Str::slug($validated['title']) . '-' . uniqid(),
+            'slug' => Str::slug($validated['title']).'-'.uniqid(),
             'body' => $validated['body'],
             'photo_url' => $photoUrl,
             'published_at' => now(),
@@ -105,25 +103,25 @@ class PostController extends Controller
     public function export($id)
     {
         $post = Post::findOrFail($id);
-        if (\Illuminate\Support\Facades\Gate::denies('update', $post)) {
+        if (Gate::denies('update', $post)) {
             abort(403);
         }
 
-        $filename = Str::slug($post->title) . '.txt';
+        $filename = Str::slug($post->title).'.txt';
         $content = "{$post->title}\n\n{$post->body}\n\nPublished: {$post->published_at}";
 
         Storage::disk('local')->put("exports/{$filename}", $content);
         $sourcePath = Storage::disk('local')->path("exports/{$filename}");
-        $destinationPath = '/storage/emulated/0/Download/' . $filename;
+        $destinationPath = '/storage/emulated/0/Download/'.$filename;
 
-        $result = File::copy($sourcePath, $destinationPath);
         $result = File::copy($sourcePath, $destinationPath);
 
         if ($result) {
-            Dialog::toast('Exported to Downloads: ' . $filename);
+            Dialog::toast('Exported to Downloads: '.$filename);
+
             return redirect()->route('posts.index');
         } else {
-            Dialog::toast('Export failed: ' . ($result['error'] ?? 'unknown error'));
+            Dialog::toast('Export failed.');
         }
 
         return redirect()->route('posts.index');
@@ -133,11 +131,11 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
 
-        if (\Illuminate\Support\Facades\Gate::denies('update', $post)) {
+        if (Gate::denies('update', $post)) {
             abort(403);
         }
 
-        $filename = Str::slug($post->title) . '.txt';
+        $filename = Str::slug($post->title).'.txt';
         $content = "{$post->title}\n\n{$post->body}\n\nPublished: {$post->published_at}";
 
         Storage::disk('local')->put("exports/{$filename}", $content);
