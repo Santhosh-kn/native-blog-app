@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -83,6 +84,21 @@ class FirebasePushMessagingService : FirebaseMessagingService() {
             messageId?.hashCode()
                 ?: System.currentTimeMillis().toInt()
 
+        val tapId = try {
+            FirebasePushNotificationTapStore.create(
+                context = this,
+                data = data
+            )
+        } catch (exception: Exception) {
+            Log.e(
+                TAG,
+                "Unable to prepare notification tap",
+                exception
+            )
+
+            null
+        }
+
         val launchIntent =
             packageManager
                 .getLaunchIntentForPackage(packageName)
@@ -92,8 +108,16 @@ class FirebasePushMessagingService : FirebaseMessagingService() {
                             Intent.FLAG_ACTIVITY_SINGLE_TOP
                     )
 
-                    data.forEach { (key, value) ->
-                        putExtra(key, value)
+                    tapId?.let { id ->
+                        this.data = Uri.Builder()
+                            .scheme(INTERNAL_SCHEME)
+                            .authority(INTERNAL_HOST)
+                            .appendPath(INTERNAL_PATH)
+                            .appendQueryParameter(
+                                TAP_PARAMETER,
+                                id
+                            )
+                            .build()
                     }
                 }
 
@@ -170,5 +194,17 @@ class FirebasePushMessagingService : FirebaseMessagingService() {
 
         private const val CHANNEL_DESCRIPTION =
             "Notifications received through Firebase Cloud Messaging"
+
+        private const val INTERNAL_SCHEME =
+            "nativeblog"
+
+        private const val INTERNAL_HOST =
+            "push"
+
+        private const val INTERNAL_PATH =
+            "open"
+
+        private const val TAP_PARAMETER =
+            "tap"
     }
 }

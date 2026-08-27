@@ -7,6 +7,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MicrophoneController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
+use App\Http\Controllers\PushNotificationDeepLinkController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\UnlockController;
@@ -24,6 +25,8 @@ Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 Route::get('/logout', function () {
     return redirect('/login');
 });
+
+Route::get('/push/open', [PushNotificationDeepLinkController::class, 'capture'])->name('push.deep-link.capture');
 
 // Route::middleware('auth')->group(function () {
 Route::middleware('device.unlocked')->group(function () {
@@ -73,6 +76,9 @@ Route::middleware('device.unlocked')->group(function () {
     Route::post('/microphone/start', [MicrophoneController::class, 'start'])->name('microphone.start');
     Route::post('/microphone/stop', [MicrophoneController::class, 'stop'])->name('microphone.stop');
     Route::get('/microphone/status', [MicrophoneController::class, 'status'])->name('microphone.status');
+
+    Route::get('/push/resume', [PushNotificationDeepLinkController::class, 'resume'])
+        ->name('push.deep-link.resume');
 
     Route::prefix('push')->name('push.')->group(function () {
         Route::get('/', [PushController::class, 'index'])->name('index');

@@ -265,4 +265,33 @@ object FirebasePushNotificationsFunctions {
             return BridgeResponse.success(response)
         }
     }
+
+    class GetPendingNotification(
+        private val context: Context
+    ) : BridgeFunction {
+
+        override fun execute(
+            parameters: Map<String, Any>
+        ): Map<String, Any> {
+            val tapId = parameters["id"] as? String
+
+            val tapFile = tapId?.let {
+                FirebasePushNotificationTapStore
+                    .readableFile(
+                        context = context,
+                        tapId = it
+                    )
+            }
+
+            val response = mutableMapOf<String, Any>(
+                "available" to (tapFile !== null)
+            )
+
+            tapFile?.let {
+                response["path"] = it.absolutePath
+            }
+
+            return BridgeResponse.success(response)
+        }
+    }
 }

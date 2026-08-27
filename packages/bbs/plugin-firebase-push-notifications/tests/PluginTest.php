@@ -94,6 +94,7 @@ final class PluginTest extends TestCase
             'FirebasePushNotifications.RequestPermission',
             'FirebasePushNotifications.GetToken',
             'FirebasePushNotifications.GetStoredToken',
+            'FirebasePushNotifications.GetPendingNotification',
         ], $names);
 
         foreach ($manifest['bridge_functions'] as $function) {
@@ -396,6 +397,11 @@ final class PluginTest extends TestCase
 
         $this->assertStringContainsString(
             '@method static object|null getStoredToken()',
+            $content
+        );
+
+        $this->assertStringContainsString(
+            '@method static object|null getPendingNotification(string $id)',
             $content
         );
     }
