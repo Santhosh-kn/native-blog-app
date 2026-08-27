@@ -1,274 +1,158 @@
 # Firebase Push Notifications for NativePHP Mobile
 
-A custom Android NativePHP Mobile plugin for Firebase Cloud Messaging notification permission and device-token registration.
+A custom BBS Android plugin for Firebase Cloud Messaging permission handling, secure device-token synchronization, notification display, and allow-listed notification-tap routing.
 
-## Current Scope
+## Scope
 
-The plugin provides four NativePHP bridge functions:
+The plugin provides five NativePHP bridge functions:
 
-- `FirebasePushNotifications.CheckPermission`
-- `FirebasePushNotifications.RequestPermission`
-- `FirebasePushNotifications.GetToken`
-- `FirebasePushNotifications.GetStoredToken`
+- FirebasePushNotifications.CheckPermission
+- FirebasePushNotifications.RequestPermission
+- FirebasePushNotifications.GetToken
+- FirebasePushNotifications.GetStoredToken
+- FirebasePushNotifications.GetPendingNotification
 
-`GetToken` is asynchronous. It returns immediately and later dispatches `FirebasePushNotificationsCompleted` back to Laravel.
+GetToken is asynchronous and later dispatches FirebasePushNotificationsCompleted to Laravel.
 
-The Android implementation also:
+GetStoredToken and GetPendingNotification are trusted-PHP operations. Native bridge responses contain only app-private file references. Raw FCM tokens and notification destinations are never returned through those bridge responses or exposed to JavaScript.
 
-- Registers a custom `FirebaseMessagingService`.
-- Disables Google Play Services notification delegation so the plugin owns message handling.
-- Displays notification messages while the app is in the foreground.
-- Supports Firebase’s system-tray presentation while the app is in the background.
-- Creates a high-importance Android notification channel when required.
-- Opens the application when a notification is tapped.
-- Stores refreshed FCM tokens in an app-private atomic file.
+The Android implementation provides:
 
-The plugin does not:
+- Notification-permission checking and runtime permission requests.
+- Asynchronous FCM token registration.
+- Automatic refreshed-token persistence.
+- Foreground and background display for data-only messages.
+- A high-importance notification channel.
+- Versioned and allow-listed notification destinations.
+- Private one-time notification-tap files.
+- Warm, background and cold-start tap handling through NativePHP.
 
-- Send FCM messages from the mobile device.
-- Include Firebase service-account credentials.
-- Route notification taps to a specific application page yet.
-- Provide an iOS implementation.
+The plugin does not send FCM messages, contain Firebase service-account credentials, accept arbitrary navigation URLs, or provide an iOS implementation.
 
 ## Requirements
 
-- NativePHP Mobile 3.x
+- NativePHP Mobile ^3.0 or ^4.0
 - Android API 21 or newer
-- A Firebase Android application matching the NativePHP application ID
-- A valid `google-services.json`
+- A Firebase Android app matching the NativePHP application ID
+- A valid google-services.json
 
-Android 13 and newer require the runtime `POST_NOTIFICATIONS` permission.
+The application must copy google-services.json from its permanent trusted plugin resource during native generation. Firebase service-account JSON is server-side private-key material and must never be packaged with the mobile app.
 
-## Installation
+## Data-only message requirement
 
-```bash
-composer require bbs/plugin-firebase-push-notifications
-php artisan native:plugin:register bbs/plugin-firebase-push-notifications
-```
+Reliable foreground, background and cold-start routing requires a high-priority FCM data-only message handled by FirebasePushMessagingService.
 
-Verify registration:
+A message containing a top-level Firebase notification block may be displayed automatically while the app is backgrounded. That path can bypass the custom service and cannot guarantee this routing contract.
 
-```bash
-php artisan native:plugin:list --all
-```
+The trusted sender may include title and body plus this versioned navigation data:
 
-## Firebase Client Configuration
+    navigation_version: 1
+    navigation_destination: post_edit
+    navigation_resource_id: 42
 
-The application must copy `google-services.json` into the generated Android app during the NativePHP build lifecycle.
+The mobile application must never contain trusted-sender credentials or send server-side Firebase requests.
 
-This plugin intentionally does not own or copy that file because the application may already have another Firebase plugin managing the shared configuration.
+## Version 1 navigation contract
 
-Firebase service-account JSON is server-side private-key material. It must never be included in a mobile build.
+Accepted keys:
 
-## PHP Usage
+- navigation_version
+- navigation_destination
+- navigation_resource_id
 
-```php
-use Bbs\FirebasePushNotifications\Facades\FirebasePushNotifications;
-use Illuminate\Support\Str;
+navigation_version must be 1.
 
-$permission =
-    FirebasePushNotifications::checkPermission();
+Allowed destinations:
 
-FirebasePushNotifications::requestPermission();
+| Destination | Laravel result |
+|---|---|
+| home | Home |
+| posts | Posts list |
+| post_create | Create Post |
+| post_edit | Edit an authorized Post |
+| push_settings | Push Notifications page |
 
-$requestId = (string) Str::uuid();
+navigation_resource_id is required only for post_edit and must be a positive integer.
 
-$started =
-    FirebasePushNotifications::getToken($requestId);
-```
+Invalid or unsupported destinations fall back to Home.
 
-### Check Permission
+The native plugin and Laravel both validate the contract. Laravel additionally requires authentication, biometric unlock, and Post authorization before opening protected destinations.
 
-```php
-$result =
-    FirebasePushNotifications::checkPermission();
-```
+## Secure notification-tap lifecycle
 
-The result includes:
+When a data-only message arrives:
 
-- `status`
-- `granted`
-- `sdkInt`
-- `requiresRuntimePermission`
+1. The native plugin reads only the navigation contract fields.
+2. Missing or invalid contracts are normalized to Home.
+3. The sanitized destination is written to an app-private atomic file.
+4. A random one-time UUID identifies that file.
+5. The Android notification receives only this fixed internal URI:
 
-Possible status values include `granted`, `not_determined`, and `denied`.
+    nativeblog://push/open?tap=<uuid>
 
-### Request Permission
+The notification payload is not copied into the Android launch intent.
 
-```php
-$result =
-    FirebasePushNotifications::requestPermission();
-```
+NativePHP processes the fixed URI through onNewIntent for a running or backgrounded app and through onCreate plus its pending-deep-link mechanism for a terminated app.
 
-On Android 13 and newer, this starts the native runtime permission dialog when permission has not already been granted.
+Laravel receives only the UUID. Trusted PHP calls GetPendingNotification, receives the private file path, reads the sanitized JSON, and deletes the file. The payload itself never crosses the NativePHP bridge response.
 
-### Retrieve the FCM Token
+The Native Blog application stores the normalized destination in its session. It resumes only after authentication and biometric unlock. Missing, unavailable, already-consumed, unauthorized, or unsupported destinations fall back to Home.
 
-```php
-$result =
-    FirebasePushNotifications::getToken($requestId);
-```
+## Token registration and refresh
 
-This returns immediately with a `started` response. Firebase retrieves the token asynchronously.
+CheckPermission reports the current Android permission state. RequestPermission starts the Android 13 or newer permission dialog when required.
 
-### Retrieve the Stored FCM Token
+GetToken returns immediately. Its final token-free result is dispatched through:
 
-```php
-$result =
-    FirebasePushNotifications::getStoredToken();
-```
-The PHP result includes `available` and, when present, `token`. Internally, the native bridge returns only a reference to an app-private token file, and the trusted PHP wrapper reads that file directly. The raw token is not returned through JNI or exposed to JavaScript. Do not render or log the returned PHP token.
+    Bbs\FirebasePushNotifications\Events\FirebasePushNotificationsCompleted
 
-## Completion Event
+The completion event contains only success, error, and request ID.
 
-The final token result is dispatched through:
+GetStoredToken asks native code only for the private token-file path. Trusted PHP reads the raw token directly and must never render, return, or log it.
 
-```php
-Bbs\FirebasePushNotifications\Events\FirebasePushNotificationsCompleted
-```
+FirebasePushMessagingService.onNewToken stores refreshed tokens in the same private token file. Authenticated Laravel code may compare the private token with an enrolled user and update it only when changed.
 
-Event properties:
+## Trusted PHP API
 
-- `success`
-- `error`
-- `id`
-A successful event confirms that Firebase retrieved the token and the plugin stored it privately. The raw token is not included in the native event. Trusted Laravel code can retrieve it through `FirebasePushNotifications::getStoredToken()`.
+The Facade provides:
 
-Example listener:
+- checkPermission()
+- requestPermission()
+- getToken(request ID)
+- getStoredToken()
+- getPendingNotification(tap ID)
 
-```php
-use Bbs\FirebasePushNotifications\Events\FirebasePushNotificationsCompleted;
-use Illuminate\Support\Facades\Event;
+getPendingNotification consumes its private file once and returns only the sanitized payload to trusted Laravel code.
 
-Event::listen(
-    FirebasePushNotificationsCompleted::class,
-    function (FirebasePushNotificationsCompleted $event) {
-        if (! $event->id) {
-            return;
-        }
+Stored-token and pending-notification file methods are intentionally absent from the JavaScript API.
 
-        // Match the event ID with the pending application request.
-    },
-);
-```
+## Validation and tests
 
-A request UUID should be stored in the Laravel session and checked before consuming the asynchronous result.
+Validate the manifest:
 
-## Receiving Notifications
+    php artisan native:plugin:validate packages/bbs/plugin-firebase-push-notifications
 
-The plugin registers `FirebasePushMessagingService` for `com.google.firebase.MESSAGING_EVENT`.
+Run all plugin tests:
 
-### Foreground
+    vendor/bin/phpunit packages/bbs/plugin-firebase-push-notifications/tests
 
-When the application is visible, `onMessageReceived()` creates and displays a native Android notification. It reads the title and body from either the Firebase notification payload or these data keys:
+Run Laravel push tests:
 
-- `title`
-- `body`
-- `message`
-
-### Background
-
-Firebase notification messages received while the application is in the background are displayed in Android’s system notification tray.
-
-### Notification Tap
-
-Tapping a notification opens the application launcher, which currently loads the Home page. Custom deep-link routing is not implemented yet.
-
-### Token Refresh
-
-Firebase may rotate an FCM token.
-
-`FirebasePushMessagingService.onNewToken()` saves the refreshed token in an app-private atomic file. The internal `GetStoredToken` bridge returns only the private file reference, and `FirebasePushNotifications::getStoredToken()` reads it from trusted PHP code inside the application sandbox.
-
-In the Native Blog application, an authenticated background request runs when an enrolled user opens or resumes the app. Laravel compares the private stored token with the user’s current `push_token` and updates the database only when the token changed.
-
-Users who never enabled push notifications are not enrolled automatically, and the synchronization response never exposes the token to JavaScript.
-
-## JavaScript API
-
-```javascript
-import {
-    firebasePushNotifications
-} from '@bbs/plugin-firebase-push-notifications';
-
-const permission =
-    await firebasePushNotifications.checkPermission();
-
-await firebasePushNotifications.requestPermission();
-
-const started =
-    await firebasePushNotifications.getToken(requestId);
-```
-
-## Architecture
-
-### Token Registration
-
-```text
-Laravel controller
-    -> NativePHP GetToken bridge
-    -> FirebaseMessaging.getToken()
-    -> App-private atomic token file
-    -> Token-free NativePHP completion event
-    -> Laravel completion cache
-    -> Browser polling
-    -> Trusted PHP reads private token file
-    -> Authenticated user push_token
-```
-
-### Incoming Notification
-
-```text
-Firebase Cloud Messaging
-    -> FirebasePushMessagingService
-    -> Android notification channel
-    -> System notification tray
-    -> User taps notification
-    -> Native Blog launcher
-    -> Home page
-```
-
-### Application Initialization
-
-```text
-NativePHP plugin init_function
-    -> FirebaseMessaging
-    -> Disable Google Play Services notification delegation
-    -> Custom plugin service owns message handling
-```
-
-### Refreshed Token Synchronization
-
-```text
-Firebase rotates token
-    -> FirebasePushMessagingService.onNewToken()
-    -> App-private atomic token file
-    -> Authenticated app foreground request
-    -> Internal GetStoredToken file reference
-    -> Trusted PHP reads private token file
-    -> Laravel compares current user token
-    -> Update push_token only when changed
-```
-## Validation and Tests
-
-Validate the NativePHP manifest:
-
-```bash
-php artisan native:plugin:validate packages/bbs/plugin-firebase-push-notifications
-```
-
-Run the plugin tests:
-
-```bash
-vendor/bin/phpunit packages/bbs/plugin-firebase-push-notifications/tests/PluginTest.php
-```
+    php artisan test tests/Feature/FirebasePushNotificationsTest.php
+    php artisan test tests/Feature/PushNotificationDeepLinkTest.php
 
 ## Security
 
-- Never place Firebase service-account credentials in this plugin or the application `.env` packaged for Android.
-- Do not log FCM registration tokens.
-- Associate each asynchronous request UUID with the current authenticated Laravel session.
-- Consume cached token results only once.
+- Never package Firebase service-account credentials.
+- Never send trusted Firebase requests from the mobile application.
+- Never render or log raw FCM tokens.
+- Never copy notification payload data into a launch intent.
+- Never accept arbitrary URLs or unrestricted route names.
+- Return only private file references through sensitive bridges.
+- Consume notification-tap files once.
+- Require Laravel authentication and biometric unlock.
+- Apply authorization to resource-specific destinations.
+- Fall back to Home for invalid, missing, unsupported, or unauthorized destinations.
 
 ## License
 

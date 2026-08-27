@@ -46,6 +46,11 @@
             "name": "FirebasePushNotifications.GetStoredToken",
             "android": "com.bbs.plugins.firebase_push_notifications.FirebasePushNotificationsFunctions.GetStoredToken",
             "description": "Return a private token-file reference for trusted PHP synchronization"
+        },
+        {
+            "name": "FirebasePushNotifications.GetPendingNotification",
+            "android": "com.bbs.plugins.firebase_push_notifications.FirebasePushNotificationsFunctions.GetPendingNotification",
+            "description": "Return a private pending-notification file reference for trusted PHP consumption"
         }
     ],
     "android": {

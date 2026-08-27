@@ -81,6 +81,94 @@ class FirebasePushNotifications
         ];
     }
 
+    public function getPendingNotification(
+        string $id
+    ): ?object {
+        $id = trim($id);
+
+        if (
+            preg_match(
+                '/\A[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\z/D',
+                $id
+            ) !== 1
+        ) {
+            return $this->pendingNotificationUnavailable();
+        }
+
+        $reference = $this->call(
+            'FirebasePushNotifications.GetPendingNotification',
+            ['id' => $id]
+        );
+
+        if ($reference === null) {
+            return null;
+        }
+
+        if (! ($reference->available ?? false)) {
+            return $this->pendingNotificationUnavailable();
+        }
+
+        $path = $reference->path ?? null;
+
+        if (
+            ! is_string($path) ||
+            trim($path) === '' ||
+            ! is_file($path) ||
+            ! is_readable($path) ||
+            basename(dirname($path)) !==
+                'firebase_push_notification_taps' ||
+            ! hash_equals(
+                $id.'.json',
+                basename($path)
+            )
+        ) {
+            return $this->pendingNotificationUnavailable();
+        }
+
+        $payload = null;
+
+        try {
+            $contents = file_get_contents($path);
+
+            if (
+                is_string($contents) &&
+                trim($contents) !== ''
+            ) {
+                $decoded = json_decode(
+                    $contents,
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR
+                );
+
+                if (is_array($decoded)) {
+                    $payload = $decoded;
+                }
+            }
+        } catch (\JsonException) {
+            $payload = null;
+        } finally {
+            @unlink($path);
+        }
+
+        if ($payload === null) {
+            return $this->pendingNotificationUnavailable();
+        }
+
+        return (object) [
+            'available' => true,
+            'payload' => $payload,
+        ];
+    }
+
+    private function pendingNotificationUnavailable(): object
+    {
+        return (object) [
+            'available' => false,
+            'payload' => null,
+        ];
+    }
+
     private function call(
         string $method,
         array $parameters = []
