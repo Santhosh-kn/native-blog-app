@@ -6,7 +6,12 @@
     @forelse ($posts as $post)
         <div class="card" style="margin-bottom: 12px;">
             @if ($post->photo_url)
-                <img src="{{ asset('storage/' . $post->photo_url) }}" style="width: 100%; height: auto; border-radius: 10px; margin-bottom: 12px; display: block;">
+                <img
+                    data-native-image="{{ route('posts.photo', ['id' => $post->id]) }}"
+                    alt="Image for {{ $post->title }}"
+                    style="width: 100%; height: auto; border-radius: 10px; margin-bottom: 12px; display: block;"
+                >
+                @include('partials.native-image-loader')
             @endif
             <p style="margin: 0 0 4px; font-weight: 700; font-size: 16px;">{{ $post->title }}</p>
             <p style="margin: 0 0 12px; font-size: 14px; color: var(--text-muted); line-height: 1.5;">{{ Str::limit($post->body, 100) }}</p>

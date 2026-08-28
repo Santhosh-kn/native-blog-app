@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Native\Mobile\Events\Camera\PhotoCancelled;
 use Native\Mobile\Events\Camera\PhotoTaken;
 use Native\Mobile\Events\Gallery\MediaSelected;
 
@@ -35,24 +36,72 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Post::class, PostPolicy::class);
         Event::listen(PhotoTaken::class, function (PhotoTaken $event) {
             Cache::forever('pending_photo_path', $event->path);
+            Cache::forever('pending_photo_selection', [
+                'state' => 'ready',
+                'message' => null,
+            ]);
         });
+
+        Event::listen(
+            PhotoCancelled::class,
+            function (PhotoCancelled $event) {
+                Cache::forget('pending_photo_path');
+                Cache::forever('pending_photo_selection', [
+                    'state' => 'cancelled',
+                    'message' => 'No image was selected.',
+                ]);
+            },
+        );
+
         Event::listen(MediaSelected::class, function (MediaSelected $event) {
             Cache::forever('debug_media_files', json_encode([
-                'success' => $event->success ?? null,
-                'files' => $event->files ?? null,
-                'count' => $event->count ?? null,
+                'success' => $event->success,
+                'files' => $event->files,
+                'count' => $event->count,
+                'cancelled' => $event->cancelled,
+                'error' => $event->error,
             ]));
 
-            $files = $event->files ?? [];
+            if ($event->cancelled) {
+                Cache::forget('pending_photo_path');
+                Cache::forever('pending_photo_selection', [
+                    'state' => 'cancelled',
+                    'message' => 'No image was selected.',
+                ]);
 
-            if (! empty($files)) {
-                $first = $files[0];
-                $path = is_array($first) ? ($first['path'] ?? null) : (is_string($first) ? $first : null);
-
-                if ($path) {
-                    Cache::forever('pending_photo_path', $path);
-                }
+                return;
             }
+
+            if (! $event->success) {
+                Cache::forget('pending_photo_path');
+                Cache::forever('pending_photo_selection', [
+                    'state' => 'failed',
+                    'message' => 'The gallery could not return an image.',
+                ]);
+
+                return;
+            }
+
+            $first = $event->files[0] ?? null;
+            $path = is_array($first)
+                ? ($first['path'] ?? null)
+                : (is_string($first) ? $first : null);
+
+            if (is_string($path) && trim($path) !== '') {
+                Cache::forever('pending_photo_path', $path);
+                Cache::forever('pending_photo_selection', [
+                    'state' => 'ready',
+                    'message' => null,
+                ]);
+
+                return;
+            }
+
+            Cache::forget('pending_photo_path');
+            Cache::forever('pending_photo_selection', [
+                'state' => 'failed',
+                'message' => 'The selected gallery image was unavailable.',
+            ]);
         });
 
         Event::listen(BiometricCompleted::class, function (BiometricCompleted $event) {
@@ -165,8 +214,7 @@ class AppServiceProvider extends ServiceProvider
                     Log::warning(
                         'Invalid native printing state event received',
                         [
-                            'valid_request_id' =>
-                                Str::isUuid($event->request_id),
+                            'valid_request_id' => Str::isUuid($event->request_id),
                             'action' => Str::limit(
                                 $event->action,
                                 50,
