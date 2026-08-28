@@ -7,10 +7,12 @@ use App\Policies\PostPolicy;
 use Bbs\Biometric\Events\BiometricCompleted;
 use Bbs\FirebaseGoogleAuth\Events\FirebaseGoogleAuthCompleted;
 use Bbs\FirebasePushNotifications\Events\FirebasePushNotificationsCompleted;
+use Bbs\NativePrinting\Events\NativePrintingStateChanged;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Native\Mobile\Events\Camera\PhotoTaken;
 use Native\Mobile\Events\Gallery\MediaSelected;
@@ -125,6 +127,84 @@ class AppServiceProvider extends ServiceProvider
                     'success' => $event->success,
                     'request_id' => $event->id,
                 ]);
+            },
+        );
+
+        Event::listen(
+            NativePrintingStateChanged::class,
+            function (NativePrintingStateChanged $event) {
+                $allowedActions = [
+                    'preview',
+                    'print',
+                ];
+
+                $allowedStatuses = [
+                    'accepted',
+                    'presented',
+                    'closed',
+                    'submitted',
+                    'blocked',
+                    'cancelled',
+                    'completed',
+                    'failed',
+                ];
+
+                if (
+                    ! Str::isUuid($event->request_id) ||
+                    ! in_array(
+                        $event->action,
+                        $allowedActions,
+                        true,
+                    ) ||
+                    ! in_array(
+                        $event->status,
+                        $allowedStatuses,
+                        true,
+                    )
+                ) {
+                    Log::warning(
+                        'Invalid native printing state event received',
+                        [
+                            'valid_request_id' =>
+                                Str::isUuid($event->request_id),
+                            'action' => Str::limit(
+                                $event->action,
+                                50,
+                                '',
+                            ),
+                            'status' => Str::limit(
+                                $event->status,
+                                50,
+                                '',
+                            ),
+                        ],
+                    );
+
+                    return;
+                }
+
+                Cache::put(
+                    "native_printing_result:{$event->request_id}",
+                    [
+                        'request_id' => $event->request_id,
+                        'action' => $event->action,
+                        'status' => $event->status,
+                        'job_id' => $event->job_id,
+                        'error_code' => $event->error_code,
+                        'error_message' => $event->error_message,
+                    ],
+                    now()->addMinutes(2),
+                );
+
+                Log::info(
+                    'Native printing state received',
+                    [
+                        'request_id' => $event->request_id,
+                        'action' => $event->action,
+                        'status' => $event->status,
+                        'error_code' => $event->error_code,
+                    ],
+                );
             },
         );
     }

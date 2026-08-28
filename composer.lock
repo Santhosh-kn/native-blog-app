@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f97dc6d26ca22403188016ae81665b38",
+    "content-hash": "e2a57fcefeb4b86285de43ebc4cf3261",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -67,7 +67,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/bbs/plugin-biometric",
-                "reference": "98281be5d7542728f92c995f8b7e7fc316617d58"
+                "reference": "19e9f4688cb31df518e5bdb5bb52080f913d6264"
             },
             "require": {
                 "nativephp/mobile": "^3.0 || ^4.0",
@@ -102,7 +102,7 @@
             ],
             "authors": [
                 {
-                    "name": "Santhosh",
+                    "name": "BBS",
                     "email": "you@example.com"
                 }
             ],
@@ -207,6 +207,56 @@
                 }
             ],
             "description": "NativePHP Mobile Android plugin for Firebase Cloud Messaging push notifications",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-native-printing",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-printing",
+                "reference": "ab8e1f65f54784de24bacb40f9c045f7d79b13ed"
+            },
+            "require": {
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativePrinting\\NativePrintingServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativePrinting\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit tests/PluginTest.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BBS",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "Native PDF preview and printing for NativePHP Mobile",
             "transport-options": {
                 "relative": true
             }

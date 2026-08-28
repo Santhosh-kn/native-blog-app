@@ -11,6 +11,7 @@
     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
         <a href="{{ route('posts.index') }}" class="btn btn-secondary btn-sm">📝 My Posts</a>
         <a href="{{ route('push.index') }}" class="btn btn-secondary btn-sm">🔔 Notifications</a>
+        <a href="{{ route('native-printing.index') }}" class="btn btn-secondary btn-sm">PDF Printing</a>
         <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
             @csrf
             <button type="submit" class="btn btn-secondary btn-sm">🚪 Logout</button>
