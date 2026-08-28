@@ -5,9 +5,16 @@
 @section('content')
     <a href="{{ route('camera.capture') }}" class="btn btn-secondary btn-block" style="margin-bottom: 12px;">📷 Take Photo</a>
 
+    <a href="{{ route('camera.pick') }}" class="btn btn-secondary btn-block" style="margin-bottom: 16px;">Choose from Gallery</a>
+
     @if ($capturedPhoto)
-        <img src="{{ route('camera.preview') }}?t={{ time() }}" style="width: 100%; border-radius: 10px; margin-bottom: 12px; display: block;">
-        <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 16px;">Photo captured — fill in the form below.</p>
+        <img
+            data-native-image="{{ route('camera.preview', ['t' => time()]) }}"
+            alt="Selected post image"
+            style="width: 100%; border-radius: 10px; margin-bottom: 12px; display: block;"
+        >
+        @include('partials.native-image-loader')
+        <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 16px;">Image selected — fill in the form below.</p>
     @endif
 
     <form method="POST" action="{{ route('posts.store') }}">
@@ -22,7 +29,7 @@
             <textarea id="body" name="body">{{ old('body') }}</textarea>
             @error('body') <p class="error">{{ $message }}</p> @enderror
         </div>
-        <input type="hidden" name="captured_photo_path" value="{{ $capturedPhoto }}">
+        @error('photo') <p class="error">{{ $message }}</p> @enderror
         <button type="submit" class="btn btn-primary btn-block">Publish</button>
     </form>
 @endsection

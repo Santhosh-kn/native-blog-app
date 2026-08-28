@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Support\NativeImagePayload;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
@@ -11,6 +13,7 @@ use Illuminate\Support\Str;
 use Native\Mobile\Facades\Dialog;
 use Native\Mobile\Facades\File;
 use Native\Mobile\Facades\Share;
+use RuntimeException;
 
 class PostController extends Controller
 {
@@ -21,6 +24,39 @@ class PostController extends Controller
         return view('posts.index', [
             'posts' => $posts,
         ]);
+    }
+
+    public function photo(Request $request, int $id): JsonResponse
+    {
+        $post = $request->user()
+            ->posts()
+            ->findOrFail($id);
+
+        if (
+            ! is_string($post->photo_url) ||
+            trim($post->photo_url) === ''
+        ) {
+            return response()->json([
+                'message' => 'The post image is unavailable.',
+            ], 404);
+        }
+
+        try {
+            $payload = NativeImagePayload::fromPath(
+                Storage::disk('local')->path($post->photo_url),
+            );
+        } catch (RuntimeException) {
+            return response()->json([
+                'message' => 'The post image is unavailable.',
+            ], 404);
+        }
+
+        return response()
+            ->json($payload)
+            ->withHeaders([
+                'Cache-Control' => 'private, no-store',
+                'X-Content-Type-Options' => 'nosniff',
+            ]);
     }
 
     public function create()
@@ -38,11 +74,34 @@ class PostController extends Controller
         ]);
 
         $photoUrl = null;
-        $capturedPath = $request->input('captured_photo_path');
+        $capturedPath = Cache::get('pending_photo_path');
 
-        if ($capturedPath && file_exists($capturedPath)) {
-            $filename = 'posts/'.uniqid().'.jpg';
-            Storage::disk('local')->put($filename, file_get_contents($capturedPath));
+        if (is_string($capturedPath) && trim($capturedPath) !== '') {
+            try {
+                $image = NativeImagePayload::read($capturedPath);
+            } catch (RuntimeException) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'photo' => 'The selected image could not be read.',
+                    ]);
+            }
+
+            $filename = 'posts/'.Str::uuid().'.'.$image['extension'];
+
+            $stored = Storage::disk('local')->put(
+                $filename,
+                $image['contents'],
+            );
+
+            if (! $stored) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'photo' => 'The selected image could not be saved.',
+                    ]);
+            }
+
             $photoUrl = $filename;
             Cache::forget('pending_photo_path');
         }
@@ -55,13 +114,15 @@ class PostController extends Controller
             'published_at' => now(),
         ]);
 
+        Cache::forget('pending_photo_selection');
+
         return redirect()->route('posts.index')->with('status', 'Post created.');
     }
 
     public function edit($id)
     {
         $post = Post::findOrFail($id);
-        
+
         if (Gate::denies('update', $post)) {
             abort(403);
         }
@@ -72,7 +133,7 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $post = Post::findOrFail($id);
-        
+
         if (Gate::denies('update', $post)) {
             abort(403);
         }
@@ -90,7 +151,7 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
-        
+
         if (Gate::denies('delete', $post)) {
             abort(403);
         }
@@ -143,6 +204,6 @@ class PostController extends Controller
 
         Share::file($post->title, 'Check out this post', $path);
 
-        return back();
+        return redirect()->route('posts.index');
     }
 }
