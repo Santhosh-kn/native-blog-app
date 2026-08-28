@@ -1,0 +1,86 @@
+{
+    "name": "bbs/plugin-native-printing",
+    "version": "1.0.0",
+    "description": "Native PDF preview and printing for NativePHP Mobile",
+    "namespace": "NativePrinting",
+    "keywords": [
+        "android",
+        "pdf",
+        "preview",
+        "printing"
+    ],
+    "category": "utilities",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "BBS",
+        "email": "you@example.com",
+        "url": ""
+    },
+    "homepage": "",
+    "repository": "",
+    "funding": [],
+    "platforms": [
+        "android"
+    ],
+    "icon": "resources/icon.png",
+    "screenshots": [],
+    "bridge_functions": [
+        {
+            "name": "NativePrinting.IsAvailable",
+            "android": "com.bbs.plugins.native_printing.NativePrintingFunctions.IsAvailable",
+            "description": "Check native PDF preview and printing availability"
+        },
+        {
+            "name": "NativePrinting.Preview",
+            "android": "com.bbs.plugins.native_printing.NativePrintingFunctions.Preview",
+            "description": "Open an application-local PDF in the native preview"
+        },
+        {
+            "name": "NativePrinting.Print",
+            "android": "com.bbs.plugins.native_printing.NativePrintingFunctions.Print",
+            "description": "Open Android's system print interface for an application-local PDF"
+        }
+    ],
+    "android": {
+        "min_version": 29,
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "implementation": [
+                "androidx.appcompat:appcompat:1.7.1",
+                "androidx.recyclerview:recyclerview:1.4.0"
+            ]
+        },
+        "activities": [
+            {
+                "name": "com.bbs.plugins.native_printing.NativePdfPreviewActivity",
+                "theme": "@style/Theme.AppCompat.DayNight.NoActionBar",
+                "exported": false,
+                "configChanges": "orientation|screenSize"
+            }
+        ],
+        "services": [],
+        "receivers": [],
+        "providers": []
+    },
+    "ios": {
+        "min_version": "18.0",
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "assets": {
+        "android": []
+    },
+    "secrets": [],
+    "events": [
+        "Bbs\\NativePrinting\\Events\\NativePrintingStateChanged"
+    ],
+    "service_provider": "Bbs\\NativePrinting\\NativePrintingServiceProvider"
+}

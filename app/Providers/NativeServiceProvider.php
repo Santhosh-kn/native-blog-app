@@ -5,6 +5,7 @@ namespace App\Providers;
 use Bbs\Biometric\BiometricServiceProvider;
 use Bbs\FirebaseGoogleAuth\FirebaseGoogleAuthServiceProvider;
 use Bbs\FirebasePushNotifications\FirebasePushNotificationsServiceProvider;
+use Bbs\NativePrinting\NativePrintingServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Native\Mobile\Providers\BrowserServiceProvider;
 use Native\Mobile\Providers\CameraServiceProvider;
@@ -50,6 +51,7 @@ class NativeServiceProvider extends ServiceProvider
             BiometricServiceProvider::class,
             FirebaseGoogleAuthServiceProvider::class,
             FirebasePushNotificationsServiceProvider::class,
+            NativePrintingServiceProvider::class,
         ];
     }
 }

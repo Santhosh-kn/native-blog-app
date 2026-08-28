@@ -5,6 +5,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MicrophoneController;
+use App\Http\Controllers\NativePrintingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\PushNotificationDeepLinkController;
@@ -87,6 +88,36 @@ Route::middleware('device.unlocked')->group(function () {
         Route::get('/status', [PushController::class, 'status'])->name('status');
     });
 
+    Route::prefix('native-printing')
+        ->name('native-printing.')
+        ->group(function () {
+            Route::get(
+                '/',
+                [NativePrintingController::class, 'index'],
+            )->name('index');
+
+            Route::get(
+                '/availability',
+                [NativePrintingController::class, 'availability'],
+            )->name('availability');
+
+            Route::post(
+                '/preview',
+                [NativePrintingController::class, 'preview'],
+            )->name('preview');
+
+            Route::post(
+                '/print',
+                [NativePrintingController::class, 'print'],
+            )->name('print');
+
+            Route::get(
+                '/status/{requestId}',
+                [NativePrintingController::class, 'status'],
+            )
+                ->whereUuid('requestId')
+                ->name('status');
+        });
     Route::post('/posts/{id}/share', [PostController::class, 'share'])->name('posts.share');
 });
 

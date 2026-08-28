@@ -9,6 +9,10 @@
     ],
     "license": "MIT",
     "repositories": {
+        "plugin-native-printing": {
+            "type": "path",
+            "url": "packages/bbs/plugin-native-printing"
+        },
         "plugin-biometric": {
             "type": "path",
             "url": "packages/bbs/plugin-biometric"
@@ -27,6 +31,7 @@
         "bbs/plugin-biometric": "^1.0",
         "bbs/plugin-firebase-google-auth": "1.0.0",
         "bbs/plugin-firebase-push-notifications": "^1.0",
+        "bbs/plugin-native-printing": "^1.0",
         "google/auth": "^1.53",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
