@@ -7,6 +7,7 @@ use App\Policies\PostPolicy;
 use Bbs\Biometric\Events\BiometricCompleted;
 use Bbs\FirebaseGoogleAuth\Events\FirebaseGoogleAuthCompleted;
 use Bbs\FirebasePushNotifications\Events\FirebasePushNotificationsCompleted;
+use Bbs\NativeDocumentPicker\Events\NativeDocumentPickerCompleted;
 use Bbs\NativePrinting\Events\NativePrintingStateChanged;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -176,6 +177,46 @@ class AppServiceProvider extends ServiceProvider
                     'success' => $event->success,
                     'request_id' => $event->id,
                 ]);
+            },
+        );
+
+        Event::listen(
+            NativeDocumentPickerCompleted::class,
+            function (NativeDocumentPickerCompleted $event) {
+                if (! Str::isUuid($event->id)) {
+                    Log::warning(
+                        'Invalid native document-picker completion received',
+                        [
+                            'valid_request_id' => false,
+                        ],
+                    );
+
+                    return;
+                }
+
+                $result = $event->result();
+
+                Cache::put(
+                    "native_document_picker_result:{$result->id}",
+                    [
+                        'id' => $result->id,
+                        'status' => $result->status,
+                        'success' => $result->success,
+                        'cancelled' => $result->cancelled,
+                        'error_code' => $result->errorCode,
+                        'error_message' => $result->errorMessage,
+                    ],
+                    now()->addMinutes(5),
+                );
+
+                Log::info(
+                    'Native document-picker completion received',
+                    [
+                        'request_id' => $result->id,
+                        'status' => $result->status,
+                        'error_code' => $result->errorCode,
+                    ],
+                );
             },
         );
 

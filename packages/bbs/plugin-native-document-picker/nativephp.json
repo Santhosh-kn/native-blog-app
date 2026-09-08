@@ -1,0 +1,72 @@
+{
+    "name": "bbs/plugin-native-document-picker",
+    "version": "1.0.0",
+    "description": "Secure Android document selection and application-private persistence for NativePHP Mobile",
+    "namespace": "NativeDocumentPicker",
+    "keywords": [
+        "android",
+        "document-picker",
+        "nativephp",
+        "private-storage",
+        "storage-access-framework"
+    ],
+    "category": "utilities",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "BBS",
+        "email": "you@example.com",
+        "url": "https://github.com/Santhosh-kn"
+    },
+    "homepage": "https://github.com/Santhosh-kn/native-blog-app",
+    "repository": "https://github.com/Santhosh-kn/native-blog-app",
+    "funding": [],
+    "platforms": [
+        "android"
+    ],
+    "screenshots": [],
+    "bridge_functions": [
+        {
+            "name": "NativeDocumentPicker.Pick",
+            "android": "com.bbs.plugins.native_document_picker.NativeDocumentPickerFunctions.Pick",
+            "description": "Open Android's system document picker"
+        },
+        {
+            "name": "NativeDocumentPicker.GetStatus",
+            "android": "com.bbs.plugins.native_document_picker.NativeDocumentPickerFunctions.GetStatus",
+            "description": "Get a safely persisted picker result by request ID"
+        }
+    ],
+    "android": {
+        "min_version": 21,
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "implementation": []
+        },
+        "activities": [],
+        "services": [],
+        "receivers": [],
+        "providers": []
+    },
+    "ios": {
+        "min_version": "15.0",
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "assets": {
+        "android": [],
+        "ios": []
+    },
+    "secrets": [],
+    "events": [
+        "Bbs\\NativeDocumentPicker\\Events\\NativeDocumentPickerCompleted"
+    ],
+    "service_provider": "Bbs\\NativeDocumentPicker\\NativeDocumentPickerServiceProvider"
+}

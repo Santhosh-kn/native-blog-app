@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2a57fcefeb4b86285de43ebc4cf3261",
+    "content-hash": "411c215551ad0e7482667d7f397cd42f",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -212,12 +212,62 @@
             }
         },
         {
+            "name": "bbs/plugin-native-document-picker",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-document-picker",
+                "reference": "9ad300ec1fa8d0f68b52cbcd3cf13a6237a3df52"
+            },
+            "require": {
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativeDocumentPicker\\NativeDocumentPickerServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativeDocumentPicker\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --bootstrap tests/bootstrap.php tests/PluginTest.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BBS",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "Secure Android document selection and application-private persistence for NativePHP Mobile",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "bbs/plugin-native-printing",
             "version": "1.0.0",
             "dist": {
                 "type": "path",
                 "url": "packages/bbs/plugin-native-printing",
-                "reference": "ab8e1f65f54784de24bacb40f9c045f7d79b13ed"
+                "reference": "e3f19cabae7c98ac374886ad1099dddb237e62ff"
             },
             "require": {
                 "nativephp/mobile": "^4.2",
