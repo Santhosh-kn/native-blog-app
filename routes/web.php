@@ -5,6 +5,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MicrophoneController;
+use App\Http\Controllers\NativeDocumentPickerController;
 use App\Http\Controllers\NativePrintingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
@@ -90,6 +91,27 @@ Route::middleware('device.unlocked')->group(function () {
         Route::post('/sync', [PushController::class, 'sync'])->name('sync');
         Route::get('/status', [PushController::class, 'status'])->name('status');
     });
+
+    Route::prefix('native-document-picker')
+        ->name('native-document-picker.')
+        ->group(function () {
+            Route::get(
+                '/',
+                [NativeDocumentPickerController::class, 'index'],
+            )->name('index');
+
+            Route::post(
+                '/pick',
+                [NativeDocumentPickerController::class, 'pick'],
+            )->name('pick');
+
+            Route::get(
+                '/status/{requestId}',
+                [NativeDocumentPickerController::class, 'status'],
+            )
+                ->whereUuid('requestId')
+                ->name('status');
+        });
 
     Route::prefix('native-printing')
         ->name('native-printing.')
