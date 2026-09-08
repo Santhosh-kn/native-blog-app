@@ -1,0 +1,37 @@
+{
+    "name": "bbs/plugin-native-background-transfer",
+    "version": "1.0.0",
+    "description": "Secure background upload and download transfers for NativePHP Mobile",
+    "type": "nativephp-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "BBS"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "nativephp/mobile": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bbs\\NativeBackgroundTransfer\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bbs\\NativeBackgroundTransfer\\NativeBackgroundTransferServiceProvider"
+            ]
+        },
+        "nativephp": {
+            "manifest": "nativephp.json"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "scripts": {
+        "test": "phpunit --bootstrap tests/bootstrap.php tests/PluginTest.php"
+    }
+}

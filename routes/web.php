@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MicrophoneController;
 use App\Http\Controllers\NativeDocumentPickerController;
+use App\Http\Controllers\NativeBackgroundTransferController;
 use App\Http\Controllers\NativePrintingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
@@ -113,6 +114,45 @@ Route::middleware('device.unlocked')->group(function () {
                 ->name('status');
         });
 
+    Route::prefix('native-background-transfer')
+        ->name('native-background-transfer.')
+        ->group(function () {
+            Route::get(
+                '/',
+                [NativeBackgroundTransferController::class, 'index'],
+            )->name('index');
+
+            Route::post(
+                '/start',
+                [NativeBackgroundTransferController::class, 'start'],
+            )->name('start');
+
+            Route::get(
+                '/transfers',
+                [NativeBackgroundTransferController::class, 'transfers'],
+            )->name('transfers');
+
+            Route::get(
+                '/status/{transferId}',
+                [NativeBackgroundTransferController::class, 'status'],
+            )
+                ->whereUuid('transferId')
+                ->name('status');
+
+            Route::post(
+                '/cancel/{transferId}',
+                [NativeBackgroundTransferController::class, 'cancel'],
+            )
+                ->whereUuid('transferId')
+                ->name('cancel');
+
+            Route::post(
+                '/consume/{transferId}',
+                [NativeBackgroundTransferController::class, 'consume'],
+            )
+                ->whereUuid('transferId')
+                ->name('consume');
+        });
     Route::prefix('native-printing')
         ->name('native-printing.')
         ->group(function () {
