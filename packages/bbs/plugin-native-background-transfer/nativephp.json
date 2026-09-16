@@ -1,0 +1,105 @@
+{
+    "name": "bbs/plugin-native-background-transfer",
+    "version": "1.0.0",
+    "description": "Secure background upload and download transfers for NativePHP Mobile",
+    "namespace": "NativeBackgroundTransfer",
+    "keywords": [
+        "android",
+        "background-transfer",
+        "download",
+        "upload",
+        "nativephp"
+    ],
+    "category": "utilities",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "BBS",
+        "email": "you@example.com",
+        "url": "https://github.com/Santhosh-kn"
+    },
+    "homepage": "https://github.com/Santhosh-kn/native-blog-app",
+    "repository": "https://github.com/Santhosh-kn/native-blog-app",
+    "funding": [],
+    "platforms": [
+        "android"
+    ],
+    "screenshots": [],
+    "bridge_functions": [
+        {
+            "name": "NativeBackgroundTransfer.StartDownload",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.StartDownload",
+            "description": "Queue a validated HTTPS background download"
+        },
+        {
+            "name": "NativeBackgroundTransfer.StartUpload",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.StartUpload",
+            "description": "Queue a validated HTTPS background upload"
+        },
+        {
+            "name": "NativeBackgroundTransfer.GetStatus",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.GetStatus",
+            "description": "Get the persisted status of a transfer"
+        },
+        {
+            "name": "NativeBackgroundTransfer.ListTransfers",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.ListTransfers",
+            "description": "Return safely persisted transfer summaries"
+        },
+        {
+            "name": "NativeBackgroundTransfer.Cancel",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.Cancel",
+            "description": "Cancel an active or queued transfer"
+        },
+        {
+            "name": "NativeBackgroundTransfer.ConsumeResult",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.ConsumeResult",
+            "description": "Atomically consume a terminal transfer result"
+        }
+    ],
+    "android": {
+        "min_version": 33,
+        "permissions": [
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE",
+            "android.permission.POST_NOTIFICATIONS",
+            "android.permission.FOREGROUND_SERVICE",
+            "android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        ],
+        "repositories": [],
+        "dependencies": {
+            "implementation": [
+                "androidx.work:work-runtime:2.11.2"
+            ]
+        },
+        "activities": [],
+        "services": [
+            {
+                "name": "androidx.work.impl.foreground.SystemForegroundService",
+                "exported": false,
+                "foregroundServiceType": "dataSync"
+            }
+        ],
+        "receivers": [],
+        "providers": []
+    },
+    "ios": {
+        "min_version": "15.0",
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "assets": {
+        "android": []
+    },
+    "secrets": [],
+    "events": [
+        "Bbs\\NativeBackgroundTransfer\\Events\\NativeBackgroundTransferCompleted"
+    ],
+    "service_provider": "Bbs\\NativeBackgroundTransfer\\NativeBackgroundTransferServiceProvider"
+}

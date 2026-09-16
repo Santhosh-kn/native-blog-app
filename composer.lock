@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "411c215551ad0e7482667d7f397cd42f",
+    "content-hash": "976fd4f32511dad60cd8345ad2fe6eaa",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -207,6 +207,56 @@
                 }
             ],
             "description": "NativePHP Mobile Android plugin for Firebase Cloud Messaging push notifications",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-native-background-transfer",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-background-transfer",
+                "reference": "7ff841e46bac41ead72e1269afd4596d2ee9958c"
+            },
+            "require": {
+                "bbs/plugin-native-document-picker": "^1.0",
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativeBackgroundTransfer\\NativeBackgroundTransferServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativeBackgroundTransfer\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --bootstrap tests/bootstrap.php tests/PluginTest.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BBS"
+                }
+            ],
+            "description": "Secure background upload and download transfers for NativePHP Mobile",
             "transport-options": {
                 "relative": true
             }

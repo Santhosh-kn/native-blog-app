@@ -54,6 +54,8 @@ class NativeServiceProvider extends ServiceProvider
             FirebasePushNotificationsServiceProvider::class,
             NativeDocumentPickerServiceProvider::class,
             NativePrintingServiceProvider::class,
+            \Bbs\NativeBackgroundTransfer\NativeBackgroundTransferServiceProvider::class,
+
         ];
     }
 }

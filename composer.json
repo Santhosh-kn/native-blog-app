@@ -9,6 +9,10 @@
     ],
     "license": "MIT",
     "repositories": {
+        "plugin-native-background-transfer": {
+            "type": "path",
+            "url": "packages/bbs/plugin-native-background-transfer"
+        },
         "plugin-native-printing": {
             "type": "path",
             "url": "packages/bbs/plugin-native-printing"
@@ -35,6 +39,7 @@
         "bbs/plugin-biometric": "^1.0",
         "bbs/plugin-firebase-google-auth": "1.0.0",
         "bbs/plugin-firebase-push-notifications": "^1.0",
+        "bbs/plugin-native-background-transfer": "1.0",
         "bbs/plugin-native-document-picker": "^1.0",
         "bbs/plugin-native-printing": "^1.0",
         "google/auth": "^1.53",
