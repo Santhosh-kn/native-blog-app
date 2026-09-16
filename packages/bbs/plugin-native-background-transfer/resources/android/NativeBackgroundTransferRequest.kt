@@ -17,17 +17,20 @@ internal sealed interface NativeBackgroundTransferRequestValidation {
 }
 
 internal data class NativeBackgroundTransferRequest(
-    val id: String,
+    override val id: String,
     val url: String,
     val mimeTypes: List<String>,
     val maxSize: Long,
-    val createdAt: Long
-) {
+    override val createdAt: Long
+) : NativeBackgroundTransferStoredRequest {
 
-    fun toStoredJson(): JSONObject {
+    override val type: String
+        get() = NativeBackgroundTransferContract.TYPE_DOWNLOAD
+
+    override fun toStoredJson(): JSONObject {
         return JSONObject().apply {
             put("id", id)
-            put("type", NativeBackgroundTransferContract.TYPE_DOWNLOAD)
+            put("type", type)
             put("url", url)
             put("mimeTypes", JSONArray(mimeTypes))
             put("maxSize", maxSize)

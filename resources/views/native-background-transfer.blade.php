@@ -196,6 +196,74 @@
             </dl>
         </section>
 
+        <section class="card">
+            <h2 class="background-transfer-heading">
+                Native background upload
+            </h2>
+
+            <p class="background-transfer-copy">
+                Upload the most recent verified Document Picker selection
+                through Android WorkManager using a raw HTTPS POST body.
+                Use only a harmless test file for this demo.
+            </p>
+
+            @if ($selectedDocument !== null)
+                <dl class="background-transfer-meta">
+                    <div>
+                        <dt>Selected file</dt>
+                        <dd>{{ $selectedDocument['original_name'] }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Type</dt>
+                        <dd>{{ $selectedDocument['mime_type'] }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Size</dt>
+                        <dd>
+                            {{ number_format(
+                                $selectedDocument['size'] / 1024,
+                                1
+                            ) }} KB
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Upload test limit</dt>
+                        <dd>
+                            {{ number_format(
+                                $testUploadMaxSize / 1_048_576,
+                                0
+                            ) }} MB
+                        </dd>
+                    </div>
+                </dl>
+
+                @if (
+                    $selectedDocument['size'] >
+                    $testUploadMaxSize
+                )
+                    <p class="background-transfer-copy">
+                        This file is too large for the first upload test.
+                        Choose a document no larger than 1 MB.
+                    </p>
+                @endif
+            @else
+                <p class="background-transfer-copy">
+                    No verified document is currently selected.
+                    Choose a document before starting the upload test.
+                </p>
+            @endif
+
+            <a
+                href="{{ route('native-document-picker.index') }}"
+                class="btn btn-secondary"
+            >
+                Choose document
+            </a>
+        </section>
+
         <section class="card background-transfer-actions">
             <button
                 type="button"
@@ -203,6 +271,19 @@
                 class="btn btn-primary full-width"
             >
                 Start test download
+            </button>
+
+            <button
+                type="button"
+                id="background-transfer-start-upload"
+                class="btn btn-primary full-width"
+                @disabled(
+                    $selectedDocument === null ||
+                    $selectedDocument['size'] >
+                        $testUploadMaxSize
+                )
+            >
+                Start test upload
             </button>
 
             <button
@@ -329,6 +410,9 @@
 
     const endpoints = Object.freeze({
         start: @json(route('native-background-transfer.start')),
+        startUpload: @json(
+            route('native-background-transfer.start-upload')
+        ),
         transfers: @json(route('native-background-transfer.transfers')),
         status: @json(route(
             'native-background-transfer.status',
@@ -361,6 +445,18 @@
 
     const startButton =
         document.getElementById('background-transfer-start');
+
+    const uploadButton =
+        document.getElementById(
+            'background-transfer-start-upload',
+        );
+
+    const uploadAvailable =
+        @json(
+            $selectedDocument !== null &&
+            $selectedDocument['size'] <=
+                $testUploadMaxSize
+        );
 
     const cancelButton =
         document.getElementById('background-transfer-cancel');
@@ -504,9 +600,16 @@
             status !== null &&
             terminalStatuses.has(status);
 
-        startButton.disabled =
+        const transferInProgress =
             activeTransferId !== null &&
             !terminal;
+
+        startButton.disabled =
+            transferInProgress;
+
+        uploadButton.disabled =
+            !uploadAvailable ||
+            transferInProgress;
 
         cancelButton.disabled =
             activeTransferId === null ||
@@ -692,13 +795,20 @@
         return 'info';
     }
 
-    function titleForStatus(status) {
+    function titleForStatus(type, status) {
+        const transferLabel =
+            type === 'upload'
+                ? 'Upload'
+                : type === 'download'
+                    ? 'Download'
+                    : 'Transfer';
+
         const labels = {
-            queued: 'Download queued',
-            running: 'Download running',
-            succeeded: 'Download completed',
-            cancelled: 'Download cancelled',
-            failed: 'Download failed',
+            queued: `${transferLabel} queued`,
+            running: `${transferLabel} running`,
+            succeeded: `${transferLabel} completed`,
+            cancelled: `${transferLabel} cancelled`,
+            failed: `${transferLabel} failed`,
         };
 
         return labels[status] ??
@@ -733,11 +843,15 @@
 
             setStatus(
                 toneForStatus(status),
-                titleForStatus(status),
+                titleForStatus(result.type, status),
                 messageFromPayload(
                     result,
                     status === 'running'
-                        ? 'Android is downloading in the background.'
+                        ? (
+                            result.type === 'upload'
+                                ? 'Android is uploading in the background.'
+                                : 'Android is downloading in the background.'
+                        )
                         : `Transfer state: ${status}.`,
                 ),
             );
@@ -899,6 +1013,75 @@
         }
     }
 
+    async function startUpload() {
+        if (
+            activeTransferId !== null ||
+            !uploadAvailable
+        ) {
+            return;
+        }
+
+        uploadButton.disabled = true;
+        startButton.disabled = true;
+
+        setStatus(
+            'info',
+            'Starting upload',
+            'Waiting for Android WorkManager to accept the upload.',
+        );
+
+        try {
+            const result =
+                await requestJson(
+                    endpoints.startUpload,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                    },
+                );
+
+            if (
+                result.accepted !== true ||
+                result.type !== 'upload' ||
+                !validUuid(result.transfer_id)
+            ) {
+                throw new Error(
+                    messageFromPayload(
+                        result,
+                        'The native upload was not accepted.',
+                    ),
+                );
+            }
+
+            rememberActiveTransfer(
+                result.transfer_id,
+            );
+
+            renderTransfer(result);
+
+            setStatus(
+                'info',
+                'Upload queued',
+                'Android accepted the background upload.',
+            );
+
+            await loadTransfers();
+            schedulePoll(0);
+        } catch (error) {
+            forgetActiveTransfer();
+            updateButtons();
+
+            setStatus(
+                'error',
+                'Upload could not start',
+                error instanceof Error
+                    ? error.message
+                    : 'The background upload could not be started.',
+            );
+        }
+    }
     async function cancelDownload() {
         const transferId = activeTransferId;
 
@@ -927,7 +1110,7 @@
 
             setStatus(
                 toneForStatus(result.status),
-                titleForStatus(result.status),
+                titleForStatus(result.type, result.status),
                 messageFromPayload(
                     result,
                     'Cancellation state received.',
@@ -1008,6 +1191,11 @@
     startButton.addEventListener(
         'click',
         () => void startDownload(),
+    );
+
+    uploadButton.addEventListener(
+        'click',
+        () => void startUpload(),
     );
 
     cancelButton.addEventListener(

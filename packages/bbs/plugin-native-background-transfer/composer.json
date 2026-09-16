@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": "^8.4",
-        "nativephp/mobile": "^4.2"
+        "nativephp/mobile": "^4.2",
+        "bbs/plugin-native-document-picker": "^1.0"
     },
     "autoload": {
         "psr-4": {

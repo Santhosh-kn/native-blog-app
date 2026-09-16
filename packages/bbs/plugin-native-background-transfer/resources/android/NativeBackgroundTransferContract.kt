@@ -19,6 +19,7 @@ internal sealed interface NativeBackgroundTransferUrlValidation {
 internal object NativeBackgroundTransferContract {
 
     const val TYPE_DOWNLOAD = "download"
+    const val TYPE_UPLOAD = "upload"
 
     const val STATUS_QUEUED = "queued"
     const val STATUS_RUNNING = "running"
@@ -27,6 +28,9 @@ internal object NativeBackgroundTransferContract {
     const val STATUS_CANCELLED = "cancelled"
 
     const val INVALID_REQUEST_ID = "INVALID_REQUEST_ID"
+    const val INVALID_SOURCE_DOCUMENT_ID = "INVALID_SOURCE_DOCUMENT_ID"
+    const val SOURCE_DOCUMENT_UNAVAILABLE = "SOURCE_DOCUMENT_UNAVAILABLE"
+    const val INVALID_HTTP_METHOD = "INVALID_HTTP_METHOD"
     const val DUPLICATE_TRANSFER_ID = "DUPLICATE_TRANSFER_ID"
     const val INVALID_URL = "INVALID_URL"
     const val HTTPS_REQUIRED = "HTTPS_REQUIRED"
@@ -79,6 +83,19 @@ internal object NativeBackgroundTransferContract {
         }
 
         return candidate.lowercase(Locale.ROOT)
+    }
+
+    fun normalizeUploadMethod(
+        value: Any?
+    ): String? {
+        val method = (value as? String)
+            ?.trim()
+            ?.uppercase(Locale.ROOT)
+            ?: return null
+
+        return method.takeIf {
+            it == "POST" || it == "PUT"
+        }
     }
 
     fun validateHttpsUrl(
@@ -352,6 +369,10 @@ internal object NativeBackgroundTransferContract {
         return status in knownStatuses
     }
 
+    fun isKnownTransferType(type: String): Boolean {
+        return type in knownTransferTypes
+    }
+
     fun isTerminalStatus(status: String): Boolean {
         return status in terminalStatuses
     }
@@ -364,6 +385,15 @@ internal object NativeBackgroundTransferContract {
         return when (errorCode) {
             INVALID_REQUEST_ID ->
                 "The transfer ID must be a valid UUID."
+
+            INVALID_SOURCE_DOCUMENT_ID ->
+                "The source document ID must be a valid UUID."
+
+            SOURCE_DOCUMENT_UNAVAILABLE ->
+                "The selected source document is not available for upload."
+
+            INVALID_HTTP_METHOD ->
+                "The upload method must be POST or PUT."
 
             DUPLICATE_TRANSFER_ID ->
                 "A transfer already exists with this ID."
@@ -467,6 +497,11 @@ internal object NativeBackgroundTransferContract {
         }
     }
 
+    private val knownTransferTypes = setOf(
+        TYPE_DOWNLOAD,
+        TYPE_UPLOAD
+    )
+
     private val knownStatuses = setOf(
         STATUS_QUEUED,
         STATUS_RUNNING,
@@ -483,6 +518,9 @@ internal object NativeBackgroundTransferContract {
 
     private val knownErrorCodes = setOf(
         INVALID_REQUEST_ID,
+        INVALID_SOURCE_DOCUMENT_ID,
+        SOURCE_DOCUMENT_UNAVAILABLE,
+        INVALID_HTTP_METHOD,
         DUPLICATE_TRANSFER_ID,
         INVALID_URL,
         HTTPS_REQUIRED,

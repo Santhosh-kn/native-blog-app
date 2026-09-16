@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\NativeDocumentPickerState;
 use Bbs\NativeBackgroundTransfer\Facades\NativeBackgroundTransfer;
 use Bbs\NativeBackgroundTransfer\Support\NativeBackgroundTransferResult;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +28,15 @@ final class NativeBackgroundTransferController extends Controller
     private const TEST_MAX_SIZE =
         10 * 1024 * 1024;
 
+    private const TEST_UPLOAD_URL =
+        'https://httpbin.org/post';
+
+    private const TEST_UPLOAD_METHOD =
+        'POST';
+
+    private const TEST_UPLOAD_MAX_SIZE =
+        1 * 1024 * 1024;
+
     private const MAX_SESSION_TRANSFERS = 10;
 
     private const TERMINAL_STATUSES = [
@@ -35,11 +45,18 @@ final class NativeBackgroundTransferController extends Controller
         'cancelled',
     ];
 
-    public function index(): View
-    {
+    public function index(
+        Request $request,
+        NativeDocumentPickerState $pickerState,
+    ): View {
         return view('native-background-transfer', [
             'testFileName' => self::TEST_FILE_NAME,
             'testMaxSize' => self::TEST_MAX_SIZE,
+            'testUploadMaxSize' => self::TEST_UPLOAD_MAX_SIZE,
+            'selectedDocument' =>
+                $pickerState->selection(
+                    $request->session(),
+                ),
         ]);
     }
 
@@ -131,6 +148,145 @@ final class NativeBackgroundTransferController extends Controller
         );
     }
 
+    public function startUpload(
+        Request $request,
+        NativeDocumentPickerState $pickerState,
+    ): JsonResponse {
+        $selection =
+            $pickerState->selection(
+                $request->session(),
+            );
+
+        if ($selection === null) {
+            return response()->json([
+                'accepted' => false,
+                'transfer_id' => null,
+                'type' => 'upload',
+                'status' => 'failed',
+                'error_code' =>
+                    'SOURCE_DOCUMENT_UNAVAILABLE',
+                'error_message' =>
+                    'Select a document with the Document Picker first.',
+            ], 422);
+        }
+
+        if (
+            $selection['size'] >
+            self::TEST_UPLOAD_MAX_SIZE
+        ) {
+            return response()->json([
+                'accepted' => false,
+                'transfer_id' => null,
+                'type' => 'upload',
+                'status' => 'failed',
+                'error_code' => 'FILE_TOO_LARGE',
+                'error_message' =>
+                    'For this upload test, select a file no larger than 1 MB.',
+            ], 422);
+        }
+
+        $transferId =
+            (string) Str::uuid();
+
+        try {
+            $result =
+                NativeBackgroundTransfer::startUpload([
+                    'id' => $transferId,
+                    'source_document_id' =>
+                        $selection['request_id'],
+                    'url' =>
+                        self::TEST_UPLOAD_URL,
+                    'method' =>
+                        self::TEST_UPLOAD_METHOD,
+                    'max_size' =>
+                        self::TEST_UPLOAD_MAX_SIZE,
+                ]);
+        } catch (Throwable $exception) {
+            $this->logFailure(
+                'Background upload could not be started',
+                $transferId,
+                $exception,
+            );
+
+            return response()->json([
+                'accepted' => false,
+                'transfer_id' => $transferId,
+                'type' => 'upload',
+                'status' => 'failed',
+                'error_code' => 'UNKNOWN_ERROR',
+                'error_message' =>
+                    'The background upload could not be started.',
+            ], 500);
+        }
+
+        $accepted =
+            ($result->accepted ?? false) === true;
+
+        $nativeId =
+            is_string($result->id ?? null)
+                ? $result->id
+                : null;
+
+        $nativeType =
+            is_string($result->type ?? null)
+                ? $result->type
+                : null;
+
+        if (
+            $nativeId === null ||
+            ! hash_equals(
+                $transferId,
+                $nativeId,
+            ) ||
+            $nativeType !== 'upload'
+        ) {
+            return response()->json([
+                'accepted' => false,
+                'transfer_id' => $transferId,
+                'type' => 'upload',
+                'status' => 'failed',
+                'error_code' =>
+                    'INVALID_NATIVE_RESULT',
+                'error_message' =>
+                    'The native upload returned an invalid result.',
+            ], 500);
+        }
+
+        $payload = [
+            'accepted' => $accepted,
+            'transfer_id' => $transferId,
+            'type' => 'upload',
+            'status' =>
+                is_string($result->status ?? null)
+                    ? $result->status
+                    : ($accepted ? 'queued' : 'failed'),
+            'error_code' =>
+                $this->nullableString(
+                    $result->errorCode ?? null,
+                ),
+            'error_message' =>
+                $this->nullableString(
+                    $result->errorMessage ?? null,
+                ),
+        ];
+
+        if (! $accepted) {
+            return response()->json(
+                $payload,
+                422,
+            );
+        }
+
+        $this->rememberTransfer(
+            $request,
+            $transferId,
+        );
+
+        return response()->json(
+            $payload,
+            202,
+        );
+    }
     public function status(
         Request $request,
         string $transferId,

@@ -217,9 +217,10 @@
             "dist": {
                 "type": "path",
                 "url": "packages/bbs/plugin-native-background-transfer",
-                "reference": "ea3ca1a8b88aedd4307eb56fd6973288d68c3194"
+                "reference": "7ff841e46bac41ead72e1269afd4596d2ee9958c"
             },
             "require": {
+                "bbs/plugin-native-document-picker": "^1.0",
                 "nativephp/mobile": "^4.2",
                 "php": "^8.4"
             },
@@ -252,8 +253,7 @@
             ],
             "authors": [
                 {
-                    "name": "BBS",
-                    "email": "you@example.com"
+                    "name": "BBS"
                 }
             ],
             "description": "Secure background upload and download transfers for NativePHP Mobile",

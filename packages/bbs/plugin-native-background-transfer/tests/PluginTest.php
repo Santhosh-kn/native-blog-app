@@ -71,7 +71,7 @@ final class PluginTest extends TestCase
         );
     }
 
-    public function test_manifest_declares_android_download_first_contract(): void
+    public function test_manifest_declares_android_transfer_contract(): void
     {
         $manifest = $this->readJson(
             dirname(__DIR__).'/nativephp.json',
@@ -123,6 +123,7 @@ final class PluginTest extends TestCase
         self::assertSame(
             [
                 'NativeBackgroundTransfer.StartDownload',
+                'NativeBackgroundTransfer.StartUpload',
                 'NativeBackgroundTransfer.GetStatus',
                 'NativeBackgroundTransfer.ListTransfers',
                 'NativeBackgroundTransfer.Cancel',
@@ -146,7 +147,7 @@ final class PluginTest extends TestCase
             );
         }
 
-        self::assertNotContains(
+        self::assertContains(
             'NativeBackgroundTransfer.StartUpload',
             array_column(
                 $manifest['bridge_functions'],
@@ -1551,6 +1552,11 @@ final class PluginTest extends TestCase
                         'type' => 'upload',
                         'status' => 'queued',
                     ],
+                    [
+                        'id' => self::REQUEST_ID,
+                        'type' => 'unsupported',
+                        'status' => 'queued',
+                    ],
                     'invalid-item',
                 ],
             ],
@@ -1560,7 +1566,7 @@ final class PluginTest extends TestCase
             ->listTransfers();
 
         self::assertCount(
-            1,
+            2,
             $results,
         );
 
@@ -1570,8 +1576,28 @@ final class PluginTest extends TestCase
         );
 
         self::assertSame(
+            'download',
+            $results[0]->type,
+        );
+
+        self::assertSame(
             'running',
             $results[0]->status,
+        );
+
+        self::assertSame(
+            self::FILE_ID,
+            $results[1]->id,
+        );
+
+        self::assertSame(
+            'upload',
+            $results[1]->type,
+        );
+
+        self::assertSame(
+            'queued',
+            $results[1]->status,
         );
     }
 
@@ -1587,6 +1613,11 @@ final class PluginTest extends TestCase
         self::assertSame(
             'failed',
             $result->status,
+        );
+
+        self::assertSame(
+            'unknown',
+            $result->type,
         );
 
         self::assertSame(
@@ -1680,6 +1711,345 @@ final class PluginTest extends TestCase
         );
     }
 
+    public function test_start_upload_normalizes_and_forwards_only_safe_fields(): void
+    {
+        $sourceDocumentId =
+            '11111111-1111-4111-8111-111111111111';
+
+        $bridge = new FakeNativeBridge(
+            (object) [
+                'accepted' => true,
+                'id' => self::REQUEST_ID,
+                'type' => 'upload',
+                'status' => 'queued',
+            ],
+        );
+
+        $result = $this->transfer($bridge)
+            ->startUpload([
+                'id' => strtoupper(self::REQUEST_ID),
+                'source_document_id' =>
+                    strtoupper($sourceDocumentId),
+                'url' =>
+                    'https://example.com/upload?token=temporary',
+                'method' => ' put ',
+                'max_size' => 1_048_576,
+
+                // These must never cross the bridge.
+                'source_path' => '/private/source',
+                'private_path' => '/data/private',
+                'destination_path' => '/unsafe/path',
+                'authorization' => 'Bearer secret',
+                'headers' => [
+                    'Authorization' => 'Bearer secret',
+                ],
+                'filename' => 'unsafe-name.pdf',
+            ]);
+
+        self::assertTrue($result->accepted);
+        self::assertSame(
+            self::REQUEST_ID,
+            $result->id,
+        );
+        self::assertSame(
+            'upload',
+            $result->type,
+        );
+        self::assertSame(
+            'queued',
+            $result->status,
+        );
+        self::assertNull($result->errorCode);
+        self::assertNull($result->errorMessage);
+
+        self::assertSame(
+            [
+                [
+                    'method' =>
+                        'NativeBackgroundTransfer.StartUpload',
+                    'parameters' => [
+                        'id' => self::REQUEST_ID,
+                        'source_document_id' =>
+                            $sourceDocumentId,
+                        'url' =>
+                            'https://example.com/upload?token=temporary',
+                        'method' => 'PUT',
+                        'max_size' => 1_048_576,
+                    ],
+                ],
+            ],
+            $bridge->calls,
+        );
+    }
+
+    public function test_invalid_upload_options_never_reach_bridge(): void
+    {
+        $validSourceId =
+            '11111111-1111-4111-8111-111111111111';
+
+        $cases = [
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'url' => 'https://example.com/upload',
+                    'method' => 'POST',
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_SOURCE_DOCUMENT_ID,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => 'not-a-uuid',
+                    'url' => 'https://example.com/upload',
+                    'method' => 'POST',
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_SOURCE_DOCUMENT_ID,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => $validSourceId,
+                    'method' => 'POST',
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_URL,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => $validSourceId,
+                    'url' => 'http://example.com/upload',
+                    'method' => 'POST',
+                ],
+                NativeBackgroundTransferErrorCode::HTTPS_REQUIRED,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => $validSourceId,
+                    'url' => 'https://example.com/upload',
+                    'method' => 'GET',
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_HTTP_METHOD,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => $validSourceId,
+                    'url' => 'https://example.com/upload',
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_HTTP_METHOD,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => $validSourceId,
+                    'url' => 'https://example.com/upload',
+                    'method' => 'POST',
+                    'max_size' => 0,
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_MAX_SIZE,
+            ],
+            [
+                [
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' => $validSourceId,
+                    'url' => 'https://example.com/upload',
+                    'method' => 'POST',
+                    'max_size' => '1048576',
+                ],
+                NativeBackgroundTransferErrorCode::INVALID_MAX_SIZE,
+            ],
+        ];
+
+        foreach ($cases as [$options, $expectedErrorCode]) {
+            $bridge =
+                new FakeNativeBridge(null);
+
+            $result =
+                $this->transfer($bridge)
+                    ->startUpload($options);
+
+            self::assertFalse(
+                $result->accepted,
+            );
+
+            self::assertSame(
+                'upload',
+                $result->type,
+            );
+
+            self::assertSame(
+                $expectedErrorCode,
+                $result->errorCode,
+            );
+
+            self::assertSame(
+                [],
+                $bridge->calls,
+            );
+        }
+    }
+
+    public function test_start_upload_null_bridge_response_is_controlled(): void
+    {
+        $bridge =
+            new FakeNativeBridge(null);
+
+        $result =
+            $this->transfer($bridge)
+                ->startUpload([
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' =>
+                        '11111111-1111-4111-8111-111111111111',
+                    'url' =>
+                        'https://example.com/upload',
+                    'method' => 'POST',
+                ]);
+
+        self::assertFalse($result->accepted);
+        self::assertSame(
+            'upload',
+            $result->type,
+        );
+        self::assertSame(
+            NativeBackgroundTransferErrorCode::SCHEDULER_UNAVAILABLE,
+            $result->errorCode,
+        );
+
+        self::assertCount(
+            1,
+            $bridge->calls,
+        );
+    }
+
+    public function test_start_upload_native_rejection_uses_safe_error_message(): void
+    {
+        $bridge = new FakeNativeBridge(
+            (object) [
+                'accepted' => false,
+                'id' => self::REQUEST_ID,
+                'type' => 'upload',
+                'status' => 'failed',
+                'errorCode' =>
+                    NativeBackgroundTransferErrorCode::HTTP_ERROR,
+
+                // Native supplied text must not become public truth.
+                'errorMessage' =>
+                    'Server said secret token was invalid',
+            ],
+        );
+
+        $result =
+            $this->transfer($bridge)
+                ->startUpload([
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' =>
+                        '11111111-1111-4111-8111-111111111111',
+                    'url' =>
+                        'https://example.com/upload',
+                    'method' => 'POST',
+                ]);
+
+        self::assertFalse($result->accepted);
+        self::assertSame(
+            'upload',
+            $result->type,
+        );
+        self::assertSame(
+            NativeBackgroundTransferErrorCode::HTTP_ERROR,
+            $result->errorCode,
+        );
+        self::assertSame(
+            NativeBackgroundTransferErrorCode::message(
+                NativeBackgroundTransferErrorCode::HTTP_ERROR,
+            ),
+            $result->errorMessage,
+        );
+        self::assertNotSame(
+            'Server said secret token was invalid',
+            $result->errorMessage,
+        );
+    }
+
+    public function test_start_upload_rejects_mismatched_native_id(): void
+    {
+        $bridge = new FakeNativeBridge(
+            (object) [
+                'accepted' => true,
+                'id' =>
+                    '22222222-2222-4222-8222-222222222222',
+                'type' => 'upload',
+                'status' => 'queued',
+            ],
+        );
+
+        $result =
+            $this->transfer($bridge)
+                ->startUpload([
+                    'id' => self::REQUEST_ID,
+                    'source_document_id' =>
+                        '11111111-1111-4111-8111-111111111111',
+                    'url' =>
+                        'https://example.com/upload',
+                    'method' => 'POST',
+                ]);
+
+        self::assertFalse($result->accepted);
+        self::assertSame(
+            'upload',
+            $result->type,
+        );
+        self::assertSame(
+            NativeBackgroundTransferErrorCode::UNKNOWN_ERROR,
+            $result->errorCode,
+        );
+    }
+
+    public function test_start_upload_rejects_wrong_native_type_or_status(): void
+    {
+        $responses = [
+            (object) [
+                'accepted' => true,
+                'id' => self::REQUEST_ID,
+                'type' => 'download',
+                'status' => 'queued',
+            ],
+            (object) [
+                'accepted' => true,
+                'id' => self::REQUEST_ID,
+                'type' => 'upload',
+                'status' => 'succeeded',
+            ],
+        ];
+
+        foreach ($responses as $response) {
+            $bridge =
+                new FakeNativeBridge($response);
+
+            $result =
+                $this->transfer($bridge)
+                    ->startUpload([
+                        'id' => self::REQUEST_ID,
+                        'source_document_id' =>
+                            '11111111-1111-4111-8111-111111111111',
+                        'url' =>
+                            'https://example.com/upload',
+                        'method' => 'POST',
+                    ]);
+
+            self::assertFalse(
+                $result->accepted,
+            );
+            self::assertSame(
+                'upload',
+                $result->type,
+            );
+            self::assertSame(
+                NativeBackgroundTransferErrorCode::UNKNOWN_ERROR,
+                $result->errorCode,
+            );
+        }
+    }
     private function transfer(
         FakeNativeBridge $bridge,
     ): NativeBackgroundTransfer {

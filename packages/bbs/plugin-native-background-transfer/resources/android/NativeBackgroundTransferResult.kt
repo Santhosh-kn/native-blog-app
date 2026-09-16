@@ -5,6 +5,7 @@ import org.json.JSONObject
 internal data class NativeBackgroundTransferResult(
     val id: String,
     val status: String,
+    val type: String = NativeBackgroundTransferContract.TYPE_DOWNLOAD,
     val transferredBytes: Long = 0L,
     val totalBytes: Long? = null,
     val progress: Int? = null,
@@ -20,10 +21,7 @@ internal data class NativeBackgroundTransferResult(
     fun toBridgeMap(): Map<String, Any> {
         return buildMap {
             put("id", id)
-            put(
-                "type",
-                NativeBackgroundTransferContract.TYPE_DOWNLOAD
-            )
+            put("type", type)
             put("status", status)
             put("transferredBytes", transferredBytes)
             put("consumed", consumed)
@@ -66,10 +64,7 @@ internal data class NativeBackgroundTransferResult(
     fun toStoredJson(): JSONObject {
         return JSONObject().apply {
             put("id", id)
-            put(
-                "type",
-                NativeBackgroundTransferContract.TYPE_DOWNLOAD
-            )
+            put("type", type)
             put("status", status)
             put("transferredBytes", transferredBytes)
             put(
@@ -108,13 +103,14 @@ internal data class NativeBackgroundTransferResult(
     companion object {
 
         fun queued(
-            request: NativeBackgroundTransferRequest
+            request: NativeBackgroundTransferStoredRequest
         ): NativeBackgroundTransferResult {
             return NativeBackgroundTransferResult(
                 id = request.id,
                 status =
                     NativeBackgroundTransferContract
-                        .STATUS_QUEUED
+                        .STATUS_QUEUED,
+                type = request.type
             )
         }
 
@@ -124,10 +120,13 @@ internal data class NativeBackgroundTransferResult(
             transferredBytes: Long = 0L,
             totalBytes: Long? = null,
             progress: Int? = null,
-            consumed: Boolean = false
+            consumed: Boolean = false,
+            type: String =
+                NativeBackgroundTransferContract.TYPE_DOWNLOAD
         ): NativeBackgroundTransferResult {
             return NativeBackgroundTransferResult(
                 id = id,
+                type = type,
                 status =
                     NativeBackgroundTransferContract
                         .STATUS_FAILED,
@@ -149,9 +148,13 @@ internal data class NativeBackgroundTransferResult(
                     )
                     ?: return null
 
+            val type =
+                (json.opt("type") as? String)
+                    ?: return null
+
             if (
-                json.optString("type") !=
-                NativeBackgroundTransferContract.TYPE_DOWNLOAD
+                !NativeBackgroundTransferContract
+                    .isKnownTransferType(type)
             ) {
                 return null
             }
@@ -356,6 +359,7 @@ internal data class NativeBackgroundTransferResult(
             return NativeBackgroundTransferResult(
                 id = id,
                 status = status,
+                type = type,
                 transferredBytes = transferredBytes,
                 totalBytes = totalBytes,
                 progress = progress,

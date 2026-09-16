@@ -34,6 +34,11 @@ final class NativeBackgroundTransfer
     private const MIME_TYPE_PATTERN =
         '/\A[a-z0-9][a-z0-9!#$&^_.+%-]*\/(?:\*|[a-z0-9][a-z0-9!#$&^_.+%-]*)\z/D';
 
+    private const VALID_TRANSFER_TYPES = [
+        'download',
+        'upload',
+    ];
+
     private const VALID_STATUSES = [
         'queued',
         'running',
@@ -167,6 +172,164 @@ final class NativeBackgroundTransfer
         ];
     }
 
+    /**
+     * @param array{
+     *     id?: string|null,
+     *     source_document_id?: mixed,
+     *     url?: mixed,
+     *     method?: mixed,
+     *     max_size?: mixed
+     * } $options
+     */
+    public function startUpload(array $options): object
+    {
+        $requestId = $this->resolveRequestId(
+            $options['id'] ?? null,
+            generateWhenEmpty: true,
+        );
+
+        if ($requestId === null) {
+            return $this->rejected(
+                id: (string) Str::uuid(),
+                errorCode: NativeBackgroundTransferErrorCode::INVALID_REQUEST_ID,
+                type: 'upload',
+            );
+        }
+
+        $sourceDocumentId = $this->resolveRequestId(
+            $options['source_document_id'] ?? null,
+            generateWhenEmpty: false,
+        );
+
+        if ($sourceDocumentId === null) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::INVALID_SOURCE_DOCUMENT_ID,
+                type: 'upload',
+            );
+        }
+
+        $urlValidation = $this->validateHttpsUrl(
+            $options['url'] ?? null,
+        );
+
+        if ($urlValidation['url'] === null) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: $urlValidation['errorCode'],
+                type: 'upload',
+            );
+        }
+
+        $method = $this->normalizeUploadMethod(
+            $options['method'] ?? null,
+        );
+
+        if ($method === null) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::INVALID_HTTP_METHOD,
+                type: 'upload',
+            );
+        }
+
+        $maxSize = array_key_exists('max_size', $options)
+            ? $options['max_size']
+            : self::DEFAULT_MAX_SIZE;
+
+        if (
+            ! is_int($maxSize) ||
+            $maxSize < 1 ||
+            $maxSize > self::MAX_CONFIGURABLE_SIZE
+        ) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::INVALID_MAX_SIZE,
+                type: 'upload',
+            );
+        }
+
+        $response = $this->bridge->call(
+            'NativeBackgroundTransfer.StartUpload',
+            [
+                'id' => $requestId,
+                'source_document_id' => $sourceDocumentId,
+                'url' => $urlValidation['url'],
+                'method' => $method,
+                'max_size' => $maxSize,
+            ],
+        );
+
+        if ($response === null) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::SCHEDULER_UNAVAILABLE,
+                type: 'upload',
+            );
+        }
+
+        $payload = get_object_vars($response);
+
+        if (($payload['accepted'] ?? false) !== true) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: $this->normalizeErrorCode(
+                    $payload['errorCode']
+                        ?? $payload['error_code']
+                        ?? null,
+                    NativeBackgroundTransferErrorCode::UNKNOWN_ERROR,
+                ),
+                type: 'upload',
+            );
+        }
+
+        $responseId = $this->resolveRequestId(
+            $payload['id'] ?? null,
+            generateWhenEmpty: false,
+        );
+
+        if ($responseId !== $requestId) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::UNKNOWN_ERROR,
+                type: 'upload',
+            );
+        }
+
+        if (($payload['type'] ?? null) !== 'upload') {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::UNKNOWN_ERROR,
+                type: 'upload',
+            );
+        }
+
+        $status = $payload['status'] ?? null;
+
+        if (
+            ! is_string($status) ||
+            ! in_array(
+                $status,
+                ['queued', 'running'],
+                true,
+            )
+        ) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::UNKNOWN_ERROR,
+                type: 'upload',
+            );
+        }
+
+        return (object) [
+            'accepted' => true,
+            'id' => $requestId,
+            'type' => 'upload',
+            'status' => $status,
+            'errorCode' => null,
+            'errorMessage' => null,
+        ];
+    }
     public function getStatus(string $id): NativeBackgroundTransferResult
     {
         return $this->requestResult(
@@ -313,6 +476,25 @@ final class NativeBackgroundTransfer
     /**
      * @return array{url: ?string, errorCode: string}
      */
+    private function normalizeUploadMethod(
+        mixed $value,
+    ): ?string {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $method = strtoupper(
+            trim($value),
+        );
+
+        return in_array(
+            $method,
+            ['POST', 'PUT'],
+            true,
+        )
+            ? $method
+            : null;
+    }
     private function validateHttpsUrl(mixed $value): array
     {
         if (! is_string($value)) {
@@ -448,7 +630,14 @@ final class NativeBackgroundTransfer
 
         $type = $payload['type'] ?? null;
 
-        if ($type !== 'download') {
+        if (
+            ! is_string($type) ||
+            ! in_array(
+                $type,
+                self::VALID_TRANSFER_TYPES,
+                true,
+            )
+        ) {
             return null;
         }
 
@@ -548,7 +737,7 @@ final class NativeBackgroundTransfer
 
         return new NativeBackgroundTransferResult(
             id: $id,
-            type: 'download',
+            type: $type,
             status: $status,
             transferredBytes: $transferredBytes,
             totalBytes: $totalBytes,
@@ -714,11 +903,12 @@ final class NativeBackgroundTransfer
     private function rejected(
         string $id,
         string $errorCode,
+        string $type = 'download',
     ): object {
         return (object) [
             'accepted' => false,
             'id' => $id,
-            'type' => 'download',
+            'type' => $type,
             'status' => 'failed',
             'errorCode' => $errorCode,
             'errorMessage' =>
@@ -731,10 +921,11 @@ final class NativeBackgroundTransfer
     private function failedResult(
         string $id,
         string $errorCode,
+        string $type = 'unknown',
     ): NativeBackgroundTransferResult {
         return new NativeBackgroundTransferResult(
             id: $id,
-            type: 'download',
+            type: $type,
             status: 'failed',
             errorCode: $errorCode,
             errorMessage:

@@ -8,6 +8,12 @@ final class NativeBackgroundTransferErrorCode
 {
     public const INVALID_REQUEST_ID = 'INVALID_REQUEST_ID';
 
+    public const INVALID_SOURCE_DOCUMENT_ID = 'INVALID_SOURCE_DOCUMENT_ID';
+
+    public const SOURCE_DOCUMENT_UNAVAILABLE = 'SOURCE_DOCUMENT_UNAVAILABLE';
+
+    public const INVALID_HTTP_METHOD = 'INVALID_HTTP_METHOD';
+
     public const DUPLICATE_TRANSFER_ID = 'DUPLICATE_TRANSFER_ID';
 
     public const INVALID_URL = 'INVALID_URL';
@@ -47,6 +53,9 @@ final class NativeBackgroundTransferErrorCode
     {
         return [
             self::INVALID_REQUEST_ID,
+            self::INVALID_SOURCE_DOCUMENT_ID,
+            self::SOURCE_DOCUMENT_UNAVAILABLE,
+            self::INVALID_HTTP_METHOD,
             self::DUPLICATE_TRANSFER_ID,
             self::INVALID_URL,
             self::HTTPS_REQUIRED,
@@ -76,6 +85,15 @@ final class NativeBackgroundTransferErrorCode
         return match ($errorCode) {
             self::INVALID_REQUEST_ID =>
                 'The transfer ID must be a valid UUID.',
+
+            self::INVALID_SOURCE_DOCUMENT_ID =>
+                'The source document ID must be a valid UUID.',
+
+            self::SOURCE_DOCUMENT_UNAVAILABLE =>
+                'The selected source document is not available for upload.',
+
+            self::INVALID_HTTP_METHOD =>
+                'The upload method must be POST or PUT.',
 
             self::DUPLICATE_TRANSFER_ID =>
                 'A transfer already exists with this ID.',

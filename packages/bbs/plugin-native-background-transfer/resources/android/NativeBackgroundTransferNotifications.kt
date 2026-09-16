@@ -26,7 +26,9 @@ internal class NativeBackgroundTransferNotifications(
     fun foregroundInfo(
         transferId: String,
         status: String,
-        progress: Int?
+        progress: Int?,
+        type: String =
+            NativeBackgroundTransferContract.TYPE_DOWNLOAD
     ): ForegroundInfo {
         val safeProgress =
             progress?.coerceIn(
@@ -34,16 +36,42 @@ internal class NativeBackgroundTransferNotifications(
                 100
             )
 
+        val isUpload =
+            type ==
+                NativeBackgroundTransferContract
+                    .TYPE_UPLOAD
+
+        val action =
+            if (isUpload) {
+                "Uploading"
+            } else {
+                "Downloading"
+            }
+
+        val title =
+            if (isUpload) {
+                "Background upload"
+            } else {
+                "Background download"
+            }
+
+        val icon =
+            if (isUpload) {
+                android.R.drawable.stat_sys_upload
+            } else {
+                android.R.drawable.stat_sys_download
+            }
+
         val text = when {
             status ==
                 NativeBackgroundTransferContract.STATUS_QUEUED ->
                 "Waiting for network"
 
             safeProgress != null ->
-                "Downloading $safeProgress%"
+                "$action $safeProgress%"
 
             else ->
-                "Downloading"
+                action
         }
 
         val notification =
@@ -51,13 +79,8 @@ internal class NativeBackgroundTransferNotifications(
                 applicationContext,
                 CHANNEL_ID
             )
-                .setSmallIcon(
-                    android.R.drawable
-                        .stat_sys_download
-                )
-                .setContentTitle(
-                    "Background download"
-                )
+                .setSmallIcon(icon)
+                .setContentTitle(title)
                 .setContentText(text)
                 .setCategory(
                     Notification.CATEGORY_PROGRESS
@@ -81,7 +104,6 @@ internal class NativeBackgroundTransferNotifications(
                 .FOREGROUND_SERVICE_TYPE_DATA_SYNC
         )
     }
-
     private fun createChannel() {
         val channel =
             NotificationChannel(

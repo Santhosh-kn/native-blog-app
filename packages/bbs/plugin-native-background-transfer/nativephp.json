@@ -34,6 +34,11 @@
             "description": "Queue a validated HTTPS background download"
         },
         {
+            "name": "NativeBackgroundTransfer.StartUpload",
+            "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.StartUpload",
+            "description": "Queue a validated HTTPS background upload"
+        },
+        {
             "name": "NativeBackgroundTransfer.GetStatus",
             "android": "com.bbs.plugins.native_background_transfer.NativeBackgroundTransferFunctions.GetStatus",
             "description": "Get the persisted status of a transfer"

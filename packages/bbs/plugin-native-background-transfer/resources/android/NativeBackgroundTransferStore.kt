@@ -54,7 +54,7 @@ internal class NativeBackgroundTransferStore(
         )
 
     fun begin(
-        request: NativeBackgroundTransferRequest
+        request: NativeBackgroundTransferStoredRequest
     ): NativeBackgroundTransferBeginResult =
         synchronized(lock) {
             val normalizedId =
@@ -63,7 +63,7 @@ internal class NativeBackgroundTransferStore(
 
             if (
                 normalizedId != request.id ||
-                NativeBackgroundTransferRequest
+                NativeBackgroundTransferStoredRequest
                     .fromStoredJson(
                         request.toStoredJson()
                     ) != request
@@ -102,6 +102,13 @@ internal class NativeBackgroundTransferStore(
     fun request(
         id: String
     ): NativeBackgroundTransferRequest? =
+        synchronized(lock) {
+            readRecord(id)?.request as? NativeBackgroundTransferRequest
+        }
+
+    fun storedRequest(
+        id: String
+    ): NativeBackgroundTransferStoredRequest? =
         synchronized(lock) {
             readRecord(id)?.request
         }
@@ -308,7 +315,7 @@ internal class NativeBackgroundTransferStore(
         }
 
         val request =
-            NativeBackgroundTransferRequest
+            NativeBackgroundTransferStoredRequest
                 .fromStoredJson(requestJson)
                 ?: return null
 
@@ -317,7 +324,10 @@ internal class NativeBackgroundTransferStore(
                 .fromStoredJson(resultJson)
                 ?: return null
 
-        if (request.id != result.id) {
+        if (
+            request.id != result.id ||
+            request.type != result.type
+        ) {
             return null
         }
 
@@ -329,11 +339,12 @@ internal class NativeBackgroundTransferStore(
 
     private fun writeRecord(
         file: File,
-        request: NativeBackgroundTransferRequest,
+        request: NativeBackgroundTransferStoredRequest,
         result: NativeBackgroundTransferResult
     ): Boolean {
         if (
             request.id != result.id ||
+            request.type != result.type ||
             !ensureRecordsDirectory()
         ) {
             return false
@@ -443,6 +454,7 @@ internal class NativeBackgroundTransferStore(
     ): Boolean {
         if (
             current.id != next.id ||
+            current.type != next.type ||
             current.consumed
         ) {
             return false
@@ -493,7 +505,7 @@ internal class NativeBackgroundTransferStore(
     }
 
     private data class StoredRecord(
-        val request: NativeBackgroundTransferRequest,
+        val request: NativeBackgroundTransferStoredRequest,
         val result: NativeBackgroundTransferResult
     )
 

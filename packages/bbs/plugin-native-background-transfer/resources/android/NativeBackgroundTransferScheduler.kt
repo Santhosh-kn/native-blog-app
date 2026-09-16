@@ -29,18 +29,11 @@ internal class NativeBackgroundTransferScheduler(
             return false
         }
 
-        val inputData = Data.Builder()
-            .putString(
-                INPUT_TRANSFER_ID,
-                transferId
-            )
-            .build()
+        val inputData =
+            transferInputData(transferId)
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(
-                NetworkType.CONNECTED
-            )
-            .build()
+        val constraints =
+            connectedNetworkConstraint()
 
         val workRequest =
             OneTimeWorkRequest.Builder(
@@ -63,7 +56,57 @@ internal class NativeBackgroundTransferScheduler(
             WorkManager
                 .getInstance(applicationContext)
                 .enqueueUniqueWork(
-                    workName(transferId),
+                    downloadWorkName(transferId),
+                    ExistingWorkPolicy.KEEP,
+                    workRequest
+                )
+
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun enqueueUpload(
+        transferId: String
+    ): Boolean {
+        val normalizedId =
+            NativeBackgroundTransferContract
+                .normalizeRequestId(transferId)
+                ?: return false
+
+        if (normalizedId != transferId) {
+            return false
+        }
+
+        val inputData =
+            transferInputData(transferId)
+
+        val constraints =
+            connectedNetworkConstraint()
+
+        val workRequest =
+            OneTimeWorkRequest.Builder(
+                NativeBackgroundUploadWorker::class.java
+            )
+                .setInputData(inputData)
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    BACKOFF_SECONDS,
+                    TimeUnit.SECONDS
+                )
+                .addTag(WORK_TAG)
+                .addTag(
+                    transferTag(transferId)
+                )
+                .build()
+
+        return try {
+            WorkManager
+                .getInstance(applicationContext)
+                .enqueueUniqueWork(
+                    uploadWorkName(transferId),
                     ExistingWorkPolicy.KEEP,
                     workRequest
                 )
@@ -87,11 +130,23 @@ internal class NativeBackgroundTransferScheduler(
         }
 
         return try {
-            WorkManager
-                .getInstance(applicationContext)
-                .cancelUniqueWork(
-                    workName(transferId)
+            val workManager =
+                WorkManager.getInstance(
+                    applicationContext
                 )
+
+            /*
+             * Keep cancellation compatible with both transfer
+             * directions. The existing download work-name prefix
+             * remains unchanged.
+             */
+            workManager.cancelUniqueWork(
+                downloadWorkName(transferId)
+            )
+
+            workManager.cancelUniqueWork(
+                uploadWorkName(transferId)
+            )
 
             true
         } catch (_: Exception) {
@@ -99,10 +154,36 @@ internal class NativeBackgroundTransferScheduler(
         }
     }
 
-    private fun workName(
+    private fun transferInputData(
+        transferId: String
+    ): Data {
+        return Data.Builder()
+            .putString(
+                INPUT_TRANSFER_ID,
+                transferId
+            )
+            .build()
+    }
+
+    private fun connectedNetworkConstraint():
+        Constraints {
+        return Constraints.Builder()
+            .setRequiredNetworkType(
+                NetworkType.CONNECTED
+            )
+            .build()
+    }
+
+    private fun downloadWorkName(
         transferId: String
     ): String {
-        return "$WORK_NAME_PREFIX$transferId"
+        return "$DOWNLOAD_WORK_NAME_PREFIX$transferId"
+    }
+
+    private fun uploadWorkName(
+        transferId: String
+    ): String {
+        return "$UPLOAD_WORK_NAME_PREFIX$transferId"
     }
 
     private fun transferTag(
@@ -115,8 +196,15 @@ internal class NativeBackgroundTransferScheduler(
         const val INPUT_TRANSFER_ID =
             "native_background_transfer_id"
 
-        private const val WORK_NAME_PREFIX =
+        /*
+         * Do not rename this. Existing download work may already
+         * have been scheduled with this exact unique-work prefix.
+         */
+        private const val DOWNLOAD_WORK_NAME_PREFIX =
             "native-background-download-"
+
+        private const val UPLOAD_WORK_NAME_PREFIX =
+            "native-background-upload-"
 
         private const val TRANSFER_TAG_PREFIX =
             "native-background-transfer-"

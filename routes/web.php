@@ -127,6 +127,11 @@ Route::middleware('device.unlocked')->group(function () {
                 [NativeBackgroundTransferController::class, 'start'],
             )->name('start');
 
+            Route::post(
+                '/start-upload',
+                [NativeBackgroundTransferController::class, 'startUpload'],
+            )->name('start-upload');
+
             Route::get(
                 '/transfers',
                 [NativeBackgroundTransferController::class, 'transfers'],

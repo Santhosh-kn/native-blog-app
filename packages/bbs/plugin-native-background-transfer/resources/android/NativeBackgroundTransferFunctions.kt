@@ -111,6 +111,147 @@ object NativeBackgroundTransferFunctions {
             }
         }
     }
+    class StartUpload(
+        private val context: Context
+    ) : BridgeFunction {
+
+        override fun execute(
+            parameters: Map<String, Any>
+        ): Map<String, Any> {
+            return when (
+                val validation =
+                    NativeBackgroundUploadRequest
+                        .fromParameters(parameters)
+            ) {
+                is NativeBackgroundUploadRequestValidation.Invalid ->
+                    BridgeResponse.success(
+                        rejectedStart(
+                            id = validation.id,
+                            errorCode = validation.errorCode,
+                            type =
+                                NativeBackgroundTransferContract
+                                    .TYPE_UPLOAD
+                        )
+                    )
+
+                is NativeBackgroundUploadRequestValidation.Valid -> {
+                    val request = validation.request
+
+                    when (
+                        val source =
+                            NativeBackgroundUploadSource.resolve(
+                                context = context,
+                                request = request
+                            )
+                    ) {
+                        is NativeBackgroundUploadSourceResolution.Rejected ->
+                            BridgeResponse.success(
+                                rejectedStart(
+                                    id = request.id,
+                                    errorCode = source.errorCode,
+                                    type =
+                                        NativeBackgroundTransferContract
+                                            .TYPE_UPLOAD
+                                )
+                            )
+
+                        is NativeBackgroundUploadSourceResolution.Resolved -> {
+                            val store =
+                                NativeBackgroundTransferStore(
+                                    context
+                                )
+
+                            when (
+                                store.begin(request)
+                            ) {
+                                NativeBackgroundTransferBeginResult.Stored -> {
+                                    val scheduler =
+                                        NativeBackgroundTransferScheduler(
+                                            context
+                                        )
+
+                                    if (
+                                        scheduler.enqueueUpload(
+                                            request.id
+                                        )
+                                    ) {
+                                        BridgeResponse.success(
+                                            acceptedStart(
+                                                id = request.id,
+                                                type =
+                                                    NativeBackgroundTransferContract
+                                                        .TYPE_UPLOAD
+                                            )
+                                        )
+                                    } else {
+                                        val failed =
+                                            NativeBackgroundTransferResult
+                                                .failed(
+                                                    id = request.id,
+                                                    errorCode =
+                                                        NativeBackgroundTransferContract
+                                                            .SCHEDULER_UNAVAILABLE,
+                                                    type =
+                                                        NativeBackgroundTransferContract
+                                                            .TYPE_UPLOAD
+                                                )
+
+                                        val persisted =
+                                            store.update(
+                                                failed
+                                            )
+
+                                        BridgeResponse.success(
+                                            rejectedStart(
+                                                id = request.id,
+                                                errorCode =
+                                                    if (persisted) {
+                                                        NativeBackgroundTransferContract
+                                                            .SCHEDULER_UNAVAILABLE
+                                                    } else {
+                                                        NativeBackgroundTransferContract
+                                                            .RESULT_PERSISTENCE_FAILED
+                                                    },
+                                                type =
+                                                    NativeBackgroundTransferContract
+                                                        .TYPE_UPLOAD
+                                            )
+                                        )
+                                    }
+                                }
+
+                                NativeBackgroundTransferBeginResult.Duplicate ->
+                                    BridgeResponse.success(
+                                        rejectedStart(
+                                            id = request.id,
+                                            errorCode =
+                                                NativeBackgroundTransferContract
+                                                    .DUPLICATE_TRANSFER_ID,
+                                            type =
+                                                NativeBackgroundTransferContract
+                                                    .TYPE_UPLOAD
+                                        )
+                                    )
+
+                                NativeBackgroundTransferBeginResult.Failed ->
+                                    BridgeResponse.success(
+                                        rejectedStart(
+                                            id = request.id,
+                                            errorCode =
+                                                NativeBackgroundTransferContract
+                                                    .RESULT_PERSISTENCE_FAILED,
+                                            type =
+                                                NativeBackgroundTransferContract
+                                                    .TYPE_UPLOAD
+                                        )
+                                    )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     class GetStatus(
         private val context: Context
     ) : BridgeFunction {
@@ -237,7 +378,8 @@ object NativeBackgroundTransferFunctions {
                             totalBytes =
                                 current.totalBytes,
                             progress =
-                                current.progress
+                                current.progress,
+                            type = current.type
                         )
                         .toBridgeMap()
                 )
@@ -246,6 +388,7 @@ object NativeBackgroundTransferFunctions {
             val cancelled =
                 NativeBackgroundTransferResult(
                     id = id,
+                    type = current.type,
                     status =
                         NativeBackgroundTransferContract
                             .STATUS_CANCELLED,
@@ -300,7 +443,8 @@ object NativeBackgroundTransferFunctions {
                                 ?: current.totalBytes,
                         progress =
                             latest?.progress
-                                ?: current.progress
+                                ?: current.progress,
+                        type = current.type
                     )
                     .toBridgeMap()
             )
@@ -348,7 +492,8 @@ object NativeBackgroundTransferFunctions {
                         progress =
                             consumeResult.result
                                 .progress,
-                        consumed = true
+                        consumed = true,
+                        type = consumeResult.result.type
                     )
 
                 is NativeBackgroundTransferConsumeResult.NotTerminal ->
@@ -397,14 +542,14 @@ object NativeBackgroundTransferFunctions {
     }
 
     private fun acceptedStart(
-        id: String
+        id: String,
+        type: String =
+            NativeBackgroundTransferContract.TYPE_DOWNLOAD
     ): Map<String, Any> {
         return mapOf(
             "accepted" to true,
             "id" to id,
-            "type" to
-                NativeBackgroundTransferContract
-                    .TYPE_DOWNLOAD,
+            "type" to type,
             "status" to
                 NativeBackgroundTransferContract
                     .STATUS_QUEUED
@@ -412,14 +557,14 @@ object NativeBackgroundTransferFunctions {
     }
     private fun rejectedStart(
         id: String,
-        errorCode: String
+        errorCode: String,
+        type: String =
+            NativeBackgroundTransferContract.TYPE_DOWNLOAD
     ): Map<String, Any> {
         return mapOf(
             "accepted" to false,
             "id" to id,
-            "type" to
-                NativeBackgroundTransferContract
-                    .TYPE_DOWNLOAD,
+            "type" to type,
             "status" to
                 NativeBackgroundTransferContract
                     .STATUS_FAILED,
