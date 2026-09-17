@@ -30,6 +30,27 @@ internal class NativeBackgroundTransferNotifications(
         type: String =
             NativeBackgroundTransferContract.TYPE_DOWNLOAD
     ): ForegroundInfo {
+        val notification =
+            notification(
+                status = status,
+                progress = progress,
+                type = type
+            )
+
+        return ForegroundInfo(
+            notificationId(transferId),
+            notification,
+            ServiceInfo
+                .FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        )
+    }
+
+    fun notification(
+        status: String,
+        progress: Int?,
+        type: String =
+            NativeBackgroundTransferContract.TYPE_DOWNLOAD
+    ): Notification {
         val safeProgress =
             progress?.coerceIn(
                 0,
@@ -74,35 +95,27 @@ internal class NativeBackgroundTransferNotifications(
                 action
         }
 
-        val notification =
-            Notification.Builder(
-                applicationContext,
-                CHANNEL_ID
-            )
-                .setSmallIcon(icon)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setCategory(
-                    Notification.CATEGORY_PROGRESS
-                )
-                .setVisibility(
-                    Notification.VISIBILITY_PRIVATE
-                )
-                .setOnlyAlertOnce(true)
-                .setOngoing(true)
-                .setProgress(
-                    100,
-                    safeProgress ?: 0,
-                    safeProgress == null
-                )
-                .build()
-
-        return ForegroundInfo(
-            notificationId(transferId),
-            notification,
-            ServiceInfo
-                .FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        return Notification.Builder(
+            applicationContext,
+            CHANNEL_ID
         )
+            .setSmallIcon(icon)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setCategory(
+                Notification.CATEGORY_PROGRESS
+            )
+            .setVisibility(
+                Notification.VISIBILITY_PRIVATE
+            )
+            .setOnlyAlertOnce(true)
+            .setOngoing(true)
+            .setProgress(
+                100,
+                safeProgress ?: 0,
+                safeProgress == null
+            )
+            .build()
     }
     private fun createChannel() {
         val channel =
@@ -124,7 +137,7 @@ internal class NativeBackgroundTransferNotifications(
             )
     }
 
-    private fun notificationId(
+    fun notificationId(
         transferId: String
     ): Int {
         val suffix =

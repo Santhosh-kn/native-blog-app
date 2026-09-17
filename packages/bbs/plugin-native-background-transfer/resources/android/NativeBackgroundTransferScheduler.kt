@@ -2,10 +2,8 @@ package com.bbs.plugins.native_background_transfer
 
 import android.content.Context
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
@@ -32,15 +30,11 @@ internal class NativeBackgroundTransferScheduler(
         val inputData =
             transferInputData(transferId)
 
-        val constraints =
-            connectedNetworkConstraint()
-
         val workRequest =
             OneTimeWorkRequest.Builder(
                 NativeBackgroundDownloadWorker::class.java
             )
                 .setInputData(inputData)
-                .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
                     BACKOFF_SECONDS,
@@ -82,15 +76,11 @@ internal class NativeBackgroundTransferScheduler(
         val inputData =
             transferInputData(transferId)
 
-        val constraints =
-            connectedNetworkConstraint()
-
         val workRequest =
             OneTimeWorkRequest.Builder(
                 NativeBackgroundUploadWorker::class.java
             )
                 .setInputData(inputData)
-                .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
                     BACKOFF_SECONDS,
@@ -161,15 +151,6 @@ internal class NativeBackgroundTransferScheduler(
             .putString(
                 INPUT_TRANSFER_ID,
                 transferId
-            )
-            .build()
-    }
-
-    private fun connectedNetworkConstraint():
-        Constraints {
-        return Constraints.Builder()
-            .setRequiredNetworkType(
-                NetworkType.CONNECTED
             )
             .build()
     }
