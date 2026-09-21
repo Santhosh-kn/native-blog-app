@@ -44,6 +44,7 @@ internal object NativeBackgroundTransferContract {
     const val FILE_TOO_LARGE = "FILE_TOO_LARGE"
     const val INVALID_CONTENT_TYPE = "INVALID_CONTENT_TYPE"
     const val NETWORK_ERROR = "NETWORK_ERROR"
+    const val UPLOAD_OUTCOME_UNCERTAIN = "UPLOAD_OUTCOME_UNCERTAIN"
     const val HTTP_ERROR = "HTTP_ERROR"
     const val RESULT_PERSISTENCE_FAILED = "RESULT_PERSISTENCE_FAILED"
     const val UNKNOWN_ERROR = "UNKNOWN_ERROR"
@@ -434,6 +435,9 @@ internal object NativeBackgroundTransferContract {
             NETWORK_ERROR ->
                 "The transfer could not continue because of a network error."
 
+            UPLOAD_OUTCOME_UNCERTAIN ->
+                "The upload may have reached the server, so it was not automatically retried."
+
             HTTP_ERROR ->
                 "The remote server rejected the transfer."
 
@@ -534,6 +538,7 @@ internal object NativeBackgroundTransferContract {
         FILE_TOO_LARGE,
         INVALID_CONTENT_TYPE,
         NETWORK_ERROR,
+        UPLOAD_OUTCOME_UNCERTAIN,
         HTTP_ERROR,
         RESULT_PERSISTENCE_FAILED,
         UNKNOWN_ERROR

@@ -94,6 +94,7 @@ internal class NativeBackgroundTransferUidtScheduler(
                             JobInfo.NETWORK_TYPE_ANY
                         )
                         .setUserInitiated(true)
+                        .setPersisted(true)
                         .setBackoffCriteria(
                             BACKOFF_MILLIS,
                             JobInfo

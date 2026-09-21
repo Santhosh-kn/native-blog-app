@@ -30,7 +30,10 @@ internal sealed interface NativeBackgroundDownloadOutcome {
 }
 
 internal class NativeBackgroundDownloadEngine(
-    context: Context
+    context: Context,
+    private val connectionOpener:
+        NativeBackgroundTransferConnectionOpener =
+            NativeBackgroundTransferConnectionOpener.default()
 ) {
 
     private val filePolicy =
@@ -78,9 +81,9 @@ internal class NativeBackgroundDownloadEngine(
             }
 
             val connection = try {
-                URL(validatedUrl)
-                    .openConnection() as?
-                    HttpsURLConnection
+                connectionOpener.open(
+                    URL(validatedUrl)
+                )
             } catch (_: Exception) {
                 null
             } ?: return NativeBackgroundDownloadOutcome

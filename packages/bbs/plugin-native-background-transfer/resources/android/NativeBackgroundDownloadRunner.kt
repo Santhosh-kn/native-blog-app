@@ -13,7 +13,10 @@ internal class NativeBackgroundDownloadRunner(
     context: Context,
     private val foregroundUpdater:
         NativeBackgroundTransferForegroundUpdater,
-    private val isStopRequested: () -> Boolean
+    private val isStopRequested: () -> Boolean,
+    private val connectionOpener:
+        NativeBackgroundTransferConnectionOpener =
+            NativeBackgroundTransferConnectionOpener.default()
 ) {
 
     private val applicationContext =
@@ -220,7 +223,8 @@ internal class NativeBackgroundDownloadRunner(
 
         val engine =
             NativeBackgroundDownloadEngine(
-                applicationContext
+                context = applicationContext,
+                connectionOpener = connectionOpener
             )
 
         var networkRetryCount = 0

@@ -153,6 +153,49 @@ internal class NativeBackgroundTransferStore(
                 .toList()
         }
 
+    fun postAttemptStarted(
+        id: String
+    ): Boolean? =
+        synchronized(lock) {
+            readRecord(id)
+                ?.postAttemptStarted
+        }
+
+    fun markPostAttemptStarted(
+        id: String
+    ): Boolean =
+        synchronized(lock) {
+            val current =
+                readRecord(id)
+                    ?: return@synchronized false
+
+            if (
+                current.request !is NativeBackgroundUploadRequest ||
+                current.request.method != "POST" ||
+                NativeBackgroundTransferContract
+                    .isTerminalStatus(
+                        current.result.status
+                    )
+            ) {
+                return@synchronized false
+            }
+
+            if (current.postAttemptStarted) {
+                return@synchronized true
+            }
+
+            val file =
+                recordFile(id)
+                    ?: return@synchronized false
+
+            writeRecord(
+                file = file,
+                request = current.request,
+                result = current.result,
+                postAttemptStarted = true
+            )
+        }
+
     fun update(
         result: NativeBackgroundTransferResult
     ): Boolean =
@@ -192,7 +235,9 @@ internal class NativeBackgroundTransferStore(
             writeRecord(
                 file = file,
                 request = current.request,
-                result = result
+                result = result,
+                postAttemptStarted =
+                    current.postAttemptStarted
             )
         }
 
@@ -236,7 +281,9 @@ internal class NativeBackgroundTransferStore(
                 !writeRecord(
                     file = file,
                     request = current.request,
-                    result = consumedResult
+                    result = consumedResult,
+                    postAttemptStarted =
+                        current.postAttemptStarted
                 )
             ) {
                 return@synchronized NativeBackgroundTransferConsumeResult.Failed
@@ -324,6 +371,14 @@ internal class NativeBackgroundTransferStore(
                 .fromStoredJson(resultJson)
                 ?: return null
 
+        val postAttemptStarted =
+            if (!json.has("postAttemptStarted")) {
+                false
+            } else {
+                json.opt("postAttemptStarted") as? Boolean
+                    ?: return null
+            }
+
         if (
             request.id != result.id ||
             request.type != result.type
@@ -333,14 +388,16 @@ internal class NativeBackgroundTransferStore(
 
         return StoredRecord(
             request = request,
-            result = result
+            result = result,
+            postAttemptStarted = postAttemptStarted
         )
     }
 
     private fun writeRecord(
         file: File,
         request: NativeBackgroundTransferStoredRequest,
-        result: NativeBackgroundTransferResult
+        result: NativeBackgroundTransferResult,
+        postAttemptStarted: Boolean = false
     ): Boolean {
         if (
             request.id != result.id ||
@@ -352,6 +409,10 @@ internal class NativeBackgroundTransferStore(
 
         val payload = JSONObject().apply {
             put("version", RECORD_VERSION)
+            put(
+                "postAttemptStarted",
+                postAttemptStarted
+            )
             put(
                 "request",
                 request.toStoredJson()
@@ -506,7 +567,8 @@ internal class NativeBackgroundTransferStore(
 
     private data class StoredRecord(
         val request: NativeBackgroundTransferStoredRequest,
-        val result: NativeBackgroundTransferResult
+        val result: NativeBackgroundTransferResult,
+        val postAttemptStarted: Boolean
     )
 
     private companion object {
