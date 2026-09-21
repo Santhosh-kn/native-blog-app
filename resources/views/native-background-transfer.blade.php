@@ -949,7 +949,12 @@
     }
 
     async function startDownload() {
-        if (activeTransferId !== null) {
+        if (
+            activeTransferId !== null &&
+            !terminalStatuses.has(
+                transferStateElement.textContent,
+            )
+        ) {
             return;
         }
 
@@ -1015,7 +1020,12 @@
 
     async function startUpload() {
         if (
-            activeTransferId !== null ||
+            (
+                activeTransferId !== null &&
+                !terminalStatuses.has(
+                    transferStateElement.textContent,
+                )
+            ) ||
             !uploadAvailable
         ) {
             return;

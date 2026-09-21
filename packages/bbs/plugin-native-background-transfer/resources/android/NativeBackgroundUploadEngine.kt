@@ -26,7 +26,11 @@ internal sealed interface NativeBackgroundUploadOutcome {
     ) : NativeBackgroundUploadOutcome
 }
 
-internal class NativeBackgroundUploadEngine {
+internal class NativeBackgroundUploadEngine(
+    private val connectionOpener:
+        NativeBackgroundTransferConnectionOpener =
+            NativeBackgroundTransferConnectionOpener.default()
+) {
 
     fun upload(
         request: NativeBackgroundUploadRequest,
@@ -36,7 +40,8 @@ internal class NativeBackgroundUploadEngine {
             transferredBytes: Long,
             totalBytes: Long?,
             progress: Int?
-        ) -> Unit = { _, _, _ -> }
+        ) -> Unit = { _, _, _ -> },
+        onRequestBodyStarting: () -> Boolean = { true }
     ): NativeBackgroundUploadOutcome {
         if (
             request.type !=
@@ -138,9 +143,9 @@ internal class NativeBackgroundUploadEngine {
             }
 
             val connection = try {
-                URL(validatedUrl)
-                    .openConnection() as?
-                    HttpsURLConnection
+                connectionOpener.open(
+                    URL(validatedUrl)
+                )
             } catch (_: Exception) {
                 null
             } ?: return NativeBackgroundUploadOutcome.Failed(
@@ -164,6 +169,18 @@ internal class NativeBackgroundUploadEngine {
                     source.size,
                     initialProgress(source.size)
                 )
+
+                if (
+                    request.method == "POST" &&
+                    !onRequestBodyStarting()
+                ) {
+                    return NativeBackgroundUploadOutcome.Failed(
+                        errorCode =
+                            NativeBackgroundTransferContract
+                                .RESULT_PERSISTENCE_FAILED,
+                        totalBytes = source.size
+                    )
+                }
 
                 val streamOutcome =
                     streamRequestBody(
@@ -238,6 +255,22 @@ internal class NativeBackgroundUploadEngine {
                     connection.responseCode
 
                 if (isUploadRedirect(responseCode)) {
+                    if (request.method == "POST") {
+                        return NativeBackgroundUploadOutcome.Failed(
+                            errorCode =
+                                NativeBackgroundTransferContract
+                                    .UPLOAD_OUTCOME_UNCERTAIN,
+                            transferredBytes =
+                                transferredBytes,
+                            totalBytes = source.size,
+                            progress =
+                                progress(
+                                    transferredBytes,
+                                    source.size
+                                )
+                        )
+                    }
+
                     if (redirectCount >= MAX_REDIRECTS) {
                         return NativeBackgroundUploadOutcome.Failed(
                             errorCode =

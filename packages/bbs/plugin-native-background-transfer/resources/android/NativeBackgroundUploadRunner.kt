@@ -12,7 +12,10 @@ internal class NativeBackgroundUploadRunner(
     context: Context,
     private val foregroundUpdater:
         NativeBackgroundTransferForegroundUpdater,
-    private val isStopRequested: () -> Boolean
+    private val isStopRequested: () -> Boolean,
+    private val connectionOpener:
+        NativeBackgroundTransferConnectionOpener =
+            NativeBackgroundTransferConnectionOpener.default()
 ) {
 
     private val applicationContext =
@@ -82,7 +85,9 @@ internal class NativeBackgroundUploadRunner(
         var foregroundFailed = false
 
         val engine =
-            NativeBackgroundUploadEngine()
+            NativeBackgroundUploadEngine(
+                connectionOpener = connectionOpener
+            )
 
         var networkRetryCount = 0
 
@@ -102,6 +107,16 @@ internal class NativeBackgroundUploadRunner(
                 engine.upload(
                     request = request,
                     source = source,
+
+                    onRequestBodyStarting = {
+                        if (request.method == "POST") {
+                            store.markPostAttemptStarted(
+                                transferId
+                            )
+                        } else {
+                            true
+                        }
+                    },
 
                     isCancelled = {
                         isStopRequested() ||
@@ -172,6 +187,27 @@ internal class NativeBackgroundUploadRunner(
                 foregroundFailed
             ) {
                 outcome = attemptOutcome
+                break
+            }
+
+            if (
+                request.method == "POST" &&
+                attemptOutcome is
+                    NativeBackgroundUploadOutcome.Failed &&
+                attemptOutcome.errorCode ==
+                    NativeBackgroundTransferContract
+                        .NETWORK_ERROR &&
+                store.postAttemptStarted(
+                    transferId
+                ) == true
+            ) {
+                outcome =
+                    attemptOutcome.copy(
+                        errorCode =
+                            NativeBackgroundTransferContract
+                                .UPLOAD_OUTCOME_UNCERTAIN
+                    )
+
                 break
             }
 
@@ -1006,6 +1042,33 @@ internal class NativeBackgroundUploadRunner(
         ) {
             return NativeBackgroundUploadPreparationResult
                 .Completed
+        }
+
+        if (
+            request.method == "POST" &&
+            store.postAttemptStarted(
+                transferId
+            ) == true
+        ) {
+            val uncertain =
+                current.copy(
+                    status =
+                        NativeBackgroundTransferContract
+                            .STATUS_FAILED,
+                    errorCode =
+                        NativeBackgroundTransferContract
+                            .UPLOAD_OUTCOME_UNCERTAIN,
+                    updatedAt =
+                        System.currentTimeMillis()
+                )
+
+            return if (store.update(uncertain)) {
+                NativeBackgroundUploadPreparationResult
+                    .Completed
+            } else {
+                NativeBackgroundUploadPreparationResult
+                    .Failed
+            }
         }
 
         val source =

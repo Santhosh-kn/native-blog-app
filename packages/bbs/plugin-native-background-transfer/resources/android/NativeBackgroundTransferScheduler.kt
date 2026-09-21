@@ -1,6 +1,7 @@
 package com.bbs.plugins.native_background_transfer
 
 import android.content.Context
+import android.os.Build
 import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -15,6 +16,11 @@ internal class NativeBackgroundTransferScheduler(
     private val applicationContext =
         context.applicationContext
 
+    private val uidtScheduler =
+        NativeBackgroundTransferUidtScheduler(
+            applicationContext
+        )
+
     fun enqueueDownload(
         transferId: String
     ): Boolean {
@@ -25,6 +31,15 @@ internal class NativeBackgroundTransferScheduler(
 
         if (normalizedId != transferId) {
             return false
+        }
+
+        if (usesUidt()) {
+            return uidtScheduler.schedule(
+                transferId = transferId,
+                type =
+                    NativeBackgroundTransferContract
+                        .TYPE_DOWNLOAD
+            )
         }
 
         val inputData =
@@ -71,6 +86,15 @@ internal class NativeBackgroundTransferScheduler(
 
         if (normalizedId != transferId) {
             return false
+        }
+
+        if (usesUidt()) {
+            return uidtScheduler.schedule(
+                transferId = transferId,
+                type =
+                    NativeBackgroundTransferContract
+                        .TYPE_UPLOAD
+            )
         }
 
         val inputData =
@@ -120,6 +144,19 @@ internal class NativeBackgroundTransferScheduler(
         }
 
         return try {
+            /*
+             * Cancel UIDT on Android 14+, but also cancel both legacy
+             * WorkManager names so stale/pre-upgrade work cannot remain.
+             */
+            val uidtCancelled =
+                if (usesUidt()) {
+                    uidtScheduler.cancel(
+                        transferId
+                    )
+                } else {
+                    true
+                }
+
             val workManager =
                 WorkManager.getInstance(
                     applicationContext
@@ -138,10 +175,15 @@ internal class NativeBackgroundTransferScheduler(
                 uploadWorkName(transferId)
             )
 
-            true
+            uidtCancelled
         } catch (_: Exception) {
             false
         }
+    }
+
+    private fun usesUidt(): Boolean {
+        return Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.UPSIDE_DOWN_CAKE
     }
 
     private fun transferInputData(
