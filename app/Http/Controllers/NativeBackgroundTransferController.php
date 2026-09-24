@@ -200,6 +200,18 @@ final class NativeBackgroundTransferController extends Controller
                         self::TEST_UPLOAD_METHOD,
                     'max_size' =>
                         self::TEST_UPLOAD_MAX_SIZE,
+                    'headers' => [
+                        'X-NativePHP-Transfer-Demo' =>
+                            'multipart',
+                    ],
+                    'multipart' => [
+                        'file_field' => 'document',
+                        'fields' => [
+                            'source' => 'nativephp-mobile',
+                            'purpose' =>
+                                'background-transfer-test',
+                        ],
+                    ],
                 ]);
         } catch (Throwable $exception) {
             $this->logFailure(

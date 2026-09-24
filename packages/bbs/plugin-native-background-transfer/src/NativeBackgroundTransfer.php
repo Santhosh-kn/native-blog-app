@@ -31,6 +31,39 @@ final class NativeBackgroundTransfer
 
     private const MAX_MIME_TYPE_COUNT = 32;
 
+    private const MAX_UPLOAD_HEADER_COUNT = 32;
+
+    private const MAX_UPLOAD_HEADER_NAME_LENGTH = 128;
+
+    private const MAX_UPLOAD_HEADER_VALUE_LENGTH = 4096;
+
+    private const MAX_MULTIPART_FIELD_COUNT = 32;
+
+    private const MAX_MULTIPART_FIELD_NAME_LENGTH = 128;
+
+    private const MAX_MULTIPART_FIELD_VALUE_LENGTH = 65_536;
+
+    private const MAX_MULTIPART_FIELDS_TOTAL_LENGTH = 262_144;
+
+    private const UPLOAD_HEADER_NAME_PATTERN =
+        "/\A[!#$%&'*+\-.^_`|~0-9A-Za-z]+\z/D";
+
+    private const MULTIPART_FIELD_NAME_PATTERN =
+        '/\A[A-Za-z0-9_.\-\[\]]+\z/D';
+
+    private const RESERVED_UPLOAD_HEADERS = [
+        'connection',
+        'content-length',
+        'content-type',
+        'expect',
+        'host',
+        'proxy-connection',
+        'te',
+        'trailer',
+        'transfer-encoding',
+        'upgrade',
+    ];
+
     private const MIME_TYPE_PATTERN =
         '/\A[a-z0-9][a-z0-9!#$&^_.+%-]*\/(?:\*|[a-z0-9][a-z0-9!#$&^_.+%-]*)\z/D';
 
@@ -178,7 +211,9 @@ final class NativeBackgroundTransfer
      *     source_document_id?: mixed,
      *     url?: mixed,
      *     method?: mixed,
-     *     max_size?: mixed
+     *     max_size?: mixed,
+     *     headers?: mixed,
+     *     multipart?: mixed
      * } $options
      */
     public function startUpload(array $options): object
@@ -249,15 +284,56 @@ final class NativeBackgroundTransfer
             );
         }
 
+        $headers = $this->normalizeUploadHeaders(
+            $options['headers'] ?? null,
+        );
+
+        if ($headers === null) {
+            return $this->rejected(
+                id: $requestId,
+                errorCode: NativeBackgroundTransferErrorCode::INVALID_HEADERS,
+                type: 'upload',
+            );
+        }
+
+        $multipart = null;
+
+        if (
+            array_key_exists('multipart', $options) &&
+            $options['multipart'] !== null
+        ) {
+            $multipart = $this->normalizeMultipart(
+                $options['multipart'],
+            );
+
+            if ($multipart === null) {
+                return $this->rejected(
+                    id: $requestId,
+                    errorCode: NativeBackgroundTransferErrorCode::INVALID_MULTIPART,
+                    type: 'upload',
+                );
+            }
+        }
+
+        $parameters = [
+            'id' => $requestId,
+            'source_document_id' => $sourceDocumentId,
+            'url' => $urlValidation['url'],
+            'method' => $method,
+            'max_size' => $maxSize,
+        ];
+
+        if ($headers !== []) {
+            $parameters['headers'] = $headers;
+        }
+
+        if ($multipart !== null) {
+            $parameters['multipart'] = $multipart;
+        }
+
         $response = $this->bridge->call(
             'NativeBackgroundTransfer.StartUpload',
-            [
-                'id' => $requestId,
-                'source_document_id' => $sourceDocumentId,
-                'url' => $urlValidation['url'],
-                'method' => $method,
-                'max_size' => $maxSize,
-            ],
+            $parameters,
         );
 
         if ($response === null) {
@@ -611,6 +687,188 @@ final class NativeBackgroundTransfer
         }
 
         return array_keys($normalized);
+    }
+
+    /**
+     * @return array<string, string>|null
+     */
+    private function normalizeUploadHeaders(
+        mixed $value,
+    ): ?array {
+        if ($value === null) {
+            return [];
+        }
+
+        if (
+            ! is_array($value) ||
+            count($value) > self::MAX_UPLOAD_HEADER_COUNT
+        ) {
+            return null;
+        }
+
+        $normalized = [];
+        $seenNames = [];
+
+        foreach ($value as $name => $headerValue) {
+            if (
+                ! is_string($name) ||
+                ! is_string($headerValue)
+            ) {
+                return null;
+            }
+
+            $name = trim($name);
+            $headerValue = trim($headerValue);
+            $lowerName = strtolower($name);
+
+            if (
+                $name === '' ||
+                strlen($name) >
+                    self::MAX_UPLOAD_HEADER_NAME_LENGTH ||
+                preg_match('//u', $name) !== 1 ||
+                preg_match(
+                    self::UPLOAD_HEADER_NAME_PATTERN,
+                    $name,
+                ) !== 1 ||
+                in_array(
+                    $lowerName,
+                    self::RESERVED_UPLOAD_HEADERS,
+                    true,
+                ) ||
+                isset($seenNames[$lowerName])
+            ) {
+                return null;
+            }
+
+            if (
+                $headerValue === '' ||
+                strlen($headerValue) >
+                    self::MAX_UPLOAD_HEADER_VALUE_LENGTH ||
+                preg_match('//u', $headerValue) !== 1 ||
+                preg_match(
+                    '/[\x00-\x1F\x7F]/',
+                    $headerValue,
+                ) === 1
+            ) {
+                return null;
+            }
+
+            $seenNames[$lowerName] = true;
+            $normalized[$name] = $headerValue;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @return array{
+     *     file_field: string,
+     *     fields: array<string, string>
+     * }|null
+     */
+    private function normalizeMultipart(
+        mixed $value,
+    ): ?array {
+        if (
+            ! is_array($value) ||
+            $value === [] ||
+            array_diff(
+                array_keys($value),
+                ['file_field', 'fields'],
+            ) !== []
+        ) {
+            return null;
+        }
+
+        $fileField = $value['file_field'] ?? null;
+
+        if (! is_string($fileField)) {
+            return null;
+        }
+
+        $fileField = trim($fileField);
+
+        if (
+            $fileField === '' ||
+            strlen($fileField) >
+                self::MAX_MULTIPART_FIELD_NAME_LENGTH ||
+            preg_match('//u', $fileField) !== 1 ||
+            preg_match(
+                self::MULTIPART_FIELD_NAME_PATTERN,
+                $fileField,
+            ) !== 1
+        ) {
+            return null;
+        }
+
+        $fields = array_key_exists('fields', $value)
+            ? $value['fields']
+            : [];
+
+        if (
+            ! is_array($fields) ||
+            count($fields) >
+                self::MAX_MULTIPART_FIELD_COUNT
+        ) {
+            return null;
+        }
+
+        $normalizedFields = [];
+        $seenNames = [];
+        $totalLength = 0;
+
+        foreach ($fields as $name => $fieldValue) {
+            if (
+                ! is_string($name) ||
+                ! is_string($fieldValue)
+            ) {
+                return null;
+            }
+
+            $name = trim($name);
+
+            if (
+                $name === '' ||
+                strlen($name) >
+                    self::MAX_MULTIPART_FIELD_NAME_LENGTH ||
+                preg_match('//u', $name) !== 1 ||
+                preg_match(
+                    self::MULTIPART_FIELD_NAME_PATTERN,
+                    $name,
+                ) !== 1 ||
+                isset($seenNames[$name])
+            ) {
+                return null;
+            }
+
+            if (
+                strlen($fieldValue) >
+                    self::MAX_MULTIPART_FIELD_VALUE_LENGTH ||
+                preg_match('//u', $fieldValue) !== 1 ||
+                str_contains($fieldValue, "\0")
+            ) {
+                return null;
+            }
+
+            $totalLength +=
+                strlen($name) +
+                strlen($fieldValue);
+
+            if (
+                $totalLength >
+                self::MAX_MULTIPART_FIELDS_TOTAL_LENGTH
+            ) {
+                return null;
+            }
+
+            $seenNames[$name] = true;
+            $normalizedFields[$name] = $fieldValue;
+        }
+
+        return [
+            'file_field' => $fileField,
+            'fields' => $normalizedFields,
+        ];
     }
 
     private function normalizeResult(

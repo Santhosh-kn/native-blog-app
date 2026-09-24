@@ -15,12 +15,107 @@ internal sealed interface NativeBackgroundUploadRequestValidation {
     ) : NativeBackgroundUploadRequestValidation
 }
 
+internal data class NativeBackgroundUploadMultipart(
+    val fileField: String,
+    val fields: Map<String, String>
+) {
+
+    fun toStoredJson(): JSONObject {
+        return JSONObject().apply {
+            put("file_field", fileField)
+            put("fields", JSONObject(fields))
+        }
+    }
+
+    companion object {
+
+        private val allowedKeys = setOf(
+            "file_field",
+            "fields"
+        )
+
+        fun fromParameters(
+            value: Any?
+        ): NativeBackgroundUploadMultipart? {
+            val values = objectValues(value)
+                ?: return null
+
+            if (
+                values.isEmpty() ||
+                values.keys.any {
+                    it !in allowedKeys
+                }
+            ) {
+                return null
+            }
+
+            val fileField =
+                NativeBackgroundTransferContract
+                    .normalizeMultipartFieldName(
+                        values["file_field"]
+                    )
+                    ?: return null
+
+            val fields =
+                NativeBackgroundTransferContract
+                    .normalizeMultipartFields(
+                        values["fields"]
+                    )
+                    ?: return null
+
+            return NativeBackgroundUploadMultipart(
+                fileField = fileField,
+                fields = fields
+            )
+        }
+
+        private fun objectValues(
+            value: Any?
+        ): Map<String, Any?>? {
+            return when (value) {
+                is JSONObject -> {
+                    val values =
+                        linkedMapOf<String, Any?>()
+
+                    val keys = value.keys()
+
+                    while (keys.hasNext()) {
+                        val key = keys.next()
+
+                        values[key] = value.opt(key)
+                    }
+
+                    values
+                }
+
+                is Map<*, *> -> {
+                    val values =
+                        linkedMapOf<String, Any?>()
+
+                    for ((key, item) in value) {
+                        val name = key as? String
+                            ?: return null
+
+                        values[name] = item
+                    }
+
+                    values
+                }
+
+                else -> null
+            }
+        }
+    }
+}
+
 internal data class NativeBackgroundUploadRequest(
     override val id: String,
     val sourceDocumentId: String,
     val url: String,
     val method: String,
     val maxSize: Long,
+    val headers: Map<String, String>,
+    val multipart: NativeBackgroundUploadMultipart?,
     override val createdAt: Long
 ) : NativeBackgroundTransferStoredRequest {
 
@@ -35,6 +130,12 @@ internal data class NativeBackgroundUploadRequest(
             put("url", url)
             put("method", method)
             put("maxSize", maxSize)
+            put("headers", JSONObject(headers))
+
+            multipart?.let {
+                put("multipart", it.toStoredJson())
+            }
+
             put("createdAt", createdAt)
         }
     }
@@ -110,6 +211,40 @@ internal data class NativeBackgroundUploadRequest(
                 )
             }
 
+            val headers =
+                NativeBackgroundTransferContract
+                    .normalizeUploadHeaders(
+                        parameters["headers"]
+                    )
+
+            if (headers == null) {
+                return NativeBackgroundUploadRequestValidation.Invalid(
+                    id = id,
+                    errorCode =
+                        NativeBackgroundTransferContract.INVALID_HEADERS
+                )
+            }
+
+            val rawMultipart = parameters["multipart"]
+
+            val multipart =
+                if (
+                    rawMultipart == null ||
+                    rawMultipart == JSONObject.NULL
+                ) {
+                    null
+                } else {
+                    NativeBackgroundUploadMultipart
+                        .fromParameters(rawMultipart)
+                        ?: return NativeBackgroundUploadRequestValidation
+                            .Invalid(
+                                id = id,
+                                errorCode =
+                                    NativeBackgroundTransferContract
+                                        .INVALID_MULTIPART
+                            )
+                }
+
             return NativeBackgroundUploadRequestValidation.Valid(
                 NativeBackgroundUploadRequest(
                     id = id,
@@ -117,6 +252,8 @@ internal data class NativeBackgroundUploadRequest(
                     url = url,
                     method = method,
                     maxSize = maxSize,
+                    headers = headers,
+                    multipart = multipart,
                     createdAt = System.currentTimeMillis()
                 )
             )
@@ -143,6 +280,13 @@ internal data class NativeBackgroundUploadRequest(
                 copyValue(json, "url", "url", this)
                 copyValue(json, "method", "method", this)
                 copyValue(json, "maxSize", "max_size", this)
+                copyValue(json, "headers", "headers", this)
+                copyValue(
+                    json,
+                    "multipart",
+                    "multipart",
+                    this
+                )
             }
 
             val validation = fromParameters(parameters)

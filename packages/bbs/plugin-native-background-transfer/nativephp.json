@@ -108,5 +108,8 @@
     "events": [
         "Bbs\\NativeBackgroundTransfer\\Events\\NativeBackgroundTransferCompleted"
     ],
-    "service_provider": "Bbs\\NativeBackgroundTransfer\\NativeBackgroundTransferServiceProvider"
+    "service_provider": "Bbs\\NativeBackgroundTransfer\\NativeBackgroundTransferServiceProvider",
+    "hooks": {
+        "pre_compile": "nativephp:native-background-transfer:pre-compile"
+    }
 }

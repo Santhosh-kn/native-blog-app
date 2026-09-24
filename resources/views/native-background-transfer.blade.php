@@ -203,7 +203,8 @@
 
             <p class="background-transfer-copy">
                 Upload the most recent verified Document Picker selection
-                through Android WorkManager using a raw HTTPS POST body.
+                as multipart form data through Android WorkManager.
+                The request includes a safe custom demo header and text fields.
                 Use only a harmless test file for this demo.
             </p>
 

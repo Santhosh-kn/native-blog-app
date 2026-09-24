@@ -1,6 +1,7 @@
 package com.bbs.plugins.native_background_transfer
 
 import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.Locale
@@ -31,6 +32,8 @@ internal object NativeBackgroundTransferContract {
     const val INVALID_SOURCE_DOCUMENT_ID = "INVALID_SOURCE_DOCUMENT_ID"
     const val SOURCE_DOCUMENT_UNAVAILABLE = "SOURCE_DOCUMENT_UNAVAILABLE"
     const val INVALID_HTTP_METHOD = "INVALID_HTTP_METHOD"
+    const val INVALID_HEADERS = "INVALID_HEADERS"
+    const val INVALID_MULTIPART = "INVALID_MULTIPART"
     const val DUPLICATE_TRANSFER_ID = "DUPLICATE_TRANSFER_ID"
     const val INVALID_URL = "INVALID_URL"
     const val HTTPS_REQUIRED = "HTTPS_REQUIRED"
@@ -57,6 +60,15 @@ internal object NativeBackgroundTransferContract {
     private const val MAX_MIME_TYPE_LENGTH = 127
     private const val MAX_INSPECTED_FILE_NAME_CODE_POINTS = 1024
 
+    private const val MAX_UPLOAD_HEADER_COUNT = 32
+    private const val MAX_UPLOAD_HEADER_NAME_BYTES = 128
+    private const val MAX_UPLOAD_HEADER_VALUE_BYTES = 4096
+
+    private const val MAX_MULTIPART_FIELD_COUNT = 32
+    private const val MAX_MULTIPART_FIELD_NAME_BYTES = 128
+    private const val MAX_MULTIPART_FIELD_VALUE_BYTES = 65_536
+    private const val MAX_MULTIPART_FIELDS_TOTAL_BYTES = 262_144
+
     private val uuidPattern = Regex(
         "^[0-9a-fA-F]{8}-" +
             "[0-9a-fA-F]{4}-" +
@@ -72,6 +84,31 @@ internal object NativeBackgroundTransferContract {
 
     private val unsafeUrlCharacters = Regex(
         "[\\u0000-\\u0020\\u007F]"
+    )
+
+    private val uploadHeaderNamePattern = Regex(
+        "^[!#\$%&'*+\\-.^_`|~0-9A-Za-z]+$"
+    )
+
+    private val multipartFieldNamePattern = Regex(
+        "^[A-Za-z0-9_.\\-\\[\\]]+$"
+    )
+
+    private val unsafeUploadHeaderValueCharacters = Regex(
+        "[\\u0000-\\u001F\\u007F]"
+    )
+
+    private val RESERVED_UPLOAD_HEADERS = setOf(
+        "connection",
+        "content-length",
+        "content-type",
+        "expect",
+        "host",
+        "proxy-connection",
+        "te",
+        "trailer",
+        "transfer-encoding",
+        "upgrade"
     )
 
     fun normalizeRequestId(value: Any?): String? {
@@ -97,6 +134,124 @@ internal object NativeBackgroundTransferContract {
         return method.takeIf {
             it == "POST" || it == "PUT"
         }
+    }
+
+    fun normalizeUploadHeaders(
+        value: Any?
+    ): Map<String, String>? {
+        val entries = stringEntries(value)
+            ?: return null
+
+        if (entries.size > MAX_UPLOAD_HEADER_COUNT) {
+            return null
+        }
+
+        val normalized = linkedMapOf<String, String>()
+        val seenNames = mutableSetOf<String>()
+
+        for ((rawName, rawValue) in entries) {
+            val name = (rawName as? String)
+                ?.trim()
+                ?: return null
+
+            val headerValue = (rawValue as? String)
+                ?.trim()
+                ?: return null
+
+            val lowerName = name.lowercase(Locale.ROOT)
+
+            if (
+                name.isEmpty() ||
+                utf8Length(name) >
+                MAX_UPLOAD_HEADER_NAME_BYTES ||
+                !uploadHeaderNamePattern.matches(name) ||
+                lowerName in RESERVED_UPLOAD_HEADERS ||
+                !seenNames.add(lowerName)
+            ) {
+                return null
+            }
+
+            if (
+                headerValue.isEmpty() ||
+                utf8Length(headerValue) >
+                MAX_UPLOAD_HEADER_VALUE_BYTES ||
+                unsafeUploadHeaderValueCharacters
+                    .containsMatchIn(headerValue)
+            ) {
+                return null
+            }
+
+            normalized[name] = headerValue
+        }
+
+        return normalized
+    }
+
+    fun normalizeMultipartFieldName(
+        value: Any?
+    ): String? {
+        val name = (value as? String)
+            ?.trim()
+            ?: return null
+
+        if (
+            name.isEmpty() ||
+            utf8Length(name) >
+            MAX_MULTIPART_FIELD_NAME_BYTES ||
+            !multipartFieldNamePattern.matches(name)
+        ) {
+            return null
+        }
+
+        return name
+    }
+
+    fun normalizeMultipartFields(
+        value: Any?
+    ): Map<String, String>? {
+        val entries = stringEntries(value)
+            ?: return null
+
+        if (entries.size > MAX_MULTIPART_FIELD_COUNT) {
+            return null
+        }
+
+        val normalized = linkedMapOf<String, String>()
+        val seenNames = mutableSetOf<String>()
+        var totalBytes = 0
+
+        for ((rawName, rawValue) in entries) {
+            val name = normalizeMultipartFieldName(
+                rawName
+            ) ?: return null
+
+            val fieldValue = rawValue as? String
+                ?: return null
+
+            if (
+                utf8Length(fieldValue) >
+                MAX_MULTIPART_FIELD_VALUE_BYTES ||
+                fieldValue.contains('\u0000') ||
+                !seenNames.add(name)
+            ) {
+                return null
+            }
+
+            totalBytes +=
+                utf8Length(name) +
+                utf8Length(fieldValue)
+
+            if (
+                totalBytes >
+                MAX_MULTIPART_FIELDS_TOTAL_BYTES
+            ) {
+                return null
+            }
+
+            normalized[name] = fieldValue
+        }
+
+        return normalized
     }
 
     fun validateHttpsUrl(
@@ -396,6 +551,12 @@ internal object NativeBackgroundTransferContract {
             INVALID_HTTP_METHOD ->
                 "The upload method must be POST or PUT."
 
+            INVALID_HEADERS ->
+                "The upload request headers are invalid."
+
+            INVALID_MULTIPART ->
+                "The multipart upload settings are invalid."
+
             DUPLICATE_TRANSFER_ID ->
                 "A transfer already exists with this ID."
 
@@ -447,6 +608,49 @@ internal object NativeBackgroundTransferContract {
             else ->
                 "The background transfer could not be completed."
         }
+    }
+
+    private fun stringEntries(
+        value: Any?
+    ): List<Pair<Any?, Any?>>? {
+        return when (value) {
+            null,
+            JSONObject.NULL -> emptyList()
+
+            is JSONObject -> buildList {
+                val keys = value.keys()
+
+                while (keys.hasNext()) {
+                    val key = keys.next()
+
+                    add(
+                        key to value.opt(key)
+                    )
+                }
+            }
+
+            is Map<*, *> ->
+                value.entries.map { entry ->
+                    entry.key to entry.value
+                }
+
+            is JSONArray ->
+                if (value.length() == 0) {
+                    emptyList()
+                } else {
+                    null
+                }
+
+            else -> null
+        }
+    }
+
+    private fun utf8Length(
+        value: String
+    ): Int {
+        return value
+            .toByteArray(Charsets.UTF_8)
+            .size
     }
 
     private fun normalizeMimeType(
@@ -525,6 +729,8 @@ internal object NativeBackgroundTransferContract {
         INVALID_SOURCE_DOCUMENT_ID,
         SOURCE_DOCUMENT_UNAVAILABLE,
         INVALID_HTTP_METHOD,
+        INVALID_HEADERS,
+        INVALID_MULTIPART,
         DUPLICATE_TRANSFER_ID,
         INVALID_URL,
         HTTPS_REQUIRED,

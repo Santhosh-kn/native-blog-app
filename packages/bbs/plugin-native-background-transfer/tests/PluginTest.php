@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Bbs\NativeBackgroundTransfer\Tests;
 
+use Bbs\NativeBackgroundTransfer\Commands\PreCompileCommand;
 use Bbs\NativeBackgroundTransfer\Contracts\NativeBridge;
 use Bbs\NativeBackgroundTransfer\NativeBackgroundTransfer;
 use Bbs\NativeBackgroundTransfer\NativeBackgroundTransferServiceProvider;
 use Bbs\NativeBackgroundTransfer\Support\NativeBackgroundTransferErrorCode;
 use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandTester;
 
 final class PluginTest extends TestCase
 {
@@ -99,6 +102,8 @@ final class PluginTest extends TestCase
                 'android.permission.POST_NOTIFICATIONS',
                 'android.permission.FOREGROUND_SERVICE',
                 'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
+                'android.permission.RECEIVE_BOOT_COMPLETED',
+                'android.permission.RUN_USER_INITIATED_JOBS',
             ],
             $manifest['android']['permissions'],
         );
@@ -115,9 +120,12 @@ final class PluginTest extends TestCase
             $manifest['android']['min_version'],
         );
 
-        self::assertArrayNotHasKey(
-            'hooks',
-            $manifest,
+        self::assertSame(
+            [
+                'pre_compile' =>
+                    'nativephp:native-background-transfer:pre-compile',
+            ],
+            $manifest['hooks'],
         );
 
         self::assertSame(
@@ -156,6 +164,123 @@ final class PluginTest extends TestCase
         );
     }
 
+    public function test_android_pre_compile_hook_redacts_nativephp_bridge_payload_logs(): void
+    {
+        $provider = $this->readPluginFile(
+            'src/NativeBackgroundTransferServiceProvider.php',
+        );
+
+        self::assertStringContainsString(
+            'PreCompileCommand::class',
+            $provider,
+        );
+
+        $buildPath =
+            sys_get_temp_dir().
+            '/native-background-transfer-'.
+            bin2hex(random_bytes(8));
+
+        $bridgeDirectory =
+            $buildPath.'/app/src/main/cpp';
+
+        $bridgePath =
+            $bridgeDirectory.'/bridge_jni.cpp';
+
+        $files = new Filesystem();
+
+        $files->ensureDirectoryExists(
+            $bridgeDirectory,
+        );
+
+        $unsafeBridge = <<<'CPP'
+LOGI("BridgeJNI: Parameters JSON: %s", parametersJSON);
+LOGI("BridgeJNI: Result JSON: %s", resultStr);
+CPP;
+
+        file_put_contents(
+            $bridgePath,
+            $unsafeBridge,
+        );
+
+        $options = [
+            '--platform' => 'android',
+            '--build-path' => $buildPath,
+            '--plugin-path' => dirname(__DIR__),
+            '--app-id' => 'com.example.app',
+        ];
+
+        try {
+            $firstCommand =
+                new PreCompileCommand();
+
+            $firstCommand->setLaravel(
+                new Container(),
+            );
+
+            $firstRun =
+                new CommandTester(
+                    $firstCommand,
+                );
+
+            self::assertSame(
+                0,
+                $firstRun->execute($options),
+            );
+
+            $redactedBridge =
+                file_get_contents($bridgePath);
+
+            self::assertNotFalse(
+                $redactedBridge,
+            );
+
+            self::assertStringNotContainsString(
+                'Parameters JSON: %s',
+                $redactedBridge,
+            );
+
+            self::assertStringNotContainsString(
+                'Result JSON: %s',
+                $redactedBridge,
+            );
+
+            self::assertStringContainsString(
+                'Parameters JSON: [REDACTED]',
+                $redactedBridge,
+            );
+
+            self::assertStringContainsString(
+                'Result JSON: [REDACTED]',
+                $redactedBridge,
+            );
+
+            $secondCommand =
+                new PreCompileCommand();
+
+            $secondCommand->setLaravel(
+                new Container(),
+            );
+
+            $secondRun =
+                new CommandTester(
+                    $secondCommand,
+                );
+
+            self::assertSame(
+                0,
+                $secondRun->execute($options),
+            );
+
+            self::assertSame(
+                $redactedBridge,
+                file_get_contents($bridgePath),
+            );
+        } finally {
+            $files->deleteDirectory(
+                $buildPath,
+            );
+        }
+    }
     public function test_android_bridge_matches_manifest_and_remains_scheduler_free(): void
     {
         $manifest = $this->readJson(
@@ -210,6 +335,10 @@ final class PluginTest extends TestCase
             'resources/android/NativeBackgroundDownloadWorker.kt',
         );
 
+        $runner = $this->readPluginFile(
+            'resources/android/NativeBackgroundDownloadRunner.kt',
+        );
+
         self::assertStringContainsString(
             'NetworkType.CONNECTED',
             $scheduler,
@@ -260,12 +389,12 @@ final class PluginTest extends TestCase
 
         self::assertStringContainsString(
             'SCHEDULER_UNAVAILABLE',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
             'store.update(failed)',
-            $worker,
+            $runner,
         );
 
         foreach ([
@@ -662,6 +791,10 @@ final class PluginTest extends TestCase
             'resources/android/NativeBackgroundDownloadWorker.kt',
         );
 
+        $runner = $this->readPluginFile(
+            'resources/android/NativeBackgroundDownloadRunner.kt',
+        );
+
         $engine = $this->readPluginFile(
             'resources/android/NativeBackgroundDownloadEngine.kt',
         );
@@ -671,13 +804,22 @@ final class PluginTest extends TestCase
         );
 
         self::assertStringContainsString(
-            'NativeBackgroundDownloadEngine(',
+            'NativeBackgroundDownloadRunner(',
             $worker,
         );
 
         self::assertStringContainsString(
-            'engine.download(',
+            'runner.execute(',
             $worker,
+        );
+        self::assertStringContainsString(
+            'NativeBackgroundDownloadEngine(',
+            $runner,
+        );
+
+        self::assertStringContainsString(
+            'engine.download(',
+            $runner,
         );
 
         self::assertStringContainsString(
@@ -692,22 +834,22 @@ final class PluginTest extends TestCase
 
         self::assertStringContainsString(
             'STATUS_RUNNING',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
             'PROGRESS_BYTE_INTERVAL',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
             'NETWORK_ERROR',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
-            'runAttemptCount',
-            $worker,
+            'MAX_NETWORK_RETRY_COUNT',
+            $runner,
         );
 
         self::assertStringContainsString(
@@ -717,17 +859,17 @@ final class PluginTest extends TestCase
 
         self::assertStringContainsString(
             'STATUS_CANCELLED',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
             'isPersistedCancelled',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
             'deleteFinalFor',
-            $worker,
+            $runner,
         );
 
         self::assertStringContainsString(
@@ -859,7 +1001,99 @@ final class PluginTest extends TestCase
             );
         }
     }
-    public function test_unused_scaffold_runtime_files_are_absent(): void
+    public function test_android_upload_engine_applies_headers_and_streams_multipart_safely(): void
+    {
+        $engine = $this->readPluginFile(
+            'resources/android/NativeBackgroundUploadEngine.kt',
+        );
+
+        foreach ([
+            'request.headers.forEach',
+            'connection.setRequestProperty(',
+            'NativeBackgroundMultipartBody',
+            'multipart/form-data; boundary=',
+            'Content-Disposition: form-data;',
+            'setFixedLengthStreamingMode(',
+            'prefixBytes',
+            'suffixBytes',
+            'transferredBytes + read',
+            'isSameOrigin(',
+        ] as $requiredToken) {
+            self::assertStringContainsString(
+                $requiredToken,
+                $engine,
+            );
+        }
+
+        foreach ([
+            'android.util.Log',
+            'Log.',
+            'println(',
+            'request.headers.toString',
+            '"Authorization"',
+            '"Bearer"',
+        ] as $forbiddenToken) {
+            self::assertStringNotContainsString(
+                $forbiddenToken,
+                $engine,
+            );
+        }
+    }
+    public function test_android_upload_request_validates_and_persists_headers_and_multipart_options(): void
+    {
+        $contract = $this->readPluginFile(
+            'resources/android/NativeBackgroundTransferContract.kt',
+        );
+
+        $request = $this->readPluginFile(
+            'resources/android/NativeBackgroundUploadRequest.kt',
+        );
+
+        foreach ([
+            'INVALID_HEADERS',
+            'INVALID_MULTIPART',
+            'RESERVED_UPLOAD_HEADERS',
+            'fun normalizeUploadHeaders(',
+            'fun normalizeMultipartFieldName(',
+            'fun normalizeMultipartFields(',
+            'JSONObject',
+        ] as $requiredToken) {
+            self::assertStringContainsString(
+                $requiredToken,
+                $contract,
+            );
+        }
+
+        foreach ([
+            'data class NativeBackgroundUploadMultipart(',
+            'val headers: Map<String, String>',
+            'val multipart: NativeBackgroundUploadMultipart?',
+            'parameters["headers"]',
+            'parameters["multipart"]',
+            'NativeBackgroundTransferContract.INVALID_HEADERS',
+            '.INVALID_MULTIPART',
+            'put("headers"',
+            'put("multipart"',
+            'fromStoredJson(',
+        ] as $requiredToken) {
+            self::assertStringContainsString(
+                $requiredToken,
+                $request,
+            );
+        }
+
+        foreach ([
+            'android.util.Log',
+            'Log.',
+            'println(',
+        ] as $forbiddenToken) {
+            self::assertStringNotContainsString(
+                $forbiddenToken,
+                $request,
+            );
+        }
+    }
+    public function test_unused_scaffold_files_are_absent_and_security_hook_is_registered(): void
     {
         self::assertFileDoesNotExist(
             dirname(__DIR__).'/tests/Pest.php',
@@ -873,8 +1107,8 @@ final class PluginTest extends TestCase
             dirname(__DIR__).'/resources/js',
         );
 
-        self::assertDirectoryDoesNotExist(
-            dirname(__DIR__).'/src/Commands',
+        self::assertFileExists(
+            dirname(__DIR__).'/src/Commands/PreCompileCommand.php',
         );
 
         $provider = $this->readPluginFile(
@@ -886,8 +1120,13 @@ final class PluginTest extends TestCase
             $provider,
         );
 
-        self::assertStringNotContainsString(
+        self::assertStringContainsString(
             'function boot',
+            $provider,
+        );
+
+        self::assertStringContainsString(
+            'PreCompileCommand::class',
             $provider,
         );
     }
@@ -1740,9 +1979,6 @@ final class PluginTest extends TestCase
                 'private_path' => '/data/private',
                 'destination_path' => '/unsafe/path',
                 'authorization' => 'Bearer secret',
-                'headers' => [
-                    'Authorization' => 'Bearer secret',
-                ],
                 'filename' => 'unsafe-name.pdf',
             ]);
 
@@ -1782,6 +2018,168 @@ final class PluginTest extends TestCase
         );
     }
 
+    public function test_start_upload_forwards_valid_headers_and_multipart_options(): void
+    {
+        $sourceDocumentId =
+            '11111111-1111-4111-8111-111111111111';
+
+        $bridge = new FakeNativeBridge(
+            (object) [
+                'accepted' => true,
+                'id' => self::REQUEST_ID,
+                'type' => 'upload',
+                'status' => 'queued',
+            ],
+        );
+
+        $result = $this->transfer($bridge)
+            ->startUpload([
+                'id' => self::REQUEST_ID,
+                'source_document_id' =>
+                    $sourceDocumentId,
+                'url' =>
+                    'https://example.com/upload',
+                'method' => 'POST',
+                'max_size' => 1_048_576,
+                'headers' => [
+                    ' Authorization ' =>
+                        ' Bearer upload-token ',
+                    'X-Trace-ID' =>
+                        ' trace-123 ',
+                ],
+                'multipart' => [
+                    'file_field' => ' document ',
+                    'fields' => [
+                        'title' =>
+                            ' Quarterly report ',
+                        'category' => 'finance',
+                    ],
+                ],
+            ]);
+
+        self::assertTrue($result->accepted);
+
+        self::assertSame(
+            [
+                [
+                    'method' =>
+                        'NativeBackgroundTransfer.StartUpload',
+                    'parameters' => [
+                        'id' => self::REQUEST_ID,
+                        'source_document_id' =>
+                            $sourceDocumentId,
+                        'url' =>
+                            'https://example.com/upload',
+                        'method' => 'POST',
+                        'max_size' => 1_048_576,
+                        'headers' => [
+                            'Authorization' =>
+                                'Bearer upload-token',
+                            'X-Trace-ID' =>
+                                'trace-123',
+                        ],
+                        'multipart' => [
+                            'file_field' => 'document',
+                            'fields' => [
+                                'title' =>
+                                    ' Quarterly report ',
+                                'category' =>
+                                    'finance',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            $bridge->calls,
+        );
+    }
+
+    public function test_start_upload_rejects_invalid_headers_and_multipart_options(): void
+    {
+        $baseOptions = [
+            'id' => self::REQUEST_ID,
+            'source_document_id' =>
+                '11111111-1111-4111-8111-111111111111',
+            'url' => 'https://example.com/upload',
+            'method' => 'POST',
+        ];
+
+        $cases = [
+            [
+                [
+                    'headers' => [
+                        'Content-Type' =>
+                            'application/json',
+                    ],
+                ],
+                'INVALID_HEADERS',
+            ],
+            [
+                [
+                    'headers' => [
+                        'X-Test' =>
+                            "safe\r\nInjected: yes",
+                    ],
+                ],
+                'INVALID_HEADERS',
+            ],
+            [
+                [
+                    'headers' => [
+                        'not-an-associative-header',
+                    ],
+                ],
+                'INVALID_HEADERS',
+            ],
+            [
+                [
+                    'multipart' => [],
+                ],
+                'INVALID_MULTIPART',
+            ],
+            [
+                [
+                    'multipart' => [
+                        'file_field' =>
+                            'bad"field',
+                    ],
+                ],
+                'INVALID_MULTIPART',
+            ],
+            [
+                [
+                    'multipart' => [
+                        'file_field' => 'file',
+                        'fields' => [
+                            'metadata' => [
+                                'not-a-string',
+                            ],
+                        ],
+                    ],
+                ],
+                'INVALID_MULTIPART',
+            ],
+        ];
+
+        foreach ($cases as [$extraOptions, $expectedErrorCode]) {
+            $bridge = new FakeNativeBridge(null);
+
+            $result = $this->transfer($bridge)
+                ->startUpload(
+                    array_merge(
+                        $baseOptions,
+                        $extraOptions,
+                    ),
+                );
+
+            self::assertFalse($result->accepted);
+            self::assertSame(
+                $expectedErrorCode,
+                $result->errorCode,
+            );
+            self::assertSame([], $bridge->calls);
+        }
+    }
     public function test_invalid_upload_options_never_reach_bridge(): void
     {
         $validSourceId =
