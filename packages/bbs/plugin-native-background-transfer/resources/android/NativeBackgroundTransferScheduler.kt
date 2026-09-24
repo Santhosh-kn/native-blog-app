@@ -3,7 +3,9 @@ package com.bbs.plugins.native_background_transfer
 import android.content.Context
 import android.os.Build
 import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.NetworkType
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -50,6 +52,13 @@ internal class NativeBackgroundTransferScheduler(
                 NativeBackgroundDownloadWorker::class.java
             )
                 .setInputData(inputData)
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(
+                            NetworkType.CONNECTED
+                        )
+                        .build()
+                )
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
                     BACKOFF_SECONDS,
@@ -105,6 +114,13 @@ internal class NativeBackgroundTransferScheduler(
                 NativeBackgroundUploadWorker::class.java
             )
                 .setInputData(inputData)
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(
+                            NetworkType.CONNECTED
+                        )
+                        .build()
+                )
                 .setBackoffCriteria(
                     BackoffPolicy.EXPONENTIAL,
                     BACKOFF_SECONDS,

@@ -4,6 +4,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.net.URI
 import java.net.URL
+import java.util.UUID
 import javax.net.ssl.HttpsURLConnection
 
 internal sealed interface NativeBackgroundUploadOutcome {
@@ -25,6 +26,13 @@ internal sealed interface NativeBackgroundUploadOutcome {
         val progress: Int? = null
     ) : NativeBackgroundUploadOutcome
 }
+
+internal data class NativeBackgroundMultipartBody(
+    val contentType: String,
+    val contentLength: Long,
+    val prefixBytes: ByteArray,
+    val suffixBytes: ByteArray
+)
 
 internal class NativeBackgroundUploadEngine(
     private val connectionOpener:
@@ -116,6 +124,79 @@ internal class NativeBackgroundUploadEngine(
                     totalBytes = source.size
                 )
 
+        val normalizedHeaders =
+            NativeBackgroundTransferContract
+                .normalizeUploadHeaders(
+                    request.headers
+                )
+
+        if (
+            normalizedHeaders == null ||
+            normalizedHeaders != request.headers
+        ) {
+            return NativeBackgroundUploadOutcome.Failed(
+                errorCode =
+                    NativeBackgroundTransferContract
+                        .INVALID_HEADERS,
+                totalBytes = source.size
+            )
+        }
+
+        val configuredMultipart = request.multipart
+
+        val normalizedMultipart =
+            if (configuredMultipart == null) {
+                null
+            } else {
+                val fileField =
+                    NativeBackgroundTransferContract
+                        .normalizeMultipartFieldName(
+                            configuredMultipart.fileField
+                        )
+                        ?: return NativeBackgroundUploadOutcome.Failed(
+                            errorCode =
+                                NativeBackgroundTransferContract
+                                    .INVALID_MULTIPART,
+                            totalBytes = source.size
+                        )
+
+                val fields =
+                    NativeBackgroundTransferContract
+                        .normalizeMultipartFields(
+                            configuredMultipart.fields
+                        )
+                        ?: return NativeBackgroundUploadOutcome.Failed(
+                            errorCode =
+                                NativeBackgroundTransferContract
+                                    .INVALID_MULTIPART,
+                            totalBytes = source.size
+                        )
+
+                NativeBackgroundUploadMultipart(
+                    fileField = fileField,
+                    fields = fields
+                ).also {
+                    if (it != configuredMultipart) {
+                        return NativeBackgroundUploadOutcome.Failed(
+                            errorCode =
+                                NativeBackgroundTransferContract
+                                    .INVALID_MULTIPART,
+                            totalBytes = source.size
+                        )
+                    }
+                }
+            }
+
+        val multipartBody =
+            normalizedMultipart?.let {
+                createMultipartBody(
+                    multipart = it,
+                    displayName = safeDisplayName,
+                    mimeType = normalizedMimeType,
+                    sourceSize = source.size
+                )
+            }
+
         var currentUrl = request.url
         var redirectCount = 0
 
@@ -157,11 +238,24 @@ internal class NativeBackgroundUploadEngine(
             var transferredBytes = 0L
 
             try {
+                request.headers.forEach {
+                        (name, value) ->
+
+                    connection.setRequestProperty(
+                        name,
+                        value
+                    )
+                }
+
                 configureConnection(
                     connection = connection,
                     method = method,
-                    mimeType = normalizedMimeType,
-                    contentLength = source.size
+                    contentType =
+                        multipartBody?.contentType
+                            ?: normalizedMimeType,
+                    contentLength =
+                        multipartBody?.contentLength
+                            ?: source.size
                 )
 
                 onProgress(
@@ -171,7 +265,7 @@ internal class NativeBackgroundUploadEngine(
                 )
 
                 if (
-                    request.method == "POST" &&
+                    method == "POST" &&
                     !onRequestBodyStarting()
                 ) {
                     return NativeBackgroundUploadOutcome.Failed(
@@ -186,6 +280,7 @@ internal class NativeBackgroundUploadEngine(
                     streamRequestBody(
                         connection = connection,
                         source = source,
+                        multipartBody = multipartBody,
                         isCancelled = isCancelled,
                         onProgress = onProgress
                     )
@@ -255,7 +350,7 @@ internal class NativeBackgroundUploadEngine(
                     connection.responseCode
 
                 if (isUploadRedirect(responseCode)) {
-                    if (request.method == "POST") {
+                    if (method == "POST") {
                         return NativeBackgroundUploadOutcome.Failed(
                             errorCode =
                                 NativeBackgroundTransferContract
@@ -334,8 +429,30 @@ internal class NativeBackgroundUploadEngine(
                                     redirectedUrl
                                 )
                     ) {
-                        is NativeBackgroundTransferUrlValidation.Valid ->
+                        is NativeBackgroundTransferUrlValidation.Valid -> {
+                            if (
+                                !isSameOrigin(
+                                    validatedUrl,
+                                    validation.url
+                                )
+                            ) {
+                                return NativeBackgroundUploadOutcome.Failed(
+                                    errorCode =
+                                        NativeBackgroundTransferContract
+                                            .HTTP_ERROR,
+                                    transferredBytes =
+                                        transferredBytes,
+                                    totalBytes = source.size,
+                                    progress =
+                                        progress(
+                                            transferredBytes,
+                                            source.size
+                                        )
+                                )
+                            }
+
                             currentUrl = validation.url
+                        }
 
                         is NativeBackgroundTransferUrlValidation.Invalid ->
                             return NativeBackgroundUploadOutcome.Failed(
@@ -453,6 +570,7 @@ internal class NativeBackgroundUploadEngine(
     private fun streamRequestBody(
         connection: HttpsURLConnection,
         source: NativeBackgroundUploadSourceResolution.Resolved,
+        multipartBody: NativeBackgroundMultipartBody?,
         isCancelled: () -> Boolean,
         onProgress: (
             transferredBytes: Long,
@@ -482,6 +600,22 @@ internal class NativeBackgroundUploadEngine(
                     ByteArray(BUFFER_SIZE)
 
                 var transferredBytes = 0L
+
+                if (multipartBody != null) {
+                    if (isCancelled()) {
+                        return@use StreamOutcome.Cancelled()
+                    }
+
+                    try {
+                        outputStream.write(
+                            multipartBody.prefixBytes
+                        )
+                    } catch (_: IOException) {
+                        return@use StreamOutcome.NetworkFailed()
+                    } catch (_: SecurityException) {
+                        return@use StreamOutcome.NetworkFailed()
+                    }
+                }
 
                 while (true) {
                     if (isCancelled()) {
@@ -564,6 +698,28 @@ internal class NativeBackgroundUploadEngine(
                     )
                 }
 
+                if (multipartBody != null) {
+                    try {
+                        outputStream.write(
+                            multipartBody.suffixBytes
+                        )
+                    } catch (_: IOException) {
+                        return@use StreamOutcome.NetworkFailed(
+                            transferredBytes
+                        )
+                    } catch (_: SecurityException) {
+                        return@use StreamOutcome.NetworkFailed(
+                            transferredBytes
+                        )
+                    }
+                }
+
+                if (isCancelled()) {
+                    return@use StreamOutcome.Cancelled(
+                        transferredBytes
+                    )
+                }
+
                 try {
                     outputStream.flush()
                 } catch (_: IOException) {
@@ -582,7 +738,7 @@ internal class NativeBackgroundUploadEngine(
     private fun configureConnection(
         connection: HttpsURLConnection,
         method: String,
-        mimeType: String,
+        contentType: String,
         contentLength: Long
     ) {
         connection.requestMethod = method
@@ -600,11 +756,86 @@ internal class NativeBackgroundUploadEngine(
 
         connection.setRequestProperty(
             "Content-Type",
-            mimeType
+            contentType
         )
 
         connection.setFixedLengthStreamingMode(
             contentLength
+        )
+    }
+
+    private fun createMultipartBody(
+        multipart: NativeBackgroundUploadMultipart,
+        displayName: String,
+        mimeType: String,
+        sourceSize: Long
+    ): NativeBackgroundMultipartBody {
+        val boundary =
+            "native-background-transfer-" +
+                UUID.randomUUID().toString()
+
+        val prefix = StringBuilder()
+
+        multipart.fields.forEach {
+                (name, value) ->
+
+            prefix
+                .append("--")
+                .append(boundary)
+                .append(CRLF)
+                .append(
+                    "Content-Disposition: form-data; " +
+                        "name=\""
+                )
+                .append(name)
+                .append("\"")
+                .append(CRLF)
+                .append(CRLF)
+                .append(value)
+                .append(CRLF)
+        }
+
+        prefix
+            .append("--")
+            .append(boundary)
+            .append(CRLF)
+            .append(
+                "Content-Disposition: form-data; " +
+                    "name=\""
+            )
+            .append(multipart.fileField)
+            .append("\"; filename=\"")
+            .append(displayName)
+            .append("\"")
+            .append(CRLF)
+            .append("Content-Type: ")
+            .append(mimeType)
+            .append(CRLF)
+            .append(CRLF)
+
+        val prefixBytes =
+            prefix.toString()
+                .toByteArray(Charsets.UTF_8)
+
+        val suffixBytes =
+            (
+                CRLF +
+                    "--" +
+                    boundary +
+                    "--" +
+                    CRLF
+                )
+                .toByteArray(Charsets.UTF_8)
+
+        return NativeBackgroundMultipartBody(
+            contentType =
+                "multipart/form-data; boundary=$boundary",
+            contentLength =
+                prefixBytes.size.toLong() +
+                    sourceSize +
+                    suffixBytes.size.toLong(),
+            prefixBytes = prefixBytes,
+            suffixBytes = suffixBytes
         )
     }
 
@@ -618,6 +849,39 @@ internal class NativeBackgroundUploadEngine(
                 .toString()
         } catch (_: Exception) {
             null
+        }
+    }
+
+    private fun isSameOrigin(
+        firstUrl: String,
+        secondUrl: String
+    ): Boolean {
+        return try {
+            val first = URI(firstUrl)
+            val second = URI(secondUrl)
+
+            first.scheme.equals(
+                second.scheme,
+                ignoreCase = true
+            ) &&
+                first.host.equals(
+                    second.host,
+                    ignoreCase = true
+                ) &&
+                effectivePort(first) ==
+                effectivePort(second)
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun effectivePort(
+        uri: URI
+    ): Int {
+        return if (uri.port == -1) {
+            DEFAULT_HTTPS_PORT
+        } else {
+            uri.port
         }
     }
 
@@ -679,6 +943,10 @@ internal class NativeBackgroundUploadEngine(
 
     private companion object {
         const val MAX_REDIRECTS = 5
+
+        const val DEFAULT_HTTPS_PORT = 443
+
+        const val CRLF = "\r\n"
 
         const val BUFFER_SIZE =
             64 * 1024

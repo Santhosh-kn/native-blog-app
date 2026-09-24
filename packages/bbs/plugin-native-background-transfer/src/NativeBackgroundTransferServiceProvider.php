@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bbs\NativeBackgroundTransfer;
 
+use Bbs\NativeBackgroundTransfer\Commands\PreCompileCommand;
 use Bbs\NativeBackgroundTransfer\Contracts\NativeBridge;
 use Bbs\NativeBackgroundTransfer\Support\NativePhpBridge;
 use Illuminate\Contracts\Foundation\Application;
@@ -25,5 +26,14 @@ final class NativeBackgroundTransferServiceProvider extends ServiceProvider
                     bridge: $app->make(NativeBridge::class),
                 ),
         );
+    }
+
+    public function boot(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PreCompileCommand::class,
+            ]);
+        }
     }
 }

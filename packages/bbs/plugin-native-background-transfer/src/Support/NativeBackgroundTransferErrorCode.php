@@ -14,6 +14,10 @@ final class NativeBackgroundTransferErrorCode
 
     public const INVALID_HTTP_METHOD = 'INVALID_HTTP_METHOD';
 
+    public const INVALID_HEADERS = 'INVALID_HEADERS';
+
+    public const INVALID_MULTIPART = 'INVALID_MULTIPART';
+
     public const DUPLICATE_TRANSFER_ID = 'DUPLICATE_TRANSFER_ID';
 
     public const INVALID_URL = 'INVALID_URL';
@@ -56,6 +60,8 @@ final class NativeBackgroundTransferErrorCode
             self::INVALID_SOURCE_DOCUMENT_ID,
             self::SOURCE_DOCUMENT_UNAVAILABLE,
             self::INVALID_HTTP_METHOD,
+            self::INVALID_HEADERS,
+            self::INVALID_MULTIPART,
             self::DUPLICATE_TRANSFER_ID,
             self::INVALID_URL,
             self::HTTPS_REQUIRED,
@@ -94,6 +100,12 @@ final class NativeBackgroundTransferErrorCode
 
             self::INVALID_HTTP_METHOD =>
                 'The upload method must be POST or PUT.',
+
+            self::INVALID_HEADERS =>
+                'The upload request headers are invalid.',
+
+            self::INVALID_MULTIPART =>
+                'The multipart upload settings are invalid.',
 
             self::DUPLICATE_TRANSFER_ID =>
                 'A transfer already exists with this ID.',
