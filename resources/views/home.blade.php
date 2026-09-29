@@ -13,6 +13,7 @@
         <a href="{{ route('push.index') }}" class="btn btn-secondary btn-sm">🔔 Notifications</a>
         <a href="{{ route('native-printing.index') }}" class="btn btn-secondary btn-sm">PDF Printing</a>
         <a href="{{ route('native-document-picker.index') }}" class="btn btn-secondary btn-sm">Document Picker</a>
+        <a href="{{ route('native-passkeys.index') }}" class="btn btn-secondary btn-sm">Passkeys</a>
         <a href="{{ route('native-background-transfer.index') }}" class="btn btn-secondary btn-sm">Background Transfers</a>
         <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
             @csrf

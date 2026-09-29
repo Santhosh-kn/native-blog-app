@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "976fd4f32511dad60cd8345ad2fe6eaa",
+    "content-hash": "26fc4bfb69daa3ae2b28aff167b0ba27",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -307,6 +307,56 @@
                 }
             ],
             "description": "Secure Android document selection and application-private persistence for NativePHP Mobile",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-native-passkeys",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-passkeys",
+                "reference": "6b9762d1e76b1fd57e774f6492f3df218b1acec4"
+            },
+            "require": {
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativePasskeys\\NativePasskeysServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativePasskeys\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --bootstrap tests/bootstrap.php tests/PluginTest.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BBS",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "Android passkey bridge contract and persisted Credential Manager request lifecycle for NativePHP Mobile",
             "transport-options": {
                 "relative": true
             }
