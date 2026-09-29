@@ -1,0 +1,96 @@
+{
+    "name": "bbs/plugin-native-passkeys",
+    "version": "1.0.0",
+    "description": "Android passkey bridge contract and persisted Credential Manager request lifecycle for NativePHP Mobile",
+    "namespace": "NativePasskeys",
+    "keywords": [
+        "android",
+        "authentication",
+        "credential-manager",
+        "nativephp",
+        "passkeys",
+        "webauthn"
+    ],
+    "category": "utilities",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "BBS",
+        "email": "you@example.com",
+        "url": "https://github.com/Santhosh-kn"
+    },
+    "homepage": "https://github.com/Santhosh-kn/native-blog-app",
+    "repository": "https://github.com/Santhosh-kn/native-blog-app",
+    "funding": [],
+    "platforms": [
+        "android"
+    ],
+    "screenshots": [],
+    "bridge_functions": [
+        {
+            "name": "NativePasskeys.IsAvailable",
+            "android": "com.bbs.plugins.native_passkeys.NativePasskeysFunctions.IsAvailable",
+            "description": "Report Android passkey bridge availability"
+        },
+        {
+            "name": "NativePasskeys.Create",
+            "android": "com.bbs.plugins.native_passkeys.NativePasskeysFunctions.Create",
+            "description": "Start passkey registration using server-generated WebAuthn creation options"
+        },
+        {
+            "name": "NativePasskeys.Authenticate",
+            "android": "com.bbs.plugins.native_passkeys.NativePasskeysFunctions.Authenticate",
+            "description": "Start passkey authentication using server-generated WebAuthn request options"
+        },
+        {
+            "name": "NativePasskeys.GetStatus",
+            "android": "com.bbs.plugins.native_passkeys.NativePasskeysFunctions.GetStatus",
+            "description": "Get persisted request status without consuming its credential response"
+        },
+        {
+            "name": "NativePasskeys.ConsumeResult",
+            "android": "com.bbs.plugins.native_passkeys.NativePasskeysFunctions.ConsumeResult",
+            "description": "Consume a completed credential response once"
+        },
+        {
+            "name": "NativePasskeys.Cancel",
+            "android": "com.bbs.plugins.native_passkeys.NativePasskeysFunctions.Cancel",
+            "description": "Cancel a pending passkey request"
+        }
+    ],
+    "android": {
+        "min_version": 28,
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "implementation": [
+                "androidx.credentials:credentials:1.6.0",
+                "androidx.credentials:credentials-play-services-auth:1.6.0"
+            ]
+        },
+        "activities": [],
+        "services": [],
+        "receivers": [],
+        "providers": []
+    },
+    "ios": {
+        "min_version": "15.0",
+        "permissions": [],
+        "repositories": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "assets": {
+        "android": [],
+        "ios": []
+    },
+    "secrets": [],
+    "events": [
+        "Bbs\\NativePasskeys\\Events\\NativePasskeysCompleted"
+    ],
+    "service_provider": "Bbs\\NativePasskeys\\NativePasskeysServiceProvider"
+}

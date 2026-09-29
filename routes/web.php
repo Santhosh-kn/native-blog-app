@@ -7,6 +7,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MicrophoneController;
 use App\Http\Controllers\NativeDocumentPickerController;
 use App\Http\Controllers\NativeBackgroundTransferController;
+use App\Http\Controllers\NativePasskeysController;
 use App\Http\Controllers\NativePrintingController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushController;
@@ -157,6 +158,24 @@ Route::middleware('device.unlocked')->group(function () {
             )
                 ->whereUuid('transferId')
                 ->name('consume');
+        });
+    Route::prefix('native-passkeys')
+        ->name('native-passkeys.')
+        ->group(function () {
+            Route::get(
+                '/',
+                [NativePasskeysController::class, 'index'],
+            )->name('index');
+
+            Route::get(
+                '/availability',
+                [NativePasskeysController::class, 'availability'],
+            )->name('availability');
+
+            Route::post(
+                '/diagnostics',
+                [NativePasskeysController::class, 'diagnostics'],
+            )->name('diagnostics');
         });
     Route::prefix('native-printing')
         ->name('native-printing.')
