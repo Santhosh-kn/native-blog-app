@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26fc4bfb69daa3ae2b28aff167b0ba27",
+    "content-hash": "6cd0f4e0a3c23bb4c63612a06ed435d8",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -262,6 +262,104 @@
             }
         },
         {
+            "name": "bbs/plugin-native-calendar",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-calendar",
+                "reference": "3e28aff75e5d698b2977d9ff44f290543453c222"
+            },
+            "require": {
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativeCalendar\\NativeCalendarServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativeCalendar\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Bbs\\NativeCalendar\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --configuration phpunit.xml"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Android calendar event editor and viewer integration for NativePHP Mobile.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-native-contacts",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-contacts",
+                "reference": "f100dbd6f261e951ee5ac11a7e53c7ae1a5492a7"
+            },
+            "require": {
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativeContacts\\NativeContactsServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativeContacts\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Bbs\\NativeContacts\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --configuration phpunit.xml"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Android system contact selection and contact editor integration for NativePHP Mobile.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "bbs/plugin-native-document-picker",
             "version": "1.0.0",
             "dist": {
@@ -317,7 +415,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/bbs/plugin-native-passkeys",
-                "reference": "6b9762d1e76b1fd57e774f6492f3df218b1acec4"
+                "reference": "017cdba09583a0e125128460698ad070f79726a0"
             },
             "require": {
                 "nativephp/mobile": "^4.2",

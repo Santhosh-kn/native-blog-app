@@ -56,6 +56,8 @@ class NativeServiceProvider extends ServiceProvider
             NativePrintingServiceProvider::class,
             \Bbs\NativeBackgroundTransfer\NativeBackgroundTransferServiceProvider::class,
             \Bbs\NativePasskeys\NativePasskeysServiceProvider::class,
+            \Bbs\NativeContacts\NativeContactsServiceProvider::class,
+            \Bbs\NativeCalendar\NativeCalendarServiceProvider::class,
 
         ];
     }

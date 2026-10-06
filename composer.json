@@ -9,6 +9,14 @@
     ],
     "license": "MIT",
     "repositories": {
+        "native-calendar": {
+            "type": "path",
+            "url": "packages/bbs/plugin-native-calendar"
+        },
+        "native-contacts": {
+            "type": "path",
+            "url": "packages/bbs/plugin-native-contacts"
+        },
         "native-passkeys": {
             "type": "path",
             "url": "packages/bbs/plugin-native-passkeys"
@@ -44,6 +52,8 @@
         "bbs/plugin-firebase-google-auth": "1.0.0",
         "bbs/plugin-firebase-push-notifications": "^1.0",
         "bbs/plugin-native-background-transfer": "1.0",
+        "bbs/plugin-native-calendar": "1.0.0",
+        "bbs/plugin-native-contacts": "1.0.0",
         "bbs/plugin-native-document-picker": "^1.0",
         "bbs/plugin-native-passkeys": "^1.0",
         "bbs/plugin-native-printing": "^1.0",

@@ -1,0 +1,37 @@
+{
+    "name": "bbs/plugin-native-contacts",
+    "version": "1.0.0",
+    "description": "Android system contact selection and contact editor integration for NativePHP Mobile.",
+    "type": "nativephp-plugin",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "nativephp/mobile": "^4.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bbs\\NativeContacts\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bbs\\NativeContacts\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bbs\\NativeContacts\\NativeContactsServiceProvider"
+            ]
+        },
+        "nativephp": {
+            "manifest": "nativephp.json"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --configuration phpunit.xml"
+    }
+}
