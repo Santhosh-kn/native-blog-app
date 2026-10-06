@@ -1,0 +1,19 @@
+def sourcePath = gradle.startParameter.projectProperties['contactsTestSourceDir']
+if (!sourcePath) {
+    throw new GradleException('The Contacts test source directory is required.')
+}
+
+def testDirectory = new File(sourcePath)
+if (!testDirectory.isDirectory()) {
+    throw new GradleException('The Contacts test source directory does not exist.')
+}
+
+gradle.beforeProject { project ->
+    if (project.path == ':app') {
+        project.pluginManager.withPlugin('com.android.application') {
+            project.extensions.getByName('android')
+                .sourceSets.getByName('androidTest')
+                .java.srcDir(testDirectory)
+        }
+    }
+}

@@ -1,0 +1,126 @@
+{
+    "name":  "bbs/plugin-native-contacts",
+    "version":  "1.0.0",
+    "description":  "Android system contact selection and contact editor integration.",
+    "namespace":  "NativeContacts",
+    "keywords":  [
+                     "android",
+                     "contacts",
+                     "contact-picker",
+                     "nativephp"
+                 ],
+    "category":  "utilities",
+    "license":  "MIT",
+    "pricing":  {
+                    "type":  "free"
+                },
+    "author":  {
+                   "name":  "Santhosh K N",
+                   "email":  "",
+                   "url":  ""
+               },
+    "homepage":  "",
+    "repository":  "",
+    "funding":  [
+
+                ],
+    "platforms":  [
+                      "android"
+                  ],
+    "screenshots":  [
+
+                    ],
+    "bridge_functions":  [
+                             {
+                                 "name":  "NativeContacts.IsAvailable",
+                                 "android":  "com.bbs.plugins.native_contacts.NativeContactsFunctions.IsAvailable",
+                                 "description":  "Check Android contact operation availability without reading contact data."
+                             },
+                             {
+                                 "name":  "NativeContacts.Pick",
+                                 "android":  "com.bbs.plugins.native_contacts.NativeContactsFunctions.Pick",
+                                 "description":  "Select a contact, phone number or email through Android system UI."
+                             },
+                             {
+                                 "name":  "NativeContacts.Create",
+                                 "android":  "com.bbs.plugins.native_contacts.NativeContactsFunctions.Create",
+                                 "description":  "Launch a prefilled contact editor without claiming that a contact was saved."
+                             },
+                             {
+                                 "name":  "NativeContacts.Open",
+                                 "android":  "com.bbs.plugins.native_contacts.NativeContactsFunctions.Open",
+                                 "description":  "Launch Android contact viewing UI for a validated contact URI."
+                             },
+                             {
+                                 "name":  "NativeContacts.GetStatus",
+                                 "android":  "com.bbs.plugins.native_contacts.NativeContactsFunctions.GetStatus",
+                                 "description":  "Retrieve request status metadata without selected contact data."
+                             },
+                             {
+                                 "name":  "NativeContacts.ConsumeResult",
+                                 "android":  "com.bbs.plugins.native_contacts.NativeContactsFunctions.ConsumeResult",
+                                 "description":  "Consume selected contact data once and redact its stored result."
+                             }
+                         ],
+    "android":  {
+                    "min_version":  33,
+                    "permissions":  [
+
+                                    ],
+                    "repositories":  [
+
+                                     ],
+                    "dependencies":  {
+                                         "implementation":  [
+
+                                                            ]
+                                     },
+                    "activities":  [
+
+                                   ],
+                    "services":  [
+
+                                 ],
+                    "receivers":  [
+
+                                  ],
+                    "providers":  [
+
+                                  ]
+                },
+    "ios":  {
+                "min_version":  "15.0",
+                "permissions":  [
+
+                                ],
+                "repositories":  [
+
+                                 ],
+                "dependencies":  {
+                                     "swift_packages":  [
+
+                                                        ],
+                                     "pods":  [
+
+                                              ]
+                                 }
+            },
+    "assets":  {
+                   "android":  [
+
+                               ],
+                   "ios":  [
+
+                           ]
+               },
+    "secrets":  [
+
+                ],
+    "events":  [
+                   "Bbs\\NativeContacts\\Events\\NativeContactsCompleted"
+               ],
+    "service_provider":  "Bbs\\NativeContacts\\NativeContactsServiceProvider",
+    "hooks":  {
+                  "post_compile":  "nativephp:native-contacts:configure-android"
+              }
+}

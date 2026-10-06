@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/bootstrap.php"
+         colors="true"
+         cacheResult="false"
+         failOnWarning="true"
+         failOnRisky="true">
+    <testsuites>
+        <testsuite name="NativeCalendar">
+            <file>tests/NativePhpBridgeTest.php</file>
+            <file>tests/NativeCalendarRequestValidatorTest.php</file>
+            <file>tests/NativeCalendarResultTest.php</file>
+            <file>tests/NativeCalendarServiceTest.php</file>
+            <file>tests/NativeCalendarCompletedTest.php</file>
+            <file>tests/NativeCalendarManifestQueriesTest.php</file>
+            <file>tests/ConfigureAndroidManifestCommandTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -1,0 +1,116 @@
+{
+    "name":  "bbs/plugin-native-calendar",
+    "version":  "1.0.0",
+    "description":  "Android calendar event editor and viewer integration.",
+    "namespace":  "NativeCalendar",
+    "keywords":  [
+                     "android",
+                     "calendar",
+                     "events",
+                     "nativephp"
+                 ],
+    "category":  "utilities",
+    "license":  "MIT",
+    "pricing":  {
+                    "type":  "free"
+                },
+    "author":  {
+                   "name":  "Santhosh K N",
+                   "email":  "",
+                   "url":  ""
+               },
+    "homepage":  "",
+    "repository":  "",
+    "funding":  [
+
+                ],
+    "platforms":  [
+                      "android"
+                  ],
+    "screenshots":  [
+
+                    ],
+    "bridge_functions":  [
+                             {
+                                 "name":  "NativeCalendar.IsAvailable",
+                                 "android":  "com.bbs.plugins.native_calendar.NativeCalendarFunctions.IsAvailable",
+                                 "description":  "Check calendar editor and viewer availability without reading calendar data."
+                             },
+                             {
+                                 "name":  "NativeCalendar.CreateEvent",
+                                 "android":  "com.bbs.plugins.native_calendar.NativeCalendarFunctions.CreateEvent",
+                                 "description":  "Launch a prefilled event editor without claiming that an event was saved."
+                             },
+                             {
+                                 "name":  "NativeCalendar.Open",
+                                 "android":  "com.bbs.plugins.native_calendar.NativeCalendarFunctions.Open",
+                                 "description":  "Launch calendar viewing UI for a validated date or event ID."
+                             },
+                             {
+                                 "name":  "NativeCalendar.GetStatus",
+                                 "android":  "com.bbs.plugins.native_calendar.NativeCalendarFunctions.GetStatus",
+                                 "description":  "Retrieve request outcome metadata without event details."
+                             }
+                         ],
+    "android":  {
+                    "min_version":  33,
+                    "permissions":  [
+
+                                    ],
+                    "repositories":  [
+
+                                     ],
+                    "dependencies":  {
+                                         "implementation":  [
+
+                                                            ]
+                                     },
+                    "activities":  [
+
+                                   ],
+                    "services":  [
+
+                                 ],
+                    "receivers":  [
+
+                                  ],
+                    "providers":  [
+
+                                  ]
+                },
+    "ios":  {
+                "min_version":  "15.0",
+                "permissions":  [
+
+                                ],
+                "repositories":  [
+
+                                 ],
+                "dependencies":  {
+                                     "swift_packages":  [
+
+                                                        ],
+                                     "pods":  [
+
+                                              ]
+                                 }
+            },
+    "assets":  {
+                   "android":  [
+
+                               ],
+                   "ios":  [
+
+                           ]
+               },
+    "secrets":  [
+
+                ],
+    "events":  [
+                   "Bbs\\NativeCalendar\\Events\\NativeCalendarCompleted"
+               ],
+    "service_provider":  "Bbs\\NativeCalendar\\NativeCalendarServiceProvider",
+    "hooks":  {
+                  "post_compile":  "nativephp:native-calendar:configure-android"
+              }
+}

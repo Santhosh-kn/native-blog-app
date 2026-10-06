@@ -267,3 +267,49 @@ Route::get('/auth/google/status/{requestId}', [GoogleAuthController::class, 'sta
 //         ])
 //     );
 // });
+
+
+// Contacts diagnostics: explicit authentication and device unlock.
+Route::middleware(['auth', 'device.unlocked'])
+    ->prefix('native-contacts')
+    ->name('native-contacts.')
+    ->group(function () {
+        $controller = \App\Http\Controllers\NativeContactsController::class;
+
+        Route::get('/', [$controller, 'index'])->name('index');
+        Route::get('/availability', [$controller, 'availability'])->name('availability');
+        Route::post('/diagnostics', [$controller, 'diagnostics'])->name('diagnostics');
+        Route::post('/pick', [$controller, 'pick'])->name('pick');
+        Route::post('/create', [$controller, 'create'])->name('create');
+
+        Route::get('/status/{id}', [$controller, 'status'])
+            ->whereUuid('id')
+            ->name('status');
+
+        Route::post('/consume/{id}', [$controller, 'consume'])
+            ->whereUuid('id')
+            ->name('consume');
+
+        Route::post('/open-selection/{id}', [$controller, 'openSelection'])
+            ->whereUuid('id')
+            ->name('open-selection');
+    });
+
+// Calendar demo: explicit authentication and device unlock.
+Route::middleware(['auth', 'device.unlocked'])
+    ->prefix('native-calendar')
+    ->name('native-calendar.')
+    ->group(function () {
+        $controller = \App\Http\Controllers\NativeCalendarController::class;
+
+        Route::get('/', [$controller, 'index'])->name('index');
+        Route::get('/availability', [$controller, 'availability'])->name('availability');
+        Route::post('/diagnostics', [$controller, 'diagnostics'])->name('diagnostics');
+        Route::post('/create', [$controller, 'createEvent'])->name('create');
+        Route::post('/open-date', [$controller, 'openDate'])->name('open-date');
+        Route::post('/open-event', [$controller, 'openEvent'])->name('open-event');
+
+        Route::get('/status/{id}', [$controller, 'status'])
+            ->whereUuid('id')
+            ->name('status');
+    });
