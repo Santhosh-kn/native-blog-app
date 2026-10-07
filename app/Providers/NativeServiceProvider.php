@@ -58,6 +58,8 @@ class NativeServiceProvider extends ServiceProvider
             \Bbs\NativePasskeys\NativePasskeysServiceProvider::class,
             \Bbs\NativeContacts\NativeContactsServiceProvider::class,
             \Bbs\NativeCalendar\NativeCalendarServiceProvider::class,
+            \Bbs\NativeMediaOptimizer\NativeMediaOptimizerServiceProvider::class,
+
 
         ];
     }

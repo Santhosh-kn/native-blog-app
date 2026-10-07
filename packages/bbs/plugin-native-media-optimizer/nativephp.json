@@ -1,0 +1,104 @@
+{
+    "name":  "bbs/plugin-native-media-optimizer",
+    "version":  "1.0.0",
+    "description":  "Native Android image optimization, video processing and thumbnails.",
+    "namespace":  "NativeMediaOptimizer",
+    "keywords":  [
+                     "android",
+                     "media",
+                     "images",
+                     "video",
+                     "nativephp"
+                 ],
+    "category":  "utilities",
+    "license":  "MIT",
+    "pricing":  {
+                    "type":  "free"
+                },
+    "author":  {
+                   "name":  "Santhosh K N"
+               },
+    "repository":  "https://github.com/Santhosh-kn/native-blog-app",
+    "platforms":  [
+                      "android"
+                  ],
+    "bridge_functions":  [
+                             {
+                                 "name":  "NativeMediaOptimizer.IsAvailable",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.IsAvailable",
+                                 "description":  "Report Android media processing capabilities."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.InspectMedia",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.InspectMedia",
+                                 "description":  "Start inspection of a validated picker document ID."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.OptimizeImage",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.OptimizeImage",
+                                 "description":  "Start bounded image resizing and encoding."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.OptimizeVideo",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.OptimizeVideo",
+                                 "description":  "Start video transcoding with optional trimming."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.GenerateThumbnail",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.GenerateThumbnail",
+                                 "description":  "Start bounded video frame extraction."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.GetStatus",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.GetStatus",
+                                 "description":  "Read persisted processing status and progress."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.Cancel",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.Cancel",
+                                 "description":  "Request cancellation of an active processing job."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.GetResult",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.GetResult",
+                                 "description":  "Read a terminal result without deleting its output."
+                             },
+                             {
+                                 "name":  "NativeMediaOptimizer.DeleteOutput",
+                                 "android":  "com.bbs.plugins.native_media_optimizer.NativeMediaOptimizerFunctions.DeleteOutput",
+                                 "description":  "Delete an owned terminal output when it is not in use."
+                             }
+                         ],
+    "android":  {
+                    "min_version":  33,
+                    "permissions":  [
+
+                                    ],
+                    "repositories":  [
+
+                                     ],
+                    "dependencies":  {
+                                         "implementation":  [
+                                                                "androidx.media3:media3-transformer:1.11.1",
+                                                                "androidx.media3:media3-effect:1.11.1",
+                                                                "androidx.media3:media3-common:1.11.1"
+                                                            ]
+                                     },
+                    "activities":  [
+
+                                   ],
+                    "services":  [
+
+                                 ],
+                    "receivers":  [
+
+                                  ],
+                    "providers":  [
+
+                                  ]
+                },
+    "events":  [
+                   "Bbs\\NativeMediaOptimizer\\Events\\NativeMediaOptimizerCompleted"
+               ],
+    "service_provider":  "Bbs\\NativeMediaOptimizer\\NativeMediaOptimizerServiceProvider"
+}

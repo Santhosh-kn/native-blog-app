@@ -313,3 +313,6 @@ Route::middleware(['auth', 'device.unlocked'])
             ->whereUuid('id')
             ->name('status');
     });
+
+// Authenticated media optimizer demo.
+require __DIR__.'/native-media-optimizer.php';
