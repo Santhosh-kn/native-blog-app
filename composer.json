@@ -9,6 +9,10 @@
     ],
     "license": "MIT",
     "repositories": {
+        "native-media-optimizer": {
+            "type": "path",
+            "url": "packages/bbs/plugin-native-media-optimizer"
+        },
         "native-calendar": {
             "type": "path",
             "url": "packages/bbs/plugin-native-calendar"
@@ -55,6 +59,7 @@
         "bbs/plugin-native-calendar": "1.0.0",
         "bbs/plugin-native-contacts": "1.0.0",
         "bbs/plugin-native-document-picker": "^1.0",
+        "bbs/plugin-native-media-optimizer": "1.0.0",
         "bbs/plugin-native-passkeys": "^1.0",
         "bbs/plugin-native-printing": "^1.0",
         "google/auth": "^1.53",

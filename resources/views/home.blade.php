@@ -16,6 +16,7 @@
         <a href="{{ route('native-passkeys.index') }}" class="btn btn-secondary btn-sm">Passkeys</a>
         <a href="{{ route('native-contacts.index') }}" class="btn btn-secondary btn-sm">Contacts</a>
         <a href="{{ route('native-calendar.index') }}" class="btn btn-secondary btn-sm">Calendar</a>
+        <a href="{{ route('native-media-optimizer.index') }}" class="btn btn-secondary btn-sm">Media Optimizer</a>
         <a href="{{ route('native-background-transfer.index') }}" class="btn btn-secondary btn-sm">Background Transfers</a>
         <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
             @csrf

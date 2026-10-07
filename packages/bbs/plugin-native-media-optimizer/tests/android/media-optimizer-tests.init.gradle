@@ -1,0 +1,29 @@
+def sourcePath = gradle.startParameter.projectProperties['mediaOptimizerTestSourceDir']
+if (!sourcePath) {
+    throw new GradleException('The media optimizer test source directory is required.')
+}
+def testDirectory = new File(sourcePath)
+if (!testDirectory.isDirectory()) {
+    throw new GradleException('The media optimizer test source directory does not exist.')
+}
+// Optional direct source inclusion for isolated foundation checks before the
+// plugin is registered. Omit this property after NativePHP compiles the plugin.
+def mainSourcePath = gradle.startParameter.projectProperties['mediaOptimizerMainSourceDir']
+def mainDirectory = mainSourcePath ? new File(mainSourcePath) : null
+if (mainDirectory != null && !mainDirectory.isDirectory()) {
+    throw new GradleException('The media optimizer main source directory does not exist.')
+}
+gradle.beforeProject { project ->
+    if (project.path == ':app') {
+        project.pluginManager.withPlugin('com.android.application') {
+            if (mainDirectory != null) {
+                project.extensions.getByName('android').sourceSets.getByName('main').java.srcDir(mainDirectory)
+                // Isolated checks before NativePHP registers the manifest dependencies.
+                ['media3-transformer', 'media3-effect', 'media3-common'].each { module ->
+                    project.dependencies.add('implementation', "androidx.media3:${module}:1.11.1")
+                }
+            }
+            project.extensions.getByName('android').sourceSets.getByName('androidTest').java.srcDir(testDirectory)
+        }
+    }
+}
