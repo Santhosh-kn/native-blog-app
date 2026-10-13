@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\FirebaseRemoteConfigDemo;
 use App\Support\NativeMediaOptimizerDemoState as State;
 use App\Support\NativeMediaOptimizerFileGuard as FileGuard;
 use Bbs\NativeDocumentPicker\Facades\NativeDocumentPicker;
@@ -26,7 +27,9 @@ final class NativeMediaOptimizerController extends Controller
 
     public function index(Request $request): Response
     {
-        return response()->view('native-media-optimizer', ['demoState' => $this->data($request)])
+        $quality = app(FirebaseRemoteConfigDemo::class)->snapshot()['values']['media_image_quality'];
+        return response()->view('native-media-optimizer', ['demoState' => $this->data($request),
+            'imageQuality' => $quality['value'], 'imageQualitySource' => $quality['source']])
             ->withHeaders($this->headers());
     }
 
@@ -103,11 +106,16 @@ final class NativeMediaOptimizerController extends Controller
         if (($operation === 'OptimizeImage' && ! $image) || (in_array($operation, ['OptimizeVideo', 'GenerateThumbnail'], true) && $image)) {
             return $this->error(ErrorCode::UNSUPPORTED_MEDIA, 422);
         }
+        // Sample a default only for this new request. Polling never revisits its options.
+        if ($operation === 'OptimizeImage' && ! array_key_exists('quality', $options) &&
+            in_array($options['format'] ?? 'jpeg', ['jpeg', 'webp'], true)) {
+            $options['quality'] = app(FirebaseRemoteConfigDemo::class)->imageQuality();
+        }
         $id = (string) Str::uuid();
         $options['id'] = $id;
         $error = Validator::validate($operation, [...$options, 'source_document_id' => $source]);
         if ($error !== null) { return $this->error($error, 422); }
-        if (! $this->state->rememberJob($request->session(), $this->owner($request), $id, $operation, $source)) {
+        if (! $this->state->rememberJob($request->session(), $this->owner($request), $id, $operation, $source, $operation === 'OptimizeImage' ? ($options['quality'] ?? null) : null)) {
             return $this->error(ErrorCode::LIMIT_EXCEEDED, 429);
         }
         $request->session()->save();
@@ -199,7 +207,8 @@ final class NativeMediaOptimizerController extends Controller
         $retryable = ! $result->accepted && in_array($result->errorCode, [ErrorCode::NATIVE_UNAVAILABLE, ErrorCode::PERSIST_FAILED, ErrorCode::INVALID_NATIVE_RESPONSE], true);
         $terminal = $result->isTerminal() && ! $retryable;
         if ($terminal && $result->id !== null) { $this->state->finishJob($request->session(), $this->owner($request), $result->id, $result->outputAvailable); }
-        return $this->json([...$result->toMetadata(), 'terminal' => $terminal, 'retryable' => $retryable], $retryable ? 503 : $status);
+        return $this->json([...$result->toMetadata(), 'terminal' => $terminal, 'retryable' => $retryable,
+            'imageQuality' => $result->id !== null ? ($this->job($request, $result->id)['image_quality'] ?? null) : null], $retryable ? 503 : $status);
     }
 
     private function job(Request $request, string $id): array

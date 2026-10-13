@@ -316,3 +316,6 @@ Route::middleware(['auth', 'device.unlocked'])
 
 // Authenticated media optimizer demo.
 require __DIR__.'/native-media-optimizer.php';
+
+// Explicitly authenticated Remote Config demo. Flags do not change route protection.
+require __DIR__.'/firebase-remote-config.php';

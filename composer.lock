@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a68baf57b125c2c68a9a36c43b3b5956",
+    "content-hash": "629a41046164ed356c26f6f8f8d7bb24",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -207,6 +207,55 @@
                 }
             ],
             "description": "NativePHP Mobile Android plugin for Firebase Cloud Messaging push notifications",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-firebase-remote-config",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-firebase-remote-config",
+                "reference": "5ae1fc7f29bb20c9fa9211d8ed502cef69299a19"
+            },
+            "require": {
+                "nativephp/mobile": "~4.2.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\FirebaseRemoteConfig\\FirebaseRemoteConfigServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\FirebaseRemoteConfig\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Bbs\\FirebaseRemoteConfig\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit --configuration phpunit.xml"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Bounded native Android Firebase Remote Config for NativePHP Mobile.",
             "transport-options": {
                 "relative": true
             }
@@ -415,7 +464,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/bbs/plugin-native-media-optimizer",
-                "reference": "352cb023514443b8d5fd61f86d226734524f1865"
+                "reference": "889de8b150aa748fe7a96abbce058f71f7fb57a0"
             },
             "require": {
                 "bbs/plugin-native-document-picker": "^1.0",

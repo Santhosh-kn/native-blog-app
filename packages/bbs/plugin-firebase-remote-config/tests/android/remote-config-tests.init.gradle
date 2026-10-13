@@ -1,0 +1,34 @@
+def sourcePath = gradle.startParameter.projectProperties['remoteConfigTestSourceDir']
+if (!sourcePath) {
+    throw new GradleException('The Remote Config test source directory is required.')
+}
+def testDirectory = new File(sourcePath)
+if (!testDirectory.isDirectory()) {
+    throw new GradleException('The Remote Config test source directory does not exist.')
+}
+def fixturesDirectory = new File(testDirectory.parentFile.parentFile, 'fixtures')
+if (!fixturesDirectory.isDirectory()) {
+    throw new GradleException('The shared Remote Config contract fixtures are missing.')
+}
+// Direct source inclusion is used before Composer/NativePHP registration.
+// Omit this property once the plugin compiler supplies the native sources.
+def mainPath = gradle.startParameter.projectProperties['remoteConfigMainSourceDir']
+def mainDirectory = mainPath ? new File(mainPath) : null
+if (mainDirectory != null && !mainDirectory.isDirectory()) {
+    throw new GradleException('The Remote Config main source directory does not exist.')
+}
+gradle.beforeProject { project ->
+    if (project.path == ':app') {
+        project.pluginManager.withPlugin('com.android.application') {
+            def android = project.extensions.getByName('android')
+            if (mainDirectory != null) {
+                android.sourceSets.getByName('main').java.srcDir(mainDirectory)
+                // Same Firebase BoM as existing Auth and Messaging integrations.
+                project.dependencies.add('implementation', project.dependencies.platform('com.google.firebase:firebase-bom:33.12.0'))
+                project.dependencies.add('implementation', 'com.google.firebase:firebase-config')
+            }
+            android.sourceSets.getByName('androidTest').java.srcDir(testDirectory)
+            android.sourceSets.getByName('androidTest').assets.srcDir(fixturesDirectory)
+        }
+    }
+}
