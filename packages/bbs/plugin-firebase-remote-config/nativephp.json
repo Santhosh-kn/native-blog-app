@@ -1,0 +1,90 @@
+{
+    "name": "bbs/plugin-firebase-remote-config",
+    "version": "1.0.0",
+    "description": "Native Android Firebase Remote Config with explicit activation.",
+    "namespace": "FirebaseRemoteConfig",
+    "keywords": [
+        "android",
+        "firebase",
+        "remote-config",
+        "nativephp"
+    ],
+    "category": "utilities",
+    "license": "MIT",
+    "pricing": {
+        "type": "free"
+    },
+    "author": {
+        "name": "Santhosh K N"
+    },
+    "repository": "https://github.com/Santhosh-kn/native-blog-app",
+    "platforms": [
+        "android"
+    ],
+    "bridge_functions": [
+        {
+            "name": "FirebaseRemoteConfig.IsAvailable",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.IsAvailable",
+            "description": "Report native Remote Config capability."
+        },
+        {
+            "name": "FirebaseRemoteConfig.Configure",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.Configure",
+            "description": "Start validated fetch-settings configuration."
+        },
+        {
+            "name": "FirebaseRemoteConfig.SetDefaults",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.SetDefaults",
+            "description": "Start explicit typed defaults registration."
+        },
+        {
+            "name": "FirebaseRemoteConfig.GetValues",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.GetValues",
+            "description": "Read selected typed values and their effective sources."
+        },
+        {
+            "name": "FirebaseRemoteConfig.Fetch",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.Fetch",
+            "description": "Fetch without activation."
+        },
+        {
+            "name": "FirebaseRemoteConfig.Activate",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.Activate",
+            "description": "Activate previously fetched values."
+        },
+        {
+            "name": "FirebaseRemoteConfig.FetchAndActivate",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.FetchAndActivate",
+            "description": "Fetch and then explicitly activate before the total deadline."
+        },
+        {
+            "name": "FirebaseRemoteConfig.GetStatus",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.GetStatus",
+            "description": "Poll a retained operation ID."
+        },
+        {
+            "name": "FirebaseRemoteConfig.GetInfo",
+            "android": "com.bbs.plugins.firebase_remote_config.FirebaseRemoteConfigFunctions.GetInfo",
+            "description": "Read readiness, fetch metadata and SDK busy state."
+        }
+    ],
+    "android": {
+        "min_version": 33,
+        "permissions": [
+            "android.permission.INTERNET"
+        ],
+        "repositories": [],
+        "dependencies": {
+            "implementation": [
+                "platform(com.google.firebase:firebase-bom:33.12.0)",
+                "com.google.firebase:firebase-config"
+            ]
+        },
+        "activities": [],
+        "services": [],
+        "receivers": [],
+        "providers": []
+    },
+    "events": [],
+    "service_provider": "Bbs\\FirebaseRemoteConfig\\FirebaseRemoteConfigServiceProvider"
+}

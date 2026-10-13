@@ -53,8 +53,10 @@
             <label>Maximum width<input id="image-width" type="number" min="1" max="4096" value="1920"></label>
             <label>Maximum height<input id="image-height" type="number" min="1" max="4096" value="1920"></label>
             <label>Output format<select id="image-format"><option value="jpeg">JPEG</option><option value="png">PNG</option><option value="webp">WebP</option></select></label>
-            <label>Quality (1–100)<input id="image-quality" type="number" min="1" max="100" value="80"></label>
+            <label>Quality (1–100)<input id="image-quality" type="number" min="1" max="100" value="{{ $imageQuality }}" disabled></label>
         </div>
+        <label style="display: flex; gap: 8px; align-items: center;"><input id="image-use-config" type="checkbox" checked style="width: auto;"> Use the current app default for each new image job</label>
+        <p>Image quality on page load: {{ $imageQuality }} ({{ $imageQualitySource }}). Each new JPEG or WebP job samples its own validated default. Uncheck this option to enter a manual quality. Existing jobs keep their submitted settings.</p>
         <p>Fit inside the requested box without enlarging. Orientation is applied once. PNG preserves transparency; JPEG uses a white background. PNG ignores quality.</p>
         <button id="media-image" type="button" class="btn btn-primary" disabled>Optimize image</button>
     </section>
@@ -190,6 +192,7 @@
         if (data.progress == null) job.progress.removeAttribute('value'); else job.progress.value = data.progress;
         const describe = meta => `${size(meta.size)} • ${meta.width} × ${meta.height}${meta.duration_ms == null ? '' : ` • ${(meta.duration_ms / 1000).toFixed(2)} s`}`;
         job.stats.textContent = [data.input ? `Original: ${describe(data.input)}` : '', data.output ? `Output: ${describe(data.output)}` : ''].filter(Boolean).join(' | ');
+        if (data.imageQuality != null) job.stats.textContent += ` | Submitted image quality: ${data.imageQuality}`;
         job.metadataText.textContent = JSON.stringify(data, null, 2);
         const output = data.status === 'succeeded' && data.outputAvailable === true;
         job.cancelButton.disabled = !data.accepted || job.terminal || data.status === 'cancelling';
@@ -259,7 +262,7 @@
     function imageOptions(prefix) {
         const format = byId(prefix + '-format').value;
         const options = {max_width: Number(byId(prefix + '-width').value), max_height: Number(byId(prefix + '-height').value), format};
-        if (format !== 'png') options.quality = Number(byId(prefix + '-quality').value);
+        if (format !== 'png' && !(prefix === 'image' && byId('image-use-config').checked)) options.quality = Number(byId(prefix + '-quality').value);
         return options;
     }
 
@@ -316,7 +319,12 @@
         start('OptimizeVideo', options);
     });
     byId('media-refresh').addEventListener('click', () => refresh(true));
-    for (const prefix of ['image', 'thumb']) byId(prefix + '-format').addEventListener('change', () => { byId(prefix + '-quality').disabled = byId(prefix + '-format').value === 'png'; });
+    const qualityControls = () => {
+        byId('image-quality').disabled = byId('image-format').value === 'png' || byId('image-use-config').checked;
+        byId('thumb-quality').disabled = byId('thumb-format').value === 'png';
+    };
+    for (const prefix of ['image', 'thumb']) byId(prefix + '-format').addEventListener('change', qualityControls);
+    byId('image-use-config').addEventListener('change', qualityControls);
     document.addEventListener('native-event', event => {
         const detail = event.detail || {};
         if (detail.event !== 'Bbs\\NativeMediaOptimizer\\Events\\NativeMediaOptimizerCompleted') return;

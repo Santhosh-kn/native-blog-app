@@ -59,6 +59,8 @@ class NativeServiceProvider extends ServiceProvider
             \Bbs\NativeContacts\NativeContactsServiceProvider::class,
             \Bbs\NativeCalendar\NativeCalendarServiceProvider::class,
             \Bbs\NativeMediaOptimizer\NativeMediaOptimizerServiceProvider::class,
+            \Bbs\FirebaseRemoteConfig\FirebaseRemoteConfigServiceProvider::class,
+
 
 
         ];

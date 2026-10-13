@@ -37,7 +37,9 @@ final class NativeMediaOptimizerDemoState
                         ? $entry['output_available']
                         : $entry['operation'] !== 'InspectMedia';
                     $data[$key][$id] = ['operation' => $entry['operation'], 'source_document_id' => $entry['source_document_id'],
-                        'terminal' => $entry['terminal'], 'output_available' => $outputAvailable];
+                        'terminal' => $entry['terminal'], 'output_available' => $outputAvailable,
+                        'image_quality' => $entry['operation'] === 'OptimizeImage' && is_int($entry['image_quality'] ?? null) &&
+                            $entry['image_quality'] >= 1 && $entry['image_quality'] <= 100 ? $entry['image_quality'] : null];
                 }
             }
         }
@@ -73,7 +75,7 @@ final class NativeMediaOptimizerDemoState
     }
 
     /** Retain active jobs and every owned output until deletion or reconciliation. */
-    public function rememberJob(Store $session, string $owner, string $id, string $operation, string $source): bool
+    public function rememberJob(Store $session, string $owner, string $id, string $operation, string $source, ?int $imageQuality = null): bool
     {
         $data = $this->read($session, $owner);
         if (count($data['jobs']) >= 50) {
@@ -84,7 +86,7 @@ final class NativeMediaOptimizerDemoState
             if ($remove === null) { return false; }
             unset($data['jobs'][$remove]);
         }
-        $data['jobs'][$id] = ['operation' => $operation, 'source_document_id' => $source, 'terminal' => false, 'output_available' => false];
+        $data['jobs'][$id] = ['operation' => $operation, 'source_document_id' => $source, 'terminal' => false, 'output_available' => false, 'image_quality' => $imageQuality];
         $session->put(self::KEY, $data);
         return true;
     }

@@ -1,0 +1,346 @@
+[
+  {
+    "name": "Configure PERSIST_FAILED",
+    "method": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 60
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Configure",
+      "success": false,
+      "errorCode": "PERSIST_FAILED"
+    }
+  },
+  {
+    "name": "Configure NATIVE_UNAVAILABLE",
+    "method": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 60
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Configure",
+      "success": false,
+      "errorCode": "NATIVE_UNAVAILABLE"
+    }
+  },
+  {
+    "name": "Configure LIMIT_EXCEEDED",
+    "method": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 60
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Configure",
+      "success": false,
+      "errorCode": "LIMIT_EXCEEDED"
+    }
+  },
+  {
+    "name": "Configure INVALID_NATIVE_RESPONSE",
+    "method": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 60
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Configure",
+      "success": false,
+      "errorCode": "INVALID_NATIVE_RESPONSE"
+    }
+  },
+  {
+    "name": "SetDefaults PERSIST_FAILED",
+    "method": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "quality": {
+          "type": "integer",
+          "value": 80
+        }
+      }
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "SetDefaults",
+      "success": false,
+      "errorCode": "PERSIST_FAILED"
+    }
+  },
+  {
+    "name": "SetDefaults NATIVE_UNAVAILABLE",
+    "method": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "quality": {
+          "type": "integer",
+          "value": 80
+        }
+      }
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "SetDefaults",
+      "success": false,
+      "errorCode": "NATIVE_UNAVAILABLE"
+    }
+  },
+  {
+    "name": "SetDefaults LIMIT_EXCEEDED",
+    "method": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "quality": {
+          "type": "integer",
+          "value": 80
+        }
+      }
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "SetDefaults",
+      "success": false,
+      "errorCode": "LIMIT_EXCEEDED"
+    }
+  },
+  {
+    "name": "SetDefaults INVALID_NATIVE_RESPONSE",
+    "method": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "quality": {
+          "type": "integer",
+          "value": 80
+        }
+      }
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "SetDefaults",
+      "success": false,
+      "errorCode": "INVALID_NATIVE_RESPONSE"
+    }
+  },
+  {
+    "name": "Fetch PERSIST_FAILED",
+    "method": "Fetch",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Fetch",
+      "success": false,
+      "errorCode": "PERSIST_FAILED"
+    }
+  },
+  {
+    "name": "Fetch NATIVE_UNAVAILABLE",
+    "method": "Fetch",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Fetch",
+      "success": false,
+      "errorCode": "NATIVE_UNAVAILABLE"
+    }
+  },
+  {
+    "name": "Fetch LIMIT_EXCEEDED",
+    "method": "Fetch",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Fetch",
+      "success": false,
+      "errorCode": "LIMIT_EXCEEDED"
+    }
+  },
+  {
+    "name": "Fetch INVALID_NATIVE_RESPONSE",
+    "method": "Fetch",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Fetch",
+      "success": false,
+      "errorCode": "INVALID_NATIVE_RESPONSE"
+    }
+  },
+  {
+    "name": "Activate PERSIST_FAILED",
+    "method": "Activate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Activate",
+      "success": false,
+      "errorCode": "PERSIST_FAILED"
+    }
+  },
+  {
+    "name": "Activate NATIVE_UNAVAILABLE",
+    "method": "Activate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Activate",
+      "success": false,
+      "errorCode": "NATIVE_UNAVAILABLE"
+    }
+  },
+  {
+    "name": "Activate LIMIT_EXCEEDED",
+    "method": "Activate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Activate",
+      "success": false,
+      "errorCode": "LIMIT_EXCEEDED"
+    }
+  },
+  {
+    "name": "Activate INVALID_NATIVE_RESPONSE",
+    "method": "Activate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "Activate",
+      "success": false,
+      "errorCode": "INVALID_NATIVE_RESPONSE"
+    }
+  },
+  {
+    "name": "FetchAndActivate PERSIST_FAILED",
+    "method": "FetchAndActivate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "FetchAndActivate",
+      "success": false,
+      "errorCode": "PERSIST_FAILED"
+    }
+  },
+  {
+    "name": "FetchAndActivate NATIVE_UNAVAILABLE",
+    "method": "FetchAndActivate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "FetchAndActivate",
+      "success": false,
+      "errorCode": "NATIVE_UNAVAILABLE"
+    }
+  },
+  {
+    "name": "FetchAndActivate LIMIT_EXCEEDED",
+    "method": "FetchAndActivate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "FetchAndActivate",
+      "success": false,
+      "errorCode": "LIMIT_EXCEEDED"
+    }
+  },
+  {
+    "name": "FetchAndActivate INVALID_NATIVE_RESPONSE",
+    "method": "FetchAndActivate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": "FetchAndActivate",
+      "success": false,
+      "errorCode": "INVALID_NATIVE_RESPONSE"
+    }
+  },
+  {
+    "name": "GetStatus PERSIST_FAILED",
+    "method": "GetStatus",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": null,
+      "success": false,
+      "errorCode": "PERSIST_FAILED"
+    }
+  },
+  {
+    "name": "GetStatus NATIVE_UNAVAILABLE",
+    "method": "GetStatus",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": null,
+      "success": false,
+      "errorCode": "NATIVE_UNAVAILABLE"
+    }
+  },
+  {
+    "name": "GetStatus LIMIT_EXCEEDED",
+    "method": "GetStatus",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": null,
+      "success": false,
+      "errorCode": "LIMIT_EXCEEDED"
+    }
+  },
+  {
+    "name": "GetStatus INVALID_NATIVE_RESPONSE",
+    "method": "GetStatus",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "response": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "operation": null,
+      "success": false,
+      "errorCode": "INVALID_NATIVE_RESPONSE"
+    }
+  }
+]

@@ -1,0 +1,1492 @@
+[
+  {
+    "name": "IsAvailable empty",
+    "operation": "IsAvailable",
+    "parameters": {},
+    "expectedCode": null
+  },
+  {
+    "name": "GetInfo empty",
+    "operation": "GetInfo",
+    "parameters": {},
+    "expectedCode": null
+  },
+  {
+    "name": "Fetch valid",
+    "operation": "Fetch",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Fetch invalid id",
+    "operation": "Fetch",
+    "parameters": {
+      "id": "invalid"
+    },
+    "expectedCode": "INVALID_REQUEST_ID"
+  },
+  {
+    "name": "Fetch missing id",
+    "operation": "Fetch",
+    "parameters": {},
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Fetch unknown option",
+    "operation": "Fetch",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "force": true
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Activate valid",
+    "operation": "Activate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Activate invalid id",
+    "operation": "Activate",
+    "parameters": {
+      "id": "invalid"
+    },
+    "expectedCode": "INVALID_REQUEST_ID"
+  },
+  {
+    "name": "Activate missing id",
+    "operation": "Activate",
+    "parameters": {},
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Activate unknown option",
+    "operation": "Activate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "force": true
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "FetchAndActivate valid",
+    "operation": "FetchAndActivate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "FetchAndActivate invalid id",
+    "operation": "FetchAndActivate",
+    "parameters": {
+      "id": "invalid"
+    },
+    "expectedCode": "INVALID_REQUEST_ID"
+  },
+  {
+    "name": "FetchAndActivate missing id",
+    "operation": "FetchAndActivate",
+    "parameters": {},
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "FetchAndActivate unknown option",
+    "operation": "FetchAndActivate",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "force": true
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "GetStatus valid",
+    "operation": "GetStatus",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000"
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "GetStatus invalid id",
+    "operation": "GetStatus",
+    "parameters": {
+      "id": "invalid"
+    },
+    "expectedCode": "INVALID_REQUEST_ID"
+  },
+  {
+    "name": "GetStatus missing id",
+    "operation": "GetStatus",
+    "parameters": {},
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "GetStatus unknown option",
+    "operation": "GetStatus",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "force": true
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "unknown operation",
+    "operation": "Reset",
+    "parameters": {},
+    "expectedCode": "INVALID_METHOD"
+  },
+  {
+    "name": "availability extra option",
+    "operation": "IsAvailable",
+    "parameters": {
+      "extra": true
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Configure production",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Configure development",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 0,
+      "fetch_timeout_seconds": 1
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Configure maximum",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 604800,
+      "fetch_timeout_seconds": 120
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Configure negative interval",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": -1,
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure large interval",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 604801,
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure decimal interval",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 1.0,
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure string interval",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": "43200",
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure boolean interval",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": true,
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure null interval",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": null,
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure zero timeout",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 0
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure large timeout",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 121
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure decimal timeout",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": 60.0
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure string timeout",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": "60"
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure boolean timeout",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": false
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure null timeout",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "minimum_fetch_interval_seconds": 43200,
+      "fetch_timeout_seconds": null
+    },
+    "expectedCode": "INVALID_SETTINGS"
+  },
+  {
+    "name": "Configure missing setting",
+    "operation": "Configure",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "fetch_timeout_seconds": 60
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults string",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "Welcome"
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults empty string",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": ""
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults unicode string",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "ಸ್ವಾಗತ"
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults max ASCII",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults oversized ASCII",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults max UTF8",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults oversized UTF8",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults true",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults false",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "boolean",
+          "value": false
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults numeric boolean",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "boolean",
+          "value": 1
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults string boolean",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "boolean",
+          "value": "true"
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": 80
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults zero integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": 0
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults max integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": 9007199254740991
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults min integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": -9007199254740991
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults too large integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": 9007199254740992
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults too small integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": -9007199254740992
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults floating integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": 80.0
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults string integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": "80"
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults boolean integer",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "integer",
+          "value": true
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": 1.25
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults whole decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": 1
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults floating whole decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": 1.0
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults negative decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": -1.25
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults small decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": 1e-12
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults string decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": "1.25"
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults boolean decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": false
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults unsafe whole decimal",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "decimal",
+          "value": 9007199254740992
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults null value",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": null
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults array value",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": []
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults object value",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": {}
+        }
+      }
+    },
+    "expectedCode": "INVALID_VALUE"
+  },
+  {
+    "name": "Defaults json type",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "json",
+          "value": "{}"
+        }
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Defaults empty",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {}
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults list",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": []
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults null",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": null
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults scalar",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": "hello"
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults untyped",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": "hello"
+      }
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults missing type",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "value": "hello"
+        }
+      }
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults missing value",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string"
+        }
+      }
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults extra field",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "example": {
+          "type": "string",
+          "value": "hello",
+          "source": "remote"
+        }
+      }
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Defaults max collection",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "key_0": {
+          "type": "integer",
+          "value": 0
+        },
+        "key_1": {
+          "type": "integer",
+          "value": 1
+        },
+        "key_2": {
+          "type": "integer",
+          "value": 2
+        },
+        "key_3": {
+          "type": "integer",
+          "value": 3
+        },
+        "key_4": {
+          "type": "integer",
+          "value": 4
+        },
+        "key_5": {
+          "type": "integer",
+          "value": 5
+        },
+        "key_6": {
+          "type": "integer",
+          "value": 6
+        },
+        "key_7": {
+          "type": "integer",
+          "value": 7
+        },
+        "key_8": {
+          "type": "integer",
+          "value": 8
+        },
+        "key_9": {
+          "type": "integer",
+          "value": 9
+        },
+        "key_10": {
+          "type": "integer",
+          "value": 10
+        },
+        "key_11": {
+          "type": "integer",
+          "value": 11
+        },
+        "key_12": {
+          "type": "integer",
+          "value": 12
+        },
+        "key_13": {
+          "type": "integer",
+          "value": 13
+        },
+        "key_14": {
+          "type": "integer",
+          "value": 14
+        },
+        "key_15": {
+          "type": "integer",
+          "value": 15
+        },
+        "key_16": {
+          "type": "integer",
+          "value": 16
+        },
+        "key_17": {
+          "type": "integer",
+          "value": 17
+        },
+        "key_18": {
+          "type": "integer",
+          "value": 18
+        },
+        "key_19": {
+          "type": "integer",
+          "value": 19
+        },
+        "key_20": {
+          "type": "integer",
+          "value": 20
+        },
+        "key_21": {
+          "type": "integer",
+          "value": 21
+        },
+        "key_22": {
+          "type": "integer",
+          "value": 22
+        },
+        "key_23": {
+          "type": "integer",
+          "value": 23
+        },
+        "key_24": {
+          "type": "integer",
+          "value": 24
+        },
+        "key_25": {
+          "type": "integer",
+          "value": 25
+        },
+        "key_26": {
+          "type": "integer",
+          "value": 26
+        },
+        "key_27": {
+          "type": "integer",
+          "value": 27
+        },
+        "key_28": {
+          "type": "integer",
+          "value": 28
+        },
+        "key_29": {
+          "type": "integer",
+          "value": 29
+        },
+        "key_30": {
+          "type": "integer",
+          "value": 30
+        },
+        "key_31": {
+          "type": "integer",
+          "value": 31
+        }
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Defaults large collection",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "key_0": {
+          "type": "integer",
+          "value": 0
+        },
+        "key_1": {
+          "type": "integer",
+          "value": 1
+        },
+        "key_2": {
+          "type": "integer",
+          "value": 2
+        },
+        "key_3": {
+          "type": "integer",
+          "value": 3
+        },
+        "key_4": {
+          "type": "integer",
+          "value": 4
+        },
+        "key_5": {
+          "type": "integer",
+          "value": 5
+        },
+        "key_6": {
+          "type": "integer",
+          "value": 6
+        },
+        "key_7": {
+          "type": "integer",
+          "value": 7
+        },
+        "key_8": {
+          "type": "integer",
+          "value": 8
+        },
+        "key_9": {
+          "type": "integer",
+          "value": 9
+        },
+        "key_10": {
+          "type": "integer",
+          "value": 10
+        },
+        "key_11": {
+          "type": "integer",
+          "value": 11
+        },
+        "key_12": {
+          "type": "integer",
+          "value": 12
+        },
+        "key_13": {
+          "type": "integer",
+          "value": 13
+        },
+        "key_14": {
+          "type": "integer",
+          "value": 14
+        },
+        "key_15": {
+          "type": "integer",
+          "value": 15
+        },
+        "key_16": {
+          "type": "integer",
+          "value": 16
+        },
+        "key_17": {
+          "type": "integer",
+          "value": 17
+        },
+        "key_18": {
+          "type": "integer",
+          "value": 18
+        },
+        "key_19": {
+          "type": "integer",
+          "value": 19
+        },
+        "key_20": {
+          "type": "integer",
+          "value": 20
+        },
+        "key_21": {
+          "type": "integer",
+          "value": 21
+        },
+        "key_22": {
+          "type": "integer",
+          "value": 22
+        },
+        "key_23": {
+          "type": "integer",
+          "value": 23
+        },
+        "key_24": {
+          "type": "integer",
+          "value": 24
+        },
+        "key_25": {
+          "type": "integer",
+          "value": 25
+        },
+        "key_26": {
+          "type": "integer",
+          "value": 26
+        },
+        "key_27": {
+          "type": "integer",
+          "value": 27
+        },
+        "key_28": {
+          "type": "integer",
+          "value": 28
+        },
+        "key_29": {
+          "type": "integer",
+          "value": 29
+        },
+        "key_30": {
+          "type": "integer",
+          "value": 30
+        },
+        "key_31": {
+          "type": "integer",
+          "value": 31
+        },
+        "key_32": {
+          "type": "integer",
+          "value": 32
+        }
+      }
+    },
+    "expectedCode": "LIMIT_EXCEEDED"
+  },
+  {
+    "name": "Defaults large payload",
+    "operation": "SetDefaults",
+    "parameters": {
+      "id": "123e4567-e89b-42d3-a456-426614174000",
+      "defaults": {
+        "key_0": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_1": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_2": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_3": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_4": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_5": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_6": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_7": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "key_8": {
+          "type": "string",
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      }
+    },
+    "expectedCode": "REQUEST_TOO_LARGE"
+  },
+  {
+    "name": "Read key 'valid_key'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "valid_key": "string"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read key '_key'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "_key": "string"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read key 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK": "string"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read key 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key ''",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key '123'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "123": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key '1flag'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "1flag": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key 'welcome.message'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "welcome.message": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key 'welcome-message'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "welcome-message": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key 'key\\n'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "key\n": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read key 'ಸ್ವಾಗತ'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "ಸ್ವಾಗತ": "string"
+      }
+    },
+    "expectedCode": "INVALID_KEY"
+  },
+  {
+    "name": "Read string",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": "string"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read boolean",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": "boolean"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read integer",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": "integer"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read decimal",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": "decimal"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read invalid type 'json'",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": "json"
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Read invalid type None",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": null
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Read invalid type 1",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": 1
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Read invalid type True",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": true
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Read invalid type []",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": []
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Read invalid type {}",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "example": {}
+      }
+    },
+    "expectedCode": "INVALID_TYPE"
+  },
+  {
+    "name": "Read empty",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {}
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Read null",
+    "operation": "GetValues",
+    "parameters": {
+      "values": null
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Read list",
+    "operation": "GetValues",
+    "parameters": {
+      "values": [
+        "string"
+      ]
+    },
+    "expectedCode": "INVALID_OPTIONS"
+  },
+  {
+    "name": "Read max count",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "key_0": "string",
+        "key_1": "string",
+        "key_2": "string",
+        "key_3": "string",
+        "key_4": "string",
+        "key_5": "string",
+        "key_6": "string",
+        "key_7": "string",
+        "key_8": "string",
+        "key_9": "string",
+        "key_10": "string",
+        "key_11": "string",
+        "key_12": "string",
+        "key_13": "string",
+        "key_14": "string",
+        "key_15": "string",
+        "key_16": "string",
+        "key_17": "string",
+        "key_18": "string",
+        "key_19": "string",
+        "key_20": "string",
+        "key_21": "string",
+        "key_22": "string",
+        "key_23": "string",
+        "key_24": "string",
+        "key_25": "string",
+        "key_26": "string",
+        "key_27": "string",
+        "key_28": "string",
+        "key_29": "string",
+        "key_30": "string",
+        "key_31": "string"
+      }
+    },
+    "expectedCode": null
+  },
+  {
+    "name": "Read above count",
+    "operation": "GetValues",
+    "parameters": {
+      "values": {
+        "key_0": "string",
+        "key_1": "string",
+        "key_2": "string",
+        "key_3": "string",
+        "key_4": "string",
+        "key_5": "string",
+        "key_6": "string",
+        "key_7": "string",
+        "key_8": "string",
+        "key_9": "string",
+        "key_10": "string",
+        "key_11": "string",
+        "key_12": "string",
+        "key_13": "string",
+        "key_14": "string",
+        "key_15": "string",
+        "key_16": "string",
+        "key_17": "string",
+        "key_18": "string",
+        "key_19": "string",
+        "key_20": "string",
+        "key_21": "string",
+        "key_22": "string",
+        "key_23": "string",
+        "key_24": "string",
+        "key_25": "string",
+        "key_26": "string",
+        "key_27": "string",
+        "key_28": "string",
+        "key_29": "string",
+        "key_30": "string",
+        "key_31": "string",
+        "key_32": "string"
+      }
+    },
+    "expectedCode": "LIMIT_EXCEEDED"
+  }
+]
