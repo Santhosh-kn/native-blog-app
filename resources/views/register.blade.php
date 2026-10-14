@@ -1,24 +1,27 @@
 @extends('layouts.app')
 
 @section('title', 'Register')
+@section('page-icon', 'users')
+@section('subtitle', 'Create your account and start exploring.')
+@section('hide-intro', 'yes')
 
 @section('content')
-    <div style="max-width: 400px; margin: 40px auto 0;">
-        <div style="text-align: center; margin-bottom: 32px;">
-            <p style="font-size: 40px; margin: 0 0 8px;">✨</p>
-            <p style="font-size: 22px; font-weight: 700; margin: 0;">Create account</p>
+    <div class="auth-panel card">
+        <div class="auth-heading">
+            <span class="feature-symbol">@include('partials.ui-icon', ['name' => 'users'])</span>
+            <h2>Create account</h2>
         </div>
 
         <form method="POST" action="{{ route('register.store') }}">
             @csrf
             <div class="field">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" value="{{ old('name') }}">
+                <input autocomplete="name" type="text" id="name" name="name" value="{{ old('name') }}">
                 @error('name') <p class="error">{{ $message }}</p> @enderror
             </div>
             <div class="field">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}">
+                <input autocomplete="email" type="email" id="email" name="email" value="{{ old('email') }}">
                 @error('email') <p class="error">{{ $message }}</p> @enderror
             </div>
             <div class="field">
@@ -33,7 +36,7 @@
             <button type="submit" class="btn btn-primary btn-block">Register</button>
         </form>
 
-        <p style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-muted);">
+        <p class="auth-footer">
             Already have an account? <a href="{{ route('login') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Login</a>
         </p>
     </div>

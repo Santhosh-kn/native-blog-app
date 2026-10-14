@@ -1,28 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Remote Config')
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">Back</a>
-@endsection
+@section('page-icon', 'settings')
+@section('subtitle', 'Review active settings and manage configuration updates.')
 @section('content')
-<style>
-    .rc-demo { display: grid; gap: 12px; }
-    .rc-demo h2 { margin: 0 0 10px; font-size: 17px; }
-    .rc-demo p { font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
-    .rc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .rc-demo button:disabled { opacity: .5; }
-    .rc-table { overflow-x: auto; }
-    .rc-table table { border-collapse: collapse; width: 100%; font-size: 13px; }
-    .rc-table th, .rc-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
-    .rc-table td { overflow-wrap: anywhere; max-width: 240px; }
-    .rc-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
-    .rc-fields select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
-    .rc-demo dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); font-size: 13px; gap: 8px; }
-    .rc-demo dd { margin: 0; overflow-wrap: anywhere; }
-    #rc-message { min-height: 24px; }
-</style>
 <div class="rc-demo">
     <section class="card">
-        <h2>Effective app settings</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'settings']) Effective app settings</h2>
         <p>These values are read from activated settings. Fetching alone does not change them.</p>
         <div class="rc-table"><table>
             <thead><tr><th>Parameter</th><th>Current value</th><th>Source</th><th>Local default</th></tr></thead>
@@ -41,7 +24,7 @@
         <p>remote: Firebase activated value · default: registered Firebase default · static: SDK fallback · local: validated PHP fallback.</p>
     </section>
     <section class="card">
-        <h2>Fetch and activation</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'settings']) Fetch and activation</h2>
         <div class="rc-actions">
             <button type="button" class="btn btn-primary" data-rc-operation="Fetch" disabled>Fetch</button>
             <button type="button" class="btn btn-secondary" data-rc-operation="Activate" disabled>Activate</button>
@@ -66,7 +49,7 @@
         </div>
     </section>
     <section class="card">
-        <h2>Fetch settings</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'settings']) Fetch settings</h2>
         <p>Startup reads the cache and registers defaults; it never fetches or activates. The normal fetch interval is 12 hours. Development mode permits explicit immediate fetches, but Firebase can still throttle them.</p>
         <div class="rc-fields">
             <label>Fetch interval<select id="rc-interval"><option value="43200">Normal: 12 hours</option><option value="0">Development: 0 seconds</option></select></label>

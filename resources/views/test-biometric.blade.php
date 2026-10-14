@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biometric Test</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; padding: 24px; background: #f5f5f5; text-align: center; }
-        button { padding: 14px 24px; font-size: 16px; background: #04ABA6; color: white; border: none; border-radius: 8px; margin-top: 24px; }
-        p { font-size: 16px; margin-top: 16px; }
-    </style>
-</head>
-<body>
-    <h1>Biometric Test</h1>
-    <p id="status">Ready</p>
-    <button id="test-btn">Test Biometric</button>
-
-    <script type="module">
+@extends('layouts.app')
+@section('title', 'Biometric Test')
+@section('page-icon', 'shield')
+@section('subtitle', 'Check biometric authentication on your device.')
+@section('content')
+    <section class="card center-card">
+        <span class="feature-symbol">@include('partials.ui-icon', ['name' => 'shield'])</span>
+        <h2>Biometric authentication</h2>
+        <p id="status" role="status" aria-live="polite">Ready</p>
+        <button id="test-btn" type="button" class="btn btn-primary btn-block">Test Biometric</button>
+    </section>
+<script type="module">
         import { Biometric, On, Events } from '#nativephp';
 
         On(Events.Biometric.Completed, (payload) => {
@@ -35,5 +29,4 @@
             await Biometric.prompt();
         });
     </script>
-</body>
-</html>
+@endsection

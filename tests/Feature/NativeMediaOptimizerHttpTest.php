@@ -155,7 +155,7 @@ final class NativeMediaOptimizerHttpTest extends TestCase
     {
         $this->unlock();
         $this->get(route('native-media-optimizer.index'))->assertOk()->assertSee("Quality (1\u{2013}100)", false)->assertSee(" \u{2022} ", false);
-        $this->view('home', ['posts' => collect()])->assertSeeText("\u{1F4DD} My Posts");
+        $this->view('home', ['posts' => collect()])->assertSeeText('My Posts');
     }
 
     public function test_home_has_a_media_optimizer_link(): void

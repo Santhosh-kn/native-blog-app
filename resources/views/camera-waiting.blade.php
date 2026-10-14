@@ -1,19 +1,21 @@
 @extends('layouts.app')
 
 @section('title', 'Selecting Image')
+@section('page-icon', 'camera')
+@section('subtitle', 'Finish selecting your photo to return to your post.')
 
 @section('content')
-    <div class="card" style="text-align: center; margin-top: 48px;">
+    <div class="card center-card">
         <div
             id="selection-spinner"
-            style="width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; margin: 8px auto 20px; animation: spin 0.8s linear infinite;"
+            class="spinner" aria-hidden="true"
         ></div>
 
         <p id="selection-title" style="font-weight: 700; margin: 0 0 8px;">
             Waiting for image...
         </p>
 
-        <p id="selection-message" style="color: var(--text-muted); font-size: 14px; line-height: 1.5; margin: 0 0 20px;">
+        <p id="selection-message" role="status" aria-live="polite" style="color: var(--text-muted); font-size: 14px; line-height: 1.5; margin: 0 0 20px;">
             Complete the native image action or return here to continue.
         </p>
 
@@ -31,14 +33,7 @@
             </a>
         </div>
     </div>
-
-    <style>
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
-
-    <script>
+<script>
         (() => {
             const statusUrl = @json(route('camera.status'));
             const createPostUrl = @json(route('posts.create'));

@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
 @section('title', 'Microphone')
+@section('page-icon', 'mic')
+@section('subtitle', 'Record audio using your device microphone.')
 
 @section('content')
-    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+    <div class="actions" style="margin-bottom: 16px;">
         <form method="POST" action="{{ route('microphone.start') }}" style="flex: 1; margin: 0;">
             @csrf
             <button type="submit" class="btn btn-primary btn-block">Start</button>
@@ -14,8 +16,9 @@
         </form>
     </div>
 
-    <div class="card" style="text-align: center;">
-        <p id="status" style="margin: 0 0 8px; font-weight: 700;">Status: checking...</p>
+    <div class="card center-card">
+        <span class="feature-symbol">@include('partials.ui-icon', ['name' => 'mic'])</span>
+        <p id="status" role="status" aria-live="polite" style="margin: 0 0 8px; font-weight: 700;">Status: checking...</p>
         <p id="recording-path" style="margin: 0; font-size: 11px; color: var(--text-muted); word-break: break-all;"></p>
     </div>
 

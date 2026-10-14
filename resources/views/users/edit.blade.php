@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('title', 'Edit User')
+@section('page-icon', 'users')
+@section('subtitle', 'Update account information.')
 
 @section('content')
+    <div class="card form-panel">
     <form method="POST" action="{{ route('users.update', $user->id) }}">
         @csrf
         @method('PUT')
@@ -18,4 +21,5 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
     </form>
+    </div>
 @endsection

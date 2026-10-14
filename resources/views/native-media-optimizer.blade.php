@@ -1,25 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Media Optimizer')
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">Back</a>
-@endsection
+@section('page-icon', 'image')
+@section('subtitle', 'Resize images, optimize video and create thumbnails.')
 @section('content')
-<style>
-    .media-demo { display: grid; gap: 12px; }
-    .media-demo h2 { margin: 0 0 10px; font-size: 17px; }
-    .media-demo p, .media-demo label { font-size: 13px; line-height: 1.5; }
-    .media-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-    .media-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .media-fields label { display: grid; gap: 4px; }
-    .media-fields input:not([type="checkbox"]), .media-fields select { width: 100%; box-sizing: border-box; padding: 9px; }
-    .media-demo pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
-    .media-demo button:disabled { opacity: .5; }
-    .media-job { margin-top: 12px; border-top: 1px solid var(--border, #ddd); padding-top: 12px; }
-    .media-job h3 { font-size: 15px; margin: 0 0 8px; }
-    .media-job progress { width: 100%; }
-    .media-job img, .media-job video { display: block; max-width: 100%; max-height: 380px; margin-top: 12px; }
-    #media-message { overflow-wrap: anywhere; }
-</style>
 <div id="media-demo" class="media-demo"
     data-availability="{{ route('native-media-optimizer.availability') }}"
     data-pick="{{ route('native-media-optimizer.pick') }}"
@@ -32,12 +15,12 @@
     data-delete="{{ route('native-media-optimizer.delete', ['id' => '__ID__']) }}">
     <input id="media-csrf" type="hidden" value="{{ csrf_token() }}">
     <section class="card">
-        <h2>Android readiness</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'image']) Android readiness</h2>
         <p id="media-readiness" role="status">Checking availability automatically...</p>
         <button id="media-check" type="button" class="btn btn-secondary">Check availability</button>
     </section>
     <section class="card">
-        <h2>Select media</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'image']) Select media</h2>
         <p>Android Files opens for selection. Your file is copied into the app's private storage; the original is preserved.</p>
         <div class="media-actions">
             <button id="media-pick-image" type="button" class="btn btn-primary" disabled>Select image</button>
@@ -48,7 +31,7 @@
         <p>Images: static JPEG, PNG or WebP, up to 100 MiB. Videos: MP4, WebM or QuickTime, up to 512 MiB and one hour. Actual codec support is checked during processing.</p>
     </section>
     <section class="card">
-        <h2>Image optimization</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'image']) Image optimization</h2>
         <div class="media-fields">
             <label>Maximum width<input id="image-width" type="number" min="1" max="4096" value="1920"></label>
             <label>Maximum height<input id="image-height" type="number" min="1" max="4096" value="1920"></label>
@@ -61,7 +44,7 @@
         <button id="media-image" type="button" class="btn btn-primary" disabled>Optimize image</button>
     </section>
     <section class="card">
-        <h2>Video optimization</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'image']) Video optimization</h2>
         <div class="media-fields">
             <label>Maximum width (even)<input id="video-width" type="number" min="16" max="1920" step="2" value="1920"></label>
             <label>Maximum height (even)<input id="video-height" type="number" min="16" max="1920" step="2" value="1080"></label>
@@ -75,7 +58,7 @@
         <button id="media-video" type="button" class="btn btn-primary" disabled>Optimize video</button>
     </section>
     <section class="card">
-        <h2>Video thumbnail</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'image']) Video thumbnail</h2>
         <div class="media-fields">
             <label>Maximum width<input id="thumb-width" type="number" min="1" max="2048" value="512"></label>
             <label>Maximum height<input id="thumb-height" type="number" min="1" max="2048" value="512"></label>
@@ -87,7 +70,7 @@
         <button id="media-thumbnail" type="button" class="btn btn-primary" disabled>Generate thumbnail</button>
     </section>
     <section class="card">
-        <h2>Processing and results</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'image']) Processing and results</h2>
         <p>One processing job runs at a time. You can leave this page and return to recover status. If Android stops the app process, unfinished jobs become interrupted.</p>
         <p>Inline previews support verified outputs up to 12 MiB. Larger files can be opened through Android's share sheet. Output size may increase for some inputs.</p>
         <button id="media-refresh" type="button" class="btn btn-secondary">Refresh status</button>

@@ -1,127 +1,11 @@
 @extends('layouts.app')
 
 @section('title', 'Native Passkeys')
-
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">
-        Back
-    </a>
-@endsection
+@section('page-icon', 'shield')
+@section('subtitle', 'Check device support and passkey readiness.')
 
 @section('content')
-    <style>
-        .passkeys-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .passkeys-heading {
-            margin: 0 0 6px;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .passkeys-copy {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .passkeys-warning {
-            padding: 12px;
-            border: 1px solid #e7cd89;
-            border-radius: 10px;
-            background: #fff8df;
-            color: #785b0a;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .passkeys-capabilities {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .passkeys-capability {
-            padding: 10px 6px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .passkeys-capability strong,
-        .passkeys-capability span {
-            display: block;
-            overflow-wrap: anywhere;
-        }
-
-        .passkeys-capability strong {
-            font-size: 14px;
-        }
-
-        .passkeys-capability span {
-            margin-top: 3px;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .passkeys-requirements {
-            margin: 10px 0 0;
-            padding-left: 20px;
-            color: var(--text-muted);
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .passkeys-status {
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--surface);
-        }
-
-        .passkeys-status[data-tone="success"] {
-            border-color: #9dd9bc;
-            background: #e3f7ee;
-            color: #0f7a4b;
-        }
-
-        .passkeys-status[data-tone="error"] {
-            border-color: #efb5bf;
-            background: #fdeced;
-            color: #b3273f;
-        }
-
-        .passkeys-status[data-tone="warning"] {
-            border-color: #e7cd89;
-            background: #fff8df;
-            color: #785b0a;
-        }
-
-        .passkeys-status-title {
-            display: block;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .passkeys-status-message {
-            margin: 5px 0 0;
-            font-size: 13px;
-            line-height: 1.45;
-            overflow-wrap: anywhere;
-            white-space: pre-line;
-        }
-
-        #passkeys-diagnostics-button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-    </style>
-
-    <div class="passkeys-grid">
+<div class="passkeys-grid">
         <section class="passkeys-warning">
             This is a local readiness and bridge diagnostic page.
             Passkey registration and authentication remain disabled
@@ -131,7 +15,7 @@
         </section>
 
         <section class="card">
-            <h2 class="passkeys-heading">Android readiness</h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'shield']) Android readiness</h2>
 
             <p
                 id="passkeys-availability-message"
@@ -159,7 +43,7 @@
         </section>
 
         <section class="card">
-            <h2 class="passkeys-heading">Production prerequisites</h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'shield']) Production prerequisites</h2>
 
             <ul class="passkeys-requirements">
                 <li>Public HTTPS application backend</li>
@@ -172,7 +56,7 @@
         </section>
 
         <section class="card">
-            <h2 class="passkeys-heading">Safe native diagnostics</h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'shield']) Safe native diagnostics</h2>
 
             <p class="passkeys-copy" style="margin-bottom: 12px;">
                 Uses a newly generated, unused request ID to verify

@@ -4,195 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Blog')</title>
-    <style>
-        :root {
-            --primary: #04ABA6;
-            --primary-dark: #038a86;
-            --bg: #f4f5f7;
-            --surface: #ffffff;
-            --text: #1a1d1f;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
-            --danger: #e0455f;
-            --radius: 14px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding-bottom: 76px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .app-bar {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: var(--surface);
-            padding: calc(16px + env(safe-area-inset-top)) 20px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-        }
-        .app-bar h1 {
-            font-size: 20px;
-            margin: 0;
-            font-weight: 700;
-        }
-        .content {
-            padding: 16px;
-        }
-        .card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 16px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            font-size: 16px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-family: inherit;
-            background: var(--surface);
-        }
-        textarea { min-height: 140px; resize: vertical; }
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .field { margin-bottom: 16px; }
-        button, .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 12px 18px;
-            font-size: 15px;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.1s ease, opacity 0.15s ease;
-        }
-        button:active, .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: var(--border); color: var(--text); }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-block { width: 100%; }
-        .btn-sm { padding: 8px 12px; font-size: 13px; }
-        .error { color: var(--danger); font-size: 13px; margin: 4px 0 0; }
-        .status-banner {
-            background: #e3f7ee;
-            color: #0f7a4b;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-        .error-banner {
-            background: #fdeced;
-            color: #b3273f;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-        .fab {
-            position: fixed;
-            bottom: 88px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 4px 12px rgba(4,171,166,0.4);
-            text-decoration: none;
-            z-index: 20;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            display: flex;
-            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-            z-index: 20;
-        }
-        .bottom-nav a {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            padding: 4px 0;
-        }
-        .bottom-nav a.active { color: var(--primary); }
-        .bottom-nav .icon { font-size: 20px; line-height: 1; }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-    </style>
+    <meta name="theme-color" content="#183f3e">
+    <title>@yield('title', 'Native Blog') · Native Blog</title>
+    @include('partials.ui-theme')
+    @stack('styles')
 </head>
-<body>
-    <div class="app-bar">
-        <h1>@yield('title', 'Blog')</h1>
-        @hasSection('app-bar-action')
-            @yield('app-bar-action')
-        @endif
-    </div>
-
-    <div class="content">
-        @if (session('status'))
-            <div class="status-banner">{{ session('status') }}</div>
-        @endif
-
+<body class="@auth @unless(request()->routeIs('unlock')) has-nav @endunless @endauth">
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <header class="app-bar">
+        <div class="app-bar-inner">
+            @if (! request()->routeIs('home', 'login', 'register', 'unlock'))
+                <a class="icon-button" href="{{ request()->routeIs('posts.create', 'posts.edit', 'camera.waiting') ? route('posts.index') : (request()->routeIs('users.edit') ? route('users.index') : route('home')) }}" aria-label="Back to {{ request()->routeIs('posts.create', 'posts.edit', 'camera.waiting') ? 'posts' : (request()->routeIs('users.edit') ? 'users' : 'home') }}">
+                    @include('partials.ui-icon', ['name' => 'back'])
+                </a>
+            @else
+                <span class="brand-mark">@include('partials.ui-icon', ['name' => 'posts'])</span>
+            @endif
+            <div class="app-bar-heading"><p>NATIVE BLOG</p><h1>@yield('title', 'Your workspace')</h1></div>
+            @hasSection('app-bar-action')<div class="app-bar-action">@yield('app-bar-action')</div>@endif
+        </div>
+    </header>
+    <main class="content" id="main-content" tabindex="-1">
+        @if (session('status'))<div class="status-banner" role="status">{{ session('status') }}</div>@endif
+        @unless($__env->hasSection('hide-intro'))
+            <div class="page-intro">
+                <span class="feature-symbol">@include('partials.ui-icon', ['name' => trim($__env->yieldContent('page-icon', 'spark'))])</span>
+                <div><p class="eyebrow">@yield('eyebrow', 'Your workspace')</p><h2>@yield('title', 'Native Blog')</h2>@hasSection('subtitle')<p>@yield('subtitle')</p>@endif</div>
+            </div>
+        @endunless
         @yield('content')
-    </div>
-
+    </main>
     @auth
-        @yield('fab')
-
-        <nav class="bottom-nav">
-            <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">
-                <span class="icon">🏠</span> Home
-            </a>
-            <a href="{{ route('posts.index') }}" class="{{ request()->routeIs('posts.*') ? 'active' : '' }}">
-                <span class="icon">📝</span> Posts
-            </a>
-            <a href="{{ route('push.index') }}" class="{{ request()->routeIs('push.*') ? 'active' : '' }}">
-                <span class="icon">🔔</span> Push
-            </a>
-            <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
-                <span class="icon">👥</span> Users
-            </a>
-        </nav>
-        @if (filled(auth()->user()->push_token))
-            @include('partials.firebase-push-token-sync')
-        @endif
+        @unless(request()->routeIs('unlock'))
+            @yield('fab')
+            <nav class="bottom-nav" aria-label="Main navigation"><div class="bottom-nav-inner">
+                @foreach ([['home', 'home', 'Home', 'home'], ['posts.index', 'posts', 'Posts', 'posts.*'], ['push.index', 'bell', 'Push', 'push.*'], ['users.index', 'users', 'Users', 'users.*']] as [$uiRoute, $uiIcon, $uiLabel, $uiPattern])
+                    <a href="{{ route($uiRoute) }}" class="{{ request()->routeIs($uiPattern) ? 'active' : '' }}" @if(request()->routeIs($uiPattern)) aria-current="page" @endif>
+                        @include('partials.ui-icon', ['name' => $uiIcon])<span>{{ $uiLabel }}</span>
+                    </a>
+                @endforeach
+            </div></nav>
+        @endunless
+        @if (filled(auth()->user()->push_token))@include('partials.firebase-push-token-sync')@endif
     @endauth
     @stack('scripts')
 </body>

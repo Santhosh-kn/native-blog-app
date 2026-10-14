@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('title', 'Edit Post')
+@section('page-icon', 'edit')
+@section('subtitle', 'Refine your post and save your changes.')
 
 @section('content')
+    <div class="card form-panel">
     <form method="POST" action="{{ route('posts.update', $post->id) }}">
         @csrf
         @method('PUT')
@@ -18,4 +21,5 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
     </form>
+    </div>
 @endsection

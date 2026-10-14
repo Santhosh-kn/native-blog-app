@@ -1,9 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'New Post')
+@section('page-icon', 'edit')
+@section('subtitle', 'Turn a thought or a photo into your next post.')
 
 @section('content')
-    <a href="{{ route('camera.capture') }}" class="btn btn-secondary btn-block" style="margin-bottom: 12px;">📷 Take Photo</a>
+    <div class="card form-panel">
+    <a href="{{ route('camera.capture') }}" class="btn btn-secondary btn-block" style="margin-bottom: 12px;">@include('partials.ui-icon', ['name' => 'camera']) Take Photo</a>
 
     <a href="{{ route('camera.pick') }}" class="btn btn-secondary btn-block" style="margin-bottom: 16px;">Choose from Gallery</a>
 
@@ -32,4 +35,5 @@
         @error('photo') <p class="error">{{ $message }}</p> @enderror
         <button type="submit" class="btn btn-primary btn-block">Publish</button>
     </form>
+    </div>
 @endsection
