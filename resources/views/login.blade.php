@@ -1,12 +1,15 @@
 @extends('layouts.app')
 
 @section('title', 'Login')
+@section('page-icon', 'lock')
+@section('subtitle', 'Sign in to your personal workspace.')
+@section('hide-intro', 'yes')
 
 @section('content')
-    <div style="max-width: 400px; margin: 40px auto 0;">
-        <div style="text-align: center; margin-bottom: 32px;">
-            <p style="font-size: 40px; margin: 0 0 8px;">📖</p>
-            <p style="font-size: 22px; font-weight: 700; margin: 0;">Welcome back</p>
+    <div class="auth-panel card">
+        <div class="auth-heading">
+            <span class="feature-symbol">@include('partials.ui-icon', ['name' => 'lock'])</span>
+            <h2>Welcome back</h2>
             <p style="font-size: 14px; color: var(--text-muted); margin: 4px 0 0;">Log in to continue</p>
         </div>
 
@@ -24,15 +27,7 @@
             <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
 
-        <div style="display: flex; align-items: center; gap: 12px; margin: 24px 0;">
-            <span style="height: 1px; background: var(--border); flex: 1;"></span>
-
-            <span style="font-size: 13px; color: var(--text-muted);">
-                or
-            </span>
-
-            <span style="height: 1px; background: var(--border); flex: 1;"></span>
-        </div>
+        <div class="divider">or continue with</div>
 
         <button
             type="button"
@@ -54,7 +49,7 @@
             style="margin-top: 12px;"
             hidden
         ></div>
-        <p style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-muted);">
+        <p class="auth-footer">
             Don't have an account? <a href="{{ route('register') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Register</a>
         </p>
     </div>

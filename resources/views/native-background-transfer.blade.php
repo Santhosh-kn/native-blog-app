@@ -1,174 +1,13 @@
 @extends('layouts.app')
 
 @section('title', 'Background Transfers')
-
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">
-        Back
-    </a>
-@endsection
+@section('page-icon', 'transfer')
+@section('subtitle', 'Upload and download files, with progress you can follow.')
 
 @section('content')
-    <style>
-        .background-transfer-page {
-            display: grid;
-            gap: 14px;
-        }
-
-        .background-transfer-heading {
-            margin: 0 0 7px;
-            font-size: 17px;
-            font-weight: 700;
-        }
-
-        .background-transfer-copy {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .background-transfer-meta {
-            display: grid;
-            gap: 8px;
-            margin-top: 14px;
-        }
-
-        .background-transfer-meta div {
-            display: grid;
-            grid-template-columns: 105px minmax(0, 1fr);
-            gap: 10px;
-            padding-top: 8px;
-            border-top: 1px solid var(--border);
-        }
-
-        .background-transfer-meta dt {
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .background-transfer-meta dd {
-            min-width: 0;
-            margin: 0;
-            overflow-wrap: anywhere;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .background-transfer-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 9px;
-        }
-
-        .background-transfer-actions .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .background-transfer-actions button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .background-transfer-status {
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 11px;
-            background: var(--surface);
-        }
-
-        .background-transfer-status[data-tone="success"] {
-            border-color: #93cca5;
-            background: #effaf2;
-        }
-
-        .background-transfer-status[data-tone="warning"] {
-            border-color: #dfbd68;
-            background: #fff8e6;
-        }
-
-        .background-transfer-status[data-tone="error"] {
-            border-color: #dd8e8e;
-            background: #fff1f1;
-        }
-
-        .background-transfer-status[data-tone="info"] {
-            border-color: color-mix(
-                in srgb,
-                var(--primary) 50%,
-                var(--border)
-            );
-        }
-
-        .background-transfer-status strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .background-transfer-status p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 13px;
-            line-height: 1.45;
-        }
-
-        .background-transfer-progress {
-            height: 9px;
-            margin-top: 12px;
-            overflow: hidden;
-            border-radius: 999px;
-            background: var(--border);
-        }
-
-        .background-transfer-progress-bar {
-            width: 0;
-            height: 100%;
-            border-radius: inherit;
-            background: var(--primary);
-            transition: width 180ms ease;
-        }
-
-        .background-transfer-list {
-            display: grid;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .background-transfer-item {
-            padding: 11px;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            background: var(--surface);
-        }
-
-        .background-transfer-item strong {
-            display: block;
-            font-size: 13px;
-        }
-
-        .background-transfer-item span {
-            display: block;
-            margin-top: 4px;
-            overflow-wrap: anywhere;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .background-transfer-empty {
-            margin-top: 12px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-    </style>
-
-    <div class="background-transfer-page">
+<div class="background-transfer-page">
         <section class="card">
-            <h2 class="background-transfer-heading">
-                Native background download
-            </h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'transfer']) Native background download</h2>
 
             <p class="background-transfer-copy">
                 This first device test downloads one fixed HTTPS PDF through
@@ -197,9 +36,7 @@
         </section>
 
         <section class="card">
-            <h2 class="background-transfer-heading">
-                Native background upload
-            </h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'transfer']) Native background upload</h2>
 
             <p class="background-transfer-copy">
                 Upload the most recent verified Document Picker selection
@@ -338,9 +175,7 @@
         </section>
 
         <section class="card">
-            <h2 class="background-transfer-heading">
-                Current transfer
-            </h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'transfer']) Current transfer</h2>
 
             <dl class="background-transfer-meta">
                 <div>
@@ -381,9 +216,7 @@
         </section>
 
         <section class="card">
-            <h2 class="background-transfer-heading">
-                Session transfers
-            </h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'transfer']) Session transfers</h2>
 
             <p class="background-transfer-copy">
                 Only transfer IDs created by this Laravel session are shown.

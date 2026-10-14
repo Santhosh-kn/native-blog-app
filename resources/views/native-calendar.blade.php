@@ -1,26 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Native Calendar')
-
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">Back</a>
-@endsection
+@section('page-icon', 'calendar')
+@section('subtitle', 'Create sample events and open your calendar.')
 
 @section('content')
-<style>
-    .calendar-grid { display: grid; gap: 12px; }
-    .calendar-grid h2 { margin: 0 0 10px; font-size: 17px; }
-    .calendar-grid p { font-size: 13px; line-height: 1.5; }
-    .calendar-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-    .calendar-grid input:not([type="hidden"]), .calendar-grid select {
-        width: 100%; padding: 10px; box-sizing: border-box;
-    }
-    .calendar-grid pre {
-        white-space: pre-wrap; overflow-wrap: anywhere;
-        font-size: 12px; margin: 10px 0 0;
-    }
-</style>
-
 <div
     id="calendar-page"
     class="calendar-grid"
@@ -34,7 +18,7 @@
     <input id="calendar-csrf" type="hidden" value="{{ csrf_token() }}">
 
     <section class="card">
-        <h2>Calendar readiness</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'calendar']) Calendar readiness</h2>
         <p>Availability is checked automatically when this page opens. You can check again using the button below.</p>
         <button id="calendar-availability" type="button" class="btn btn-primary">
             Check availability
@@ -43,7 +27,7 @@
     </section>
 
     <section class="card">
-        <h2>Sample event editor</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'calendar']) Sample event editor</h2>
         <p>Each button opens Calendar with the title “Native Calendar Demo”, a sample description, and a demo location. Review the event before saving.</p>
         <div class="calendar-actions">
             <button type="button" class="btn btn-primary" data-preset="timed" disabled>
@@ -61,7 +45,7 @@
     </section>
 
     <section class="card">
-        <h2>Calendar viewer</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'calendar']) Calendar viewer</h2>
         <div class="calendar-actions">
             <button id="calendar-open-date" type="button" class="btn btn-secondary" disabled>
                 Open tomorrow
@@ -86,7 +70,7 @@
     </section>
 
     <section class="card">
-        <h2>Request status</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'calendar']) Request status</h2>
         <label for="calendar-request">Request from this session</label>
         <select id="calendar-request">
             <option value="">Choose a request</option>
@@ -106,7 +90,7 @@
     </section>
 
     <section class="card">
-        <h2>Safe diagnostics</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'calendar']) Safe diagnostics</h2>
         <p>Check status for a fresh request ID without opening Calendar.</p>
         <button id="calendar-diagnostics" type="button" class="btn btn-secondary">
             Check unused request

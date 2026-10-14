@@ -1,116 +1,13 @@
 @extends('layouts.app')
 
 @section('title', 'Native Printing')
-
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">
-        Back
-    </a>
-@endsection
+@section('page-icon', 'printer')
+@section('subtitle', 'Preview a sample PDF or open the system print dialog.')
 
 @section('content')
-    <style>
-        .printing-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .printing-heading {
-            margin: 0 0 6px;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .printing-copy {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .printing-file-name {
-            margin-top: 10px;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow-wrap: anywhere;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .printing-capabilities {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .printing-capability {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .printing-capability span {
-            display: block;
-            margin-top: 3px;
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-
-        .printing-actions {
-            display: grid;
-            gap: 10px;
-        }
-
-        .printing-actions button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .printing-status-panel {
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--surface);
-        }
-
-        .printing-status-panel[data-tone="success"] {
-            border-color: #9dd9bc;
-            background: #e3f7ee;
-            color: #0f7a4b;
-        }
-
-        .printing-status-panel[data-tone="error"] {
-            border-color: #efb5bf;
-            background: #fdeced;
-            color: #b3273f;
-        }
-
-        .printing-status-panel[data-tone="warning"] {
-            border-color: #e7cd89;
-            background: #fff8df;
-            color: #785b0a;
-        }
-
-        .printing-status-title {
-            display: block;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .printing-status-message {
-            margin: 5px 0 0;
-            font-size: 13px;
-            line-height: 1.45;
-            overflow-wrap: anywhere;
-        }
-    </style>
-
-    <div class="printing-grid">
+<div class="printing-grid">
         <section class="card">
-            <h2 class="printing-heading">Android capabilities</h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'printer']) Android capabilities</h2>
 
             <p
                 id="printing-availability-message"
@@ -133,7 +30,7 @@
         </section>
 
         <section class="card">
-            <h2 class="printing-heading">Private sample document</h2>
+            <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'printer']) Private sample document</h2>
 
             <p class="printing-copy">
                 A deterministic two-page PDF is generated inside

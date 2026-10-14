@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Push Notifications')
+@section('page-icon', 'bell')
+@section('subtitle', 'Manage notification permission and device registration.')
 
 @section('content')
     <div class="card" style="margin-bottom: 16px; text-align: center;">
@@ -24,7 +26,7 @@
         @csrf
 
         <button type="submit" class="btn btn-primary btn-block">
-            Enable Push Notifications
+            {{ (($permission ?? '') === 'granted' && $registered) ? 'Refresh registration' : 'Enable Push Notifications' }}
         </button>
     </form>
 

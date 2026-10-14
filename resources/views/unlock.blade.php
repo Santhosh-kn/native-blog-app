@@ -1,16 +1,19 @@
 @extends('layouts.app')
 
 @section('title', 'Unlock')
+@section('page-icon', 'shield')
+@section('subtitle', 'Verify your identity to continue.')
+@section('hide-intro', 'yes')
 
 @section('content')
-    <div style="max-width: 360px; margin: 60px auto 0; text-align: center;">
-        <p style="font-size: 48px; margin: 0 0 16px;">🔒</p>
-        <p style="font-size: 20px; font-weight: 700; margin: 0 0 4px;">Welcome back</p>
+    <div class="auth-panel card auth-heading">
+        <span class="feature-symbol">@include('partials.ui-icon', ['name' => 'lock'])</span>
+        <h2>Welcome back</h2>
         <p style="font-size: 14px; color: var(--text-muted); margin: 0 0 32px;">Unlock with biometrics to continue</p>
 
         <button id="unlock-btn" class="btn btn-primary btn-block">Unlock</button>
-        <p id="status-msg" style="font-size: 13px; color: var(--text-muted); margin-top: 12px;"></p>
-        <p id="error-msg" class="error" style="text-align: center; margin-top: 12px;"></p>
+        <p id="status-msg" role="status" aria-live="polite" style="font-size: 13px; color: var(--text-muted); margin-top: 12px;"></p>
+        <p id="error-msg" role="alert" class="error" style="text-align: center; margin-top: 12px;"></p>
 
         <form id="confirm-form" method="POST" action="{{ route('unlock.confirm') }}" style="display: none;">
             @csrf

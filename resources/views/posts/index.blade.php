@@ -1,21 +1,23 @@
 @extends('layouts.app')
 
 @section('title', 'Posts')
+@section('page-icon', 'posts')
+@section('subtitle', 'Your stories, photos and ideas.')
 
 @section('content')
     @forelse ($posts as $post)
-        <div class="card" style="margin-bottom: 12px;">
+        <article class="card" style="margin-bottom: 16px;">
             @if ($post->photo_url)
                 <img
                     data-native-image="{{ route('posts.photo', ['id' => $post->id]) }}"
                     alt="Image for {{ $post->title }}"
-                    style="width: 100%; height: auto; border-radius: 10px; margin-bottom: 12px; display: block;"
+                    class="post-image"
                 >
                 @include('partials.native-image-loader')
             @endif
             <p style="margin: 0 0 4px; font-weight: 700; font-size: 16px;">{{ $post->title }}</p>
             <p style="margin: 0 0 12px; font-size: 14px; color: var(--text-muted); line-height: 1.5;">{{ Str::limit($post->body, 100) }}</p>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <div class="actions">
                 <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-secondary btn-sm">Edit</a>
                 <form method="POST" action="{{ route('posts.export', $post->id) }}" style="margin: 0;">
                     @csrf
@@ -31,10 +33,10 @@
                     <button type="submit" class="btn btn-sm" style="background: #fdeced; color: var(--danger);">Delete</button>
                 </form>
             </div>
-        </div>
+        </article>
     @empty
         <div class="empty-state">
-            <div class="icon">📝</div>
+            <span class="feature-symbol">@include('partials.ui-icon', ['name' => 'edit'])</span>
             <p>No posts yet — tap the button below to write your first one.</p>
         </div>
     @endforelse
@@ -49,5 +51,5 @@
 @endsection
 
 @section('fab')
-    <a href="{{ route('posts.create') }}" class="fab">+</a>
+    <a href="{{ route('posts.create') }}" class="fab" aria-label="Create a post">@include('partials.ui-icon', ['name' => 'plus'])</a>
 @endsection

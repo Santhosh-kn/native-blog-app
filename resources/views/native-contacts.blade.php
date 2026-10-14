@@ -1,26 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Native Contacts')
-
-@section('app-bar-action')
-    <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">Back</a>
-@endsection
+@section('page-icon', 'contacts')
+@section('subtitle', 'Choose a contact or open the contact editor.')
 
 @section('content')
-<style>
-    .contacts-grid { display: grid; gap: 12px; }
-    .contacts-grid h2 { margin: 0 0 10px; font-size: 17px; }
-    .contacts-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-    .contacts-grid pre {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        font-size: 12px;
-        margin: 10px 0 0;
-    }
-    .contacts-grid select { width: 100%; padding: 10px; }
-    .contacts-grid p { font-size: 13px; line-height: 1.5; }
-</style>
-
 <div
     id="contacts-page"
     class="contacts-grid"
@@ -35,7 +19,7 @@
     <input id="contacts-csrf" type="hidden" value="{{ csrf_token() }}">
 
     <section class="card">
-        <h2>Android readiness</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'contacts']) Android readiness</h2>
         <p>Check whether this device can select contacts and launch contact editors or viewers.</p>
         <button id="contacts-availability" type="button" class="btn btn-primary">
             Check availability
@@ -44,7 +28,7 @@
     </section>
 
     <section class="card">
-        <h2>Safe native diagnostics</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'contacts']) Safe native diagnostics</h2>
         <p>Check status and result consumption using a fresh, unused request ID.</p>
         <button id="contacts-diagnostics" type="button" class="btn btn-secondary">
             Run safe diagnostics
@@ -53,7 +37,7 @@
     </section>
 
     <section class="card">
-        <h2>Manual contact checks</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'contacts']) Manual contact checks</h2>
         <p>Use synthetic contacts for these checks. Selected contact details stay private.</p>
         <div class="contacts-actions">
             <button type="button" class="btn btn-primary" data-mode="contact" disabled>
@@ -73,7 +57,7 @@
     </section>
 
     <section class="card">
-        <h2>Request status</h2>
+        <h2 class="card-heading">@include('partials.ui-icon', ['name' => 'contacts']) Request status</h2>
         <label for="contacts-request">Request from this session</label>
         <select id="contacts-request">
             <option value="">Choose a request</option>
