@@ -314,6 +314,31 @@ Route::middleware(['auth', 'device.unlocked'])
             ->name('status');
     });
 
+// NFC reader and writer diagnostics: explicit authentication and device unlock.
+Route::middleware(['auth', 'device.unlocked'])
+    ->prefix('native-nfc')
+    ->name('native-nfc.')
+    ->group(function () {
+        $controller = \App\Http\Controllers\NativeNfcController::class;
+
+        Route::get('/', [$controller, 'index'])->name('index');
+        Route::get('/availability', [$controller, 'availability'])->name('availability');
+        Route::post('/diagnostics', [$controller, 'diagnostics'])->name('diagnostics');
+        Route::post('/scan', [$controller, 'scan'])->name('scan');
+        Route::post('/write', [$controller, 'write'])->name('write');
+
+        Route::get('/status/{id}', [$controller, 'status'])
+            ->whereUuid('id')
+            ->name('status');
+
+        Route::post('/stop/{id}', [$controller, 'stop'])
+            ->whereUuid('id')
+            ->name('stop');
+
+        Route::post('/consume/{id}', [$controller, 'consume'])
+            ->whereUuid('id')
+            ->name('consume');
+    });
 // Authenticated media optimizer demo.
 require __DIR__.'/native-media-optimizer.php';
 

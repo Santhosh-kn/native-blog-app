@@ -1,0 +1,139 @@
+{
+    "name":  "bbs/plugin-native-nfc",
+    "version":  "1.0.0",
+    "description":  "A NativePHP Mobile plugin",
+    "namespace":  "NativeNfc",
+    "keywords":  [
+
+                 ],
+    "category":  "utilities",
+    "license":  "MIT",
+    "pricing":  {
+                    "type":  "free"
+                },
+    "author":  {
+                   "name":  "Your Name",
+                   "email":  "you@example.com",
+                   "url":  ""
+               },
+    "homepage":  "",
+    "repository":  "",
+    "funding":  [
+
+                ],
+    "platforms":  [
+                      "android"
+                  ],
+    "icon":  "resources/icon.png",
+    "screenshots":  [
+
+                    ],
+    "bridge_functions":  [
+                             {
+                                 "name":  "NativeNfc.IsAvailable",
+                                 "android":  "com.bbs.plugins.native_nfc.NativeNfcFunctions.IsAvailable",
+                                 "android_params":  [
+                                                        "context"
+                                                    ]
+                             },
+                             {
+                                 "name":  "NativeNfc.StartScan",
+                                 "android":  "com.bbs.plugins.native_nfc.NativeNfcFunctions.StartScan",
+                                 "android_params":  [
+                                                        "activity"
+                                                    ]
+                             },
+                             {
+                                 "name":  "NativeNfc.StartWrite",
+                                 "android":  "com.bbs.plugins.native_nfc.NativeNfcFunctions.StartWrite",
+                                 "android_params":  [
+                                                        "activity"
+                                                    ]
+                             },
+                             {
+                                 "name":  "NativeNfc.GetStatus",
+                                 "android":  "com.bbs.plugins.native_nfc.NativeNfcFunctions.GetStatus",
+                                 "android_params":  [
+                                                        "context"
+                                                    ]
+                             },
+                             {
+                                 "name":  "NativeNfc.StopSession",
+                                 "android":  "com.bbs.plugins.native_nfc.NativeNfcFunctions.StopSession",
+                                 "android_params":  [
+                                                        "context"
+                                                    ]
+                             },
+                             {
+                                 "name":  "NativeNfc.ConsumeResult",
+                                 "android":  "com.bbs.plugins.native_nfc.NativeNfcFunctions.ConsumeResult",
+                                 "android_params":  [
+                                                        "context"
+                                                    ]
+                             }
+                         ],
+    "android":  {
+                    "min_version":  33,
+                    "permissions":  [
+                                        "android.permission.NFC"
+                                    ],
+                    "features":  [
+                                     {
+                                         "name":  "android.hardware.nfc",
+                                         "required":  false
+                                     }
+                                 ],
+                    "repositories":  [
+
+                                     ],
+                    "dependencies":  {
+                                         "implementation":  [
+
+                                                            ]
+                                     },
+                    "activities":  [
+
+                                   ],
+                    "services":  [
+
+                                 ],
+                    "receivers":  [
+
+                                  ],
+                    "providers":  [
+
+                                  ]
+                },
+    "ios":  {
+                "min_version":  "15.0",
+                "permissions":  [
+
+                                ],
+                "repositories":  [
+
+                                 ],
+                "dependencies":  {
+                                     "swift_packages":  [
+
+                                                        ],
+                                     "pods":  [
+
+                                              ]
+                                 }
+            },
+    "assets":  {
+                   "android":  [
+
+                               ],
+                   "ios":  [
+
+                           ]
+               },
+    "secrets":  [
+
+                ],
+    "events":  [
+                   "Bbs\\NativeNfc\\Events\\NativeNfcCompleted"
+               ],
+    "service_provider":  "Bbs\\NativeNfc\\NativeNfcServiceProvider"
+}

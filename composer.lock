@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "629a41046164ed356c26f6f8f8d7bb24",
+    "content-hash": "3a1bb0495bdb047217343db7ab11ec0e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -504,6 +504,56 @@
                 "MIT"
             ],
             "description": "Native Android image optimization, video processing and thumbnails for NativePHP Mobile.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "bbs/plugin-native-nfc",
+            "version": "dev-feature/native-nfc-reader-writer",
+            "dist": {
+                "type": "path",
+                "url": "packages/bbs/plugin-native-nfc",
+                "reference": "38387cb416f81f6fc895d43a1b2f75d9f50f20c6"
+            },
+            "require": {
+                "nativephp/mobile": "^4.2",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "pestphp/pest": "^3.0"
+            },
+            "type": "nativephp-plugin",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bbs\\NativeNfc\\NativeNfcServiceProvider"
+                    ]
+                },
+                "nativephp": {
+                    "manifest": "nativephp.json"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bbs\\NativeNfc\\": "src/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Your Name",
+                    "email": "you@example.com"
+                }
+            ],
+            "description": "A NativePHP Mobile plugin",
             "transport-options": {
                 "relative": true
             }
@@ -10395,7 +10445,9 @@
     ],
     "aliases": [],
     "minimum-stability": "beta",
-    "stability-flags": {},
+    "stability-flags": {
+        "bbs/plugin-native-nfc": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -1,0 +1,37 @@
+{
+    "name": "bbs/plugin-native-nfc",
+    "description": "Android NFC reader and writer plugin for NativePHP Mobile",
+    "type": "nativephp-plugin",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "nativephp/mobile": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bbs\\NativeNfc\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bbs\\NativeNfc\\NativeNfcServiceProvider"
+            ]
+        },
+        "nativephp": {
+            "manifest": "nativephp.json"
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "ramsey/uuid": "4.7"
+    },
+    "scripts": {
+        "test": "pest"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

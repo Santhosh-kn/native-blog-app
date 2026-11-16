@@ -60,6 +60,8 @@ class NativeServiceProvider extends ServiceProvider
             \Bbs\NativeCalendar\NativeCalendarServiceProvider::class,
             \Bbs\NativeMediaOptimizer\NativeMediaOptimizerServiceProvider::class,
             \Bbs\FirebaseRemoteConfig\FirebaseRemoteConfigServiceProvider::class,
+            \Bbs\NativeNfc\NativeNfcServiceProvider::class,
+
 
 
 

@@ -33,6 +33,7 @@
             <a href="{{ route('native-document-picker.index') }}" class="feature-card"><span class="feature-symbol blue">@include('partials.ui-icon', ['name' => 'file'])</span><strong>Document Picker</strong><span>Select a document securely</span></a>
             <a href="{{ route('native-printing.index') }}" class="feature-card"><span class="feature-symbol amber">@include('partials.ui-icon', ['name' => 'printer'])</span><strong>PDF Printing</strong><span>Preview and print documents</span></a>
             <a href="{{ route('native-background-transfer.index') }}" class="feature-card"><span class="feature-symbol violet">@include('partials.ui-icon', ['name' => 'transfer'])</span><strong>Background Transfers</strong><span>Manage uploads &amp; downloads</span></a>
+            <a href="{{ route('native-nfc.index') }}" class="feature-card"><span class="feature-symbol blue">@include('partials.ui-icon', ['name' => 'nfc'])</span><strong>NFC Reader &amp; Writer</strong><span>Read and write NFC tags</span></a>
         </div>
     </section>
     <section aria-labelledby="device-heading">
